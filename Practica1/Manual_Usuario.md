@@ -1,12 +1,23 @@
-# Manual de Usuario - Sistema de Estacionamiento
+# Manual de Usuario - Sistema de Estacionamiento (UI/UX Avanzada)
 
-Este instructivo le guiará paso a paso sobre el funcionamiento y el uso del Sistema de Estacionamiento de la Práctica 1.
+Este instructivo le guiará paso a paso sobre el funcionamiento y el uso del Sistema de Estacionamiento de la Práctica 1 (Versión Actualizada con UI/UX Avanzada).
 
 ---
 
-## 1. Inicio y Menú Principal
+## 1. Inicio y Configuración de Temas Visuales
 
-Al ejecutar la aplicación, se generará de manera aleatoria el mapa del estacionamiento con su Entrada (`E`) y Salida (`S`). En la pantalla se le desplegará el menú interactivo:
+Al iniciar la aplicación, esta se adaptará automáticamente al tema visual configurado mediante la variable `MODO_VISUAL` en el código fuente. Se admiten cuatro temas:
+
+1. **Oficial:** Muestra las celdas libres como `L` y las celdas ocupadas por vehículos como `A`.
+2. **Minimalista:** Estética elegante. Celdas libres como `.` y ocupadas como `X`.
+3. **Matriarcal:** Celdas libres como `O` y ocupadas como `#`.
+4. **Celdas Nativas:** Bloques de alta densidad en terminales modernos: libre como `░` y ocupado como `█`.
+
+---
+
+## 2. Menú Principal e Interfaz
+
+La aplicación se ejecuta a pantalla limpia en la terminal de comandos:
 
 ```text
 --- MENU PRINCIPAL ---
@@ -20,43 +31,41 @@ Al ejecutar la aplicación, se generará de manera aleatoria el mapa del estacio
 Seleccione una opcion: 
 ```
 
-Para seleccionar una opción, escriba el número correspondiente (1 al 7) y presione la tecla `Enter`.
+Cada vez que selecciona una opción, la terminal se limpia de forma automática para evitar acumulaciones de texto viejo. Al terminar una tarea, el sistema le pedirá presionar `ENTER` antes de regresar al menú principal.
 
 ---
 
-## 2. Descripción de Funciones
+## 3. Descripción de Funciones Paso a Paso
 
 ### Opción 1: Ingresar vehículo
-Utilice esta opción para registrar un vehículo en el parqueo.
-1. Ingrese la placa del vehículo respetando estrictamente el formato `P###LLL` (ejemplo: `P123ABC`).
-2. Indique la coordenada de fila donde se estacionará (número del $1$ al $8$).
-3. Indique la coordenada de columna donde se estacionará (número del $1$ al $8$).
-4. El sistema le informará que la tarifa fija es de `Q10.00` y le solicitará el monto entregado por el usuario. Escriba el monto (ejemplo: `15.00`).
-5. El sistema le confirmará el pago indicando el cambio a devolver y posicionará el vehículo (representado por una `'A'`) en el tablero.
+Registra un nuevo vehículo en el parqueo:
+1. Ingrese la placa en el formato `P###LLL` (ejemplo: `P450TQR`).
+2. Indique la coordenada de la **Fila** (número del $1$ al $8$).
+3. Indique la coordenada de la **Columna** ingresando una letra de la `A` a la `H` (o en minúsculas `a` a `h`). Por ejemplo: escriba `E` y presione Enter.
+4. El sistema mostrará la tarifa fija de `Q10.00` y le solicitará el monto entregado por el usuario.
+5. El sistema procesará el pago, calculará el cambio y posicionará el auto.
 
 ### Opción 2: Retirar vehículo
-Utilice esta opción cuando un cliente se retire del estacionamiento.
-1. Ingrese la placa del vehículo a retirar (formato `P###LLL`).
-2. Si el vehículo existe, el sistema le indicará las coordenadas que ocupaba, cambiará el estado de la celda a libre (`'L'`) y lo removerá de la base de datos.
-3. Si el vehículo no se encuentra, se le mostrará el mensaje `"Vehiculo no encontrado"`.
+Retira un vehículo en base a su placa:
+1. Ingrese la placa (formato `P###LLL`).
+2. Si el vehículo existe, el sistema le informará las coordenadas en donde se ubicaba (ej. `Fila: 3, Columna: D`) y lo removerá del parqueo, actualizando el tablero a su estado libre.
 
 ### Opción 3: Mostrar estacionamiento
-Esta opción muestra gráficamente el estado actual del estacionamiento en una matriz de $10 \times 10$:
-* Los bordes perimetrales están marcados con el símbolo `=`.
-* El acceso de entrada está marcado con la letra `E`.
-* La salida del parqueo está marcada con la letra `S`.
-* Las celdas internas libres están indicadas con `L` y las ocupadas con `A`.
-* Al final de la matriz se imprime el conteo resumido de los espacios disponibles y ocupados.
+Esta opción muestra la cuadrícula del parqueo con las cabeceras de columnas identificadas de la `A` a la `H` y las filas del `1` al `8` de forma organizada y elegante. Al final se resume el conteo de espacios libres y ocupados según el tema de símbolos activo.
 
 ### Opción 4: Buscar vehículo por placa
-Le permite ubicar un vehículo específico sin tener que ver todo el mapa.
-1. Escriba la placa del vehículo (patrón `P###LLL`).
-2. Si está en el parqueo, el sistema le devolverá su fila y columna correspondiente.
+Le permite ubicar un vehículo específico:
+1. Ingrese la placa.
+2. Si está en el parqueo, el sistema le dirá las coordenadas de ubicación (ej. `Fila: 5, Columna: B`).
 
 ### Opción 5: Mostrar ruta más corta entre entrada y salida
-Calcula de manera matemática el camino más rápido entre el punto de Entrada (`E`) y el de Salida (`S`) del estacionamiento siguiendo el perimetral exterior:
-* Le indicará la distancia en número de celdas recorridas tanto en sentido **horario** como **antihorario**.
-* Le dará una recomendación explícita sobre qué sentido tomar.
+Esta opción realiza un cálculo matemático en sentido horario y antihorario para determinar el camino más corto en el perímetro exterior. 
+Al seleccionarla, el sistema trazará el recorrido de forma animada en un mapa temporal:
+* Las esquinas del camino se marcarán con el carácter `+`.
+* Los tramos horizontales del perímetro se marcarán con `-`.
+* Los tramos verticales del perímetro se marcarán con `|`.
+* La Entrada `E` y la Salida `S` permanecerán visibles sobre el camino trazado.
+* Al final de la animación, el sistema le recomendará el sentido óptimo a tomar.
 
 ### Opción 6: Mostrar ingresos
 Muestra un reporte resumido de la recaudación histórica:
@@ -66,18 +75,3 @@ Muestra un reporte resumido de la recaudación histórica:
 
 ### Opción 7: Salir
 Finaliza la ejecución del programa y cierra el sistema de consola.
-
----
-
-## 3. Ejemplo de Flujo de Operación
-
-1. **Mostrar tablero inicial:**
-   Selecciona la opción `3` para ver el diseño generado aleatoriamente.
-2. **Ingresar un vehículo:**
-   Selecciona la opción `1`, ingresa la placa `P302KSM`, fila `2`, columna `5`, ingresa un pago de `Q20.00` y el sistema le devuelve `Q10.00` de cambio.
-3. **Verificación de registro:**
-   Selecciona la opción `3` y podrá ver una letra `'A'` en la fila 2, columna 5 de la matriz.
-4. **Buscar coordenadas:**
-   Selecciona la opción `4` para buscar `P302KSM`, el sistema le responderá con `Fila: 2, Columna: 5`.
-5. **Retiro de vehículo:**
-   Selecciona la opción `2`, ingresa `P302KSM` y el espacio es liberado.
