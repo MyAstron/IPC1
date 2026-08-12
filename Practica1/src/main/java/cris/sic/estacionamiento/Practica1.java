@@ -5,14 +5,8 @@ import java.util.Random;
 
 public class Practica1 {
 
-    /* 
-        Cambia esta variable para seleccionar el tema visual 
-            1: Oficial
-            2: Minimalista
-            3: Matriarcal
-            4: Celdas Nativas
-    */
-    static int MODO_VISUAL = 2;
+    // Cambia esta variable para seleccionar el tema visual (1: Oficial, 2: Minimalista, 3: Matriarcal, 4: Celdas Nativas)
+    static int MODO_VISUAL = 1;
 
     // Las siguientes variables se utilizan para definir dinamicamente los simbolos de celdas libres y ocupadas
     static char SIMBOLO_LIBRE;
@@ -310,6 +304,20 @@ public class Practica1 {
             return;
         }
 
+        int[][] camino = buscarCaminoBFS(filaE, colE, fila, col);
+        if (camino == null) {
+            System.out.println("No hay una ruta transitable libre por el interior para llegar a este espacio.");
+            return;
+        }
+
+        char[][] copia = new char[10][10];
+        for (int i = 0; i < 10; i++) {
+            System.arraycopy(tablero[i], 0, copia[i], 0, 10);
+        }
+        marcarCaminoEnTablero(copia, camino);
+        imprimirTableroAnimado(copia);
+        System.out.printf("%nRuta de ingreso calculada con éxito: %d pasos.%n", camino.length - 1);
+
         double tarifa = 10.00;
         System.out.printf("Tarifa fija: Q%.2f%n", tarifa);
         double monto = 0.0;
@@ -370,6 +378,21 @@ public class Practica1 {
         if (idx != -1) {
             int fila = filasVehiculos[idx];
             int col = columnasVehiculos[idx];
+
+            int[][] camino = buscarCaminoBFS(fila, col, filaS, colS);
+            if (camino == null) {
+                System.out.println("No hay una ruta transitable libre hacia la salida. El vehiculo esta bloqueado.");
+                return;
+            }
+
+            char[][] copia = new char[10][10];
+            for (int i = 0; i < 10; i++) {
+                System.arraycopy(tablero[i], 0, copia[i], 0, 10);
+            }
+            marcarCaminoEnTablero(copia, camino);
+            imprimirTableroAnimado(copia);
+            System.out.printf("%nRuta de salida calculada con éxito: %d pasos.%n", camino.length - 1);
+
             char colLetra = columnaIndiceALetra(col);
             System.out.printf("Vehiculo retirado del espacio Fila: %d, Columna: %c.%n", fila, colLetra);
             tablero[fila][col] = SIMBOLO_LIBRE;
@@ -502,6 +525,135 @@ public class Practica1 {
         }
     }
 
+    // Modulo para busqueda de camino mas corto (BFS) esquivando obstaculos y bordes
+    public static int[][] buscarCaminoBFS(int startX, int startY, int endX, int endY) {
+        int[] qX = new int[100];
+        int[] qY = new int[100];
+        int qHead = 0;
+        int qTail = 0;
+
+        int[][] parentX = new int[10][10];
+        int[][] parentY = new int[10][10];
+        for (int i = 0; i < 10; i++) {
+            for (int j = 0; j < 10; j++) {
+                parentX[i][j] = -1;
+                parentY[i][j] = -1;
+            }
+        }
+
+        qX[qTail] = startX;
+        qY[qTail] = startY;
+        qTail++;
+        parentX[startX][startY] = startX;
+        parentY[startX][startY] = startY;
+
+        int[] dirX = {-1, 1, 0, 0};
+        int[] dirY = {0, 0, -1, 1};
+
+        boolean encontrado = false;
+        while (qHead < qTail) {
+            int currX = qX[qHead];
+            int currY = qY[qHead];
+            qHead++;
+
+            if (currX == endX && currY == endY) {
+                encontrado = true;
+                break;
+            }
+
+            for (int d = 0; d < 4; d++) {
+                int nextX = currX + dirX[d];
+                int nextY = currY + dirY[d];
+
+                if (nextX < 0 || nextX >= 10 || nextY < 0 || nextY >= 10) {
+                    continue;
+                }
+
+                if (parentX[nextX][nextY] != -1) {
+                    continue;
+                }
+
+                boolean esDestino = (nextX == endX && nextY == endY);
+                boolean esInternaLibre = (nextX >= 1 && nextX <= 8 && nextY >= 1 && nextY <= 8 && tablero[nextX][nextY] == SIMBOLO_LIBRE);
+
+                if (esDestino || esInternaLibre) {
+                    qX[qTail] = nextX;
+                    qY[qTail] = nextY;
+                    qTail++;
+                    parentX[nextX][nextY] = currX;
+                    parentY[nextX][nextY] = currY;
+                }
+            }
+        }
+
+        if (!encontrado) {
+            return null;
+        }
+
+        int[] pathX = new int[100];
+        int[] pathY = new int[100];
+        int steps = 0;
+        int tempX = endX;
+        int tempY = endY;
+
+        while (!(tempX == startX && tempY == startY)) {
+            pathX[steps] = tempX;
+            pathY[steps] = tempY;
+            steps++;
+            int px = parentX[tempX][tempY];
+            int py = parentY[tempX][tempY];
+            tempX = px;
+            tempY = py;
+        }
+        pathX[steps] = startX;
+        pathY[steps] = startY;
+        steps++;
+
+        int[][] camino = new int[steps][2];
+        for (int i = 0; i < steps; i++) {
+            camino[i][0] = pathX[steps - 1 - i];
+            camino[i][1] = pathY[steps - 1 - i];
+        }
+
+        return camino;
+    }
+
+    // Modulo para marcar el camino trazado en una copia temporal del tablero
+    public static void marcarCaminoEnTablero(char[][] copia, int[][] camino) {
+        if (camino == null || camino.length < 2) {
+            return;
+        }
+
+        for (int i = 0; i < camino.length; i++) {
+            int r = camino[i][0];
+            int c = camino[i][1];
+
+            if (copia[r][c] == 'E' || copia[r][c] == 'S') {
+                continue;
+            }
+
+            if (i > 0 && i < camino.length - 1) {
+                int prevR = camino[i - 1][0];
+                int prevC = camino[i - 1][1];
+                int nextR = camino[i + 1][0];
+                int nextC = camino[i + 1][1];
+
+                boolean horizontal = (prevR == r && nextR == r);
+                boolean vertical = (prevC == c && nextC == c);
+
+                if (horizontal) {
+                    copia[r][c] = '-';
+                } else if (vertical) {
+                    copia[r][c] = '|';
+                } else {
+                    copia[r][c] = '+';
+                }
+            } else {
+                copia[r][c] = '*';
+            }
+        }
+    }
+
     // Modulo para imprimir el tablero temporal con retardo animado fila por fila
     public static void imprimirTableroAnimado(char[][] mat) {
         limpiarPantalla();
@@ -525,40 +677,24 @@ public class Practica1 {
 
     // Calculo de las distancias horarias y antihorarias sobre el perimetro y recomendacion de ruta mas corta
     public static void calcularRutaCorta(Scanner scanner) {
-        int indiceE = obtenerIndicePerimetral(filaE, colE);
-        int indiceS = obtenerIndicePerimetral(filaS, colS);
-
-        int horario = (indiceS - indiceE + 36) % 36;
-        int antihorario = (indiceE - indiceS + 36) % 36;
+        int[][] camino = buscarCaminoBFS(filaE, colE, filaS, colS);
+        if (camino == null) {
+            System.out.println("\n--- CALCULO DE RUTA MAS CORTA ---");
+            System.out.println("No existe una ruta libre transitable por el interior entre la Entrada y la Salida.");
+            return;
+        }
 
         char[][] copia = new char[10][10];
         for (int i = 0; i < 10; i++) {
             System.arraycopy(tablero[i], 0, copia[i], 0, 10);
         }
-
-        boolean irHorario = horario <= antihorario;
-        int paso = irHorario ? 1 : -1;
-        int actual = (indiceE + paso + 36) % 36;
-
-        while (actual != indiceS) {
-            marcarRutaEnCopia(copia, actual);
-            actual = (actual + paso + 36) % 36;
-        }
-
+        marcarCaminoEnTablero(copia, camino);
         imprimirTableroAnimado(copia);
 
         System.out.println("\n--- CALCULO DE RUTA MAS CORTA ---");
-        System.out.println("Entrada (E) esta en la posicion perimetral: " + indiceE + " (Fila: " + filaE + ", Col: " + colE + ")");
-        System.out.println("Salida (S) esta en la posicion perimetral: " + indiceS + " (Fila: " + filaS + ", Col: " + colS + ")");
-        System.out.println("Distancia en sentido horario: " + horario + " posiciones");
-        System.out.println("Distancia en sentido antihorario: " + antihorario + " posiciones");
-
-        if (horario < antihorario) {
-            System.out.println("Recomendacion: Seguir en sentido HORARIO.");
-        } else if (antihorario < horario) {
-            System.out.println("Recomendacion: Seguir en sentido ANTIHORARIO.");
-        } else {
-            System.out.println("Recomendacion: Ambas rutas tienen la misma distancia (Empate).");
-        }
+        System.out.println("Entrada (E) esta en (Fila: " + filaE + ", Col: " + colE + ")");
+        System.out.println("Salida (S) esta en (Fila: " + filaS + ", Col: " + colS + ")");
+        System.out.printf("Distancia de la ruta mas corta encontrada: %d pasos.%n", camino.length - 1);
+        System.out.println("La ruta se traza esquivando vehiculos y bordes de forma exitosa.");
     }
 }
