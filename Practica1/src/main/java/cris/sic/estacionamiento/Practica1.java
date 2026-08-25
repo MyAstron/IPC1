@@ -6,7 +6,7 @@ import java.util.Random;
 public class Practica1 {
 
     // Cambia esta variable para seleccionar el tema visual (1: Oficial, 2: Minimalista, 3: Matriarcal, 4: Celdas Nativas)
-    static int MODO_VISUAL = 1;
+    static int MODO_VISUAL = 4;
 
     // Las siguientes variables se utilizan para definir dinamicamente los simbolos de celdas libres y ocupadas
     static char SIMBOLO_LIBRE;
@@ -20,6 +20,7 @@ public class Practica1 {
     static int[] columnasVehiculos = new int[64];
     static int contadorActivos = 0;
     static int totalCobrados = 0;
+    static int[] totalCobradosFila = new int[9];
     static double totalRecaudado = 0.0;
     static int filaE = -1;
     static int colE = -1;
@@ -170,8 +171,7 @@ public class Practica1 {
             System.out.println("5. Mostrar ruta mas corta entre entrada y salida");
             System.out.println("6. Mostrar ingresos");
             System.out.println("7. Salir");
-            System.out.print("Seleccione una opcion: ");
-
+            
             if (scanner.hasNextInt()) {
                 opcion = scanner.nextInt();
                 scanner.nextLine();
@@ -352,6 +352,7 @@ public class Practica1 {
             }
         }
 
+        totalCobradosFila[fila] += tarifa;
         contadorActivos++;
         totalCobrados++;
         totalRecaudado += tarifa;
@@ -471,6 +472,9 @@ public class Practica1 {
         System.out.println("Vehiculos cobrados: " + totalCobrados);
         System.out.println("Tarifa por vehiculo: Q10.00");
         System.out.printf("Total recaudado: Q%.2f%n", totalRecaudado);
+        for (int i = 1; i <= 8; i++){
+            System.err.println("Para la fila "+ i +" has recaudado Q."+ totalCobradosFila[i]);
+        }
     }
 
     // Mapeo de coordenadas bidimensionales de borde a un indice lineal perimetral de 0 a 35
