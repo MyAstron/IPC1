@@ -70,8 +70,25 @@ public class AdoptanteServicio {
         return false;
     }
 
+    // Modulo para generar el siguiente codigo correlativo disponible (AD-xxx)
+    public static String generarSiguienteCodigoAdoptante() {
+        for (int i = 1; i <= 999; i++) {
+            String codigo = String.format("AD-%03d", i);
+            if (!existeCodigo(codigo)) {
+                return codigo;
+            }
+        }
+        return null;
+    }
+
     // Modulo para registrar un nuevo adoptante con sus validaciones correspondientes
     public static String registrarAdoptante(String codigo, String nombre, String dpi, String telefono, String usuarioActivo) {
+        if (codigo == null || codigo.trim().isEmpty()) {
+            codigo = generarSiguienteCodigoAdoptante();
+            if (codigo == null) {
+                return "No hay codigos disponibles para registrar nuevos adoptantes.";
+            }
+        }
         if (!validarCodigo(codigo)) {
             BitacoraServicio.registrarError(usuarioActivo, "Adoptantes", "Codigo de adoptante invalido: " + codigo);
             return "Codigo invalido. Debe usar el patron AD-xxx.";

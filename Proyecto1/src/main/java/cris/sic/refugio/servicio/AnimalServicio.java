@@ -33,8 +33,25 @@ public class AnimalServicio {
         return false;
     }
 
+    // Modulo para generar el siguiente codigo correlativo disponible (A-xxx)
+    public static String generarSiguienteCodigoAnimal() {
+        for (int i = 1; i <= 999; i++) {
+            String codigo = String.format("A-%03d", i);
+            if (!existeCodigo(codigo)) {
+                return codigo;
+            }
+        }
+        return null;
+    }
+
     // Modulo para registrar un nuevo animal con sus validaciones
     public static String registrarAnimal(String codigo, String nombre, String especie, int edad, String estadoClinico, String usuarioActivo) {
+        if (codigo == null || codigo.trim().isEmpty()) {
+            codigo = generarSiguienteCodigoAnimal();
+            if (codigo == null) {
+                return "No hay codigos disponibles para registrar nuevos animales.";
+            }
+        }
         if (!validarFormatoCompleto(codigo, nombre, especie, edad, estadoClinico)) {
             BitacoraServicio.registrarError(usuarioActivo, "Animales", "Error de validacion al intentar registrar animal: " + codigo);
             return "Campos invalidos. Verifique formatos y rango de edad (0-25).";
@@ -91,6 +108,11 @@ public class AnimalServicio {
                     return "El animal ya se encuentra eliminado.";
                 }
                 a.setEstadoAdopcion("ELIMINADO");
+                // Liberar la celda correspondiente en la matriz de ubicaciones
+                UbicacionServicio.liberarAnimal(codigo, usuarioActivo);
+                // Eliminar los datos del rescate asociado si pertenece a uno
+                RescateServicio.eliminarRescatePorAnimal(codigo, usuarioActivo);
+
                 BitacoraServicio.registrarAccion(usuarioActivo, "Animales", "Baja logica aplicada al animal: " + codigo);
                 return "SUCCESS";
             }

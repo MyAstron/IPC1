@@ -1,6 +1,6 @@
 package cris.sic.refugio;
 
-import cris.sic.refugio.servicio.AutenticacionServicio;
+import cris.sic.refugio.servicio.PersistenciaServicio;
 import cris.sic.refugio.vista.LoginFrame;
 import javax.swing.SwingUtilities;
 
@@ -8,8 +8,8 @@ import javax.swing.SwingUtilities;
 public class Main {
 
     public static void main(String[] args) {
-        // Inicializar usuarios predeterminados en memoria al iniciar la aplicacion
-        AutenticacionServicio.inicializarUsuariosPorDefecto();
+        // Cargar datos persistidos en memoria o inicializar valores por defecto
+        PersistenciaServicio.cargarTodo();
 
         // Inicializacion de la interfaz grafica en el hilo de despacho de eventos de Swing
         SwingUtilities.invokeLater(new Runnable() {

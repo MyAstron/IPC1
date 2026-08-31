@@ -34,12 +34,38 @@ public class JFrameMain extends JFrame {
         btnCerrarSesion.setBounds(630, 30, 120, 30);
         add(btnCerrarSesion);
 
+        // Instanciar los paneles correspondientes a los modulos
+        final AnimalPanel panelAnimales = new AnimalPanel();
+        final AdoptantePanel panelAdoptantes = new AdoptantePanel();
+        final SolicitudPanel panelSolicitudes = new SolicitudPanel();
+        final RescatePanel panelRescates = new RescatePanel();
+        final UbicacionPanel panelUbicaciones = new UbicacionPanel();
+        final ReportePanel panelReportes = new ReportePanel();
+        final EstudiantePanel panelEstudiante = new EstudiantePanel();
+
         // Panel de pestañas para albergar los modulos core
         JTabbedPane pestanas = new JTabbedPane();
-        pestanas.setBounds(10, 80, 775, 470);
-        pestanas.addTab("Animales", new AnimalPanel());
-        pestanas.addTab("Adoptantes", new AdoptantePanel());
+        pestanas.setBounds(10, 80, 777, 470);
+        pestanas.addTab("Animales", panelAnimales);
+        pestanas.addTab("Adoptantes", panelAdoptantes);
+        pestanas.addTab("Solicitudes", panelSolicitudes);
+        pestanas.addTab("Rescates", panelRescates);
+        pestanas.addTab("Ubicaciones", panelUbicaciones);
+        pestanas.addTab("Reportes", panelReportes);
+        pestanas.addTab("Estudiante", panelEstudiante);
         add(pestanas);
+
+        // Evento para refrescar la informacion de las tablas y cuadriculas al cambiar de pestaña
+        pestanas.addChangeListener(new javax.swing.event.ChangeListener() {
+            @Override
+            public void stateChanged(javax.swing.event.ChangeEvent e) {
+                panelAnimales.buscar();
+                panelAdoptantes.buscar();
+                panelSolicitudes.buscar();
+                panelRescates.buscar();
+                panelUbicaciones.actualizarCuadricula();
+            }
+        });
 
         // Evento para cerrar sesion
         btnCerrarSesion.addActionListener(new ActionListener() {

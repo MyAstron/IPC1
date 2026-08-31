@@ -1,0 +1,416 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<title>Reporte de Bitácora de Acciones</title>
+<style>
+body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; margin: 30px; background-color: #f4f6f9; color: #333; }
+.container { max-width: 950px; margin: auto; background: #fff; padding: 30px; border-radius: 8px; box-shadow: 0 4px 10px rgba(0,0,0,0.1); }
+h1 { color: #2c3e50; border-bottom: 3px solid #3498db; padding-bottom: 10px; margin-top: 0; }
+.meta { font-size: 0.95em; color: #7f8c8d; margin-bottom: 20px; }
+table { width: 100%; border-collapse: collapse; margin-top: 15px; margin-bottom: 20px; }
+th, td { border: 1px solid #ddd; padding: 10px 12px; text-align: left; font-size: 0.95em; }
+th { background-color: #2980b9; color: white; }
+tr:nth-child(even) { background-color: #f8f9fa; }
+.badge-green { background-color: #d4edda; color: #155724; padding: 4px 8px; border-radius: 4px; font-weight: bold; }
+.badge-red { background-color: #f8d7da; color: #721c24; padding: 4px 8px; border-radius: 4px; font-weight: bold; }
+.badge-yellow { background-color: #fff3cd; color: #856404; padding: 4px 8px; border-radius: 4px; font-weight: bold; }
+.badge-blue { background-color: #d1ecf1; color: #0c5460; padding: 4px 8px; border-radius: 4px; font-weight: bold; }
+.grid-table { width: auto; margin: 20px auto; border-collapse: collapse; }
+.grid-cell { width: 90px; height: 70px; text-align: center; vertical-align: middle; border: 2px solid #bdc3c7; font-weight: bold; }
+.grid-libre { background-color: #d4edda; color: #155724; }
+.grid-ocupado { background-color: #f8d7da; color: #721c24; }
+.summary { margin-top: 20px; padding: 15px; background: #eaeded; border-radius: 6px; font-size: 0.95em; }
+</style>
+</head>
+<body>
+<div class="container">
+<h1>Reporte de Bitácora de Acciones</h1>
+<div class="meta">Refugio de Animales | Generado el: <b>2026-08-31 15:35:34</b> por el usuario: <b>admin1</b></div>
+
+<table>
+<thead><tr><th>Fecha y Hora</th><th>Usuario</th><th>Módulo</th><th>Tipo Evento</th><th>Descripción</th><th>Motivo Rechazo</th></tr></thead>
+<tbody>
+<tr>
+<td>2026-08-31 09:33:34</td>
+<td>admin1</td>
+<td>Autenticacion</td>
+<td><span class="badge-blue">ACCION</span></td>
+<td>Inicio de sesion exitoso. Rol: ADMIN</td>
+<td>-</td>
+</tr>
+<tr>
+<td>2026-08-31 09:33:48</td>
+<td>auxiliar1</td>
+<td>Autenticacion</td>
+<td><span class="badge-blue">ACCION</span></td>
+<td>Inicio de sesion exitoso. Rol: AUXILIAR</td>
+<td>-</td>
+</tr>
+<tr>
+<td>2026-08-31 09:51:23</td>
+<td>admin1</td>
+<td>Autenticacion</td>
+<td><span class="badge-blue">ACCION</span></td>
+<td>Inicio de sesion exitoso. Rol: ADMIN</td>
+<td>-</td>
+</tr>
+<tr>
+<td>2026-08-31 10:16:23</td>
+<td>admin1</td>
+<td>Autenticacion</td>
+<td><span class="badge-blue">ACCION</span></td>
+<td>Inicio de sesion exitoso. Rol: ADMIN</td>
+<td>-</td>
+</tr>
+<tr>
+<td>2026-08-31 10:18:10</td>
+<td>admin1</td>
+<td>Adoptantes</td>
+<td><span class="badge-blue">ACCION</span></td>
+<td>Adoptante registrado exitosamente: AD-111</td>
+<td>-</td>
+</tr>
+<tr>
+<td>2026-08-31 10:18:45</td>
+<td>admin1</td>
+<td>Animales</td>
+<td><span class="badge-blue">ACCION</span></td>
+<td>Registro exitoso de animal: A-111 (111)</td>
+<td>-</td>
+</tr>
+<tr>
+<td>2026-08-31 10:19:05</td>
+<td>admin1</td>
+<td>Animales</td>
+<td><span class="badge-blue">ACCION</span></td>
+<td>Registro exitoso de animal: A-222 (222)</td>
+<td>-</td>
+</tr>
+<tr>
+<td>2026-08-31 10:19:33</td>
+<td>admin1</td>
+<td>Animales</td>
+<td><span class="badge-blue">ACCION</span></td>
+<td>Registro exitoso de animal: A-333 (33)</td>
+<td>-</td>
+</tr>
+<tr>
+<td>2026-08-31 10:19:50</td>
+<td>admin1</td>
+<td>Animales</td>
+<td><span class="badge-blue">ACCION</span></td>
+<td>Actualizacion exitosa de animal: A-333</td>
+<td>-</td>
+</tr>
+<tr>
+<td>2026-08-31 10:20:00</td>
+<td>admin1</td>
+<td>Animales</td>
+<td><span class="badge-blue">ACCION</span></td>
+<td>Actualizacion exitosa de animal: A-222</td>
+<td>-</td>
+</tr>
+<tr>
+<td>2026-08-31 10:20:08</td>
+<td>admin1</td>
+<td>Animales</td>
+<td><span class="badge-blue">ACCION</span></td>
+<td>Actualizacion exitosa de animal: A-222</td>
+<td>-</td>
+</tr>
+<tr>
+<td>2026-08-31 10:20:25</td>
+<td>admin1</td>
+<td>Animales</td>
+<td><span class="badge-blue">ACCION</span></td>
+<td>Actualizacion exitosa de animal: A-222</td>
+<td>-</td>
+</tr>
+<tr>
+<td>2026-08-31 10:20:50</td>
+<td>admin1</td>
+<td>Adoptantes</td>
+<td><span class="badge-blue">ACCION</span></td>
+<td>Adoptante editado exitosamente: AD-111</td>
+<td>-</td>
+</tr>
+<tr>
+<td>2026-08-31 10:28:11</td>
+<td>admin1</td>
+<td>Autenticacion</td>
+<td><span class="badge-blue">ACCION</span></td>
+<td>Inicio de sesion exitoso. Rol: ADMIN</td>
+<td>-</td>
+</tr>
+<tr>
+<td>2026-08-31 10:29:39</td>
+<td>admin1</td>
+<td>Autenticacion</td>
+<td><span class="badge-blue">ACCION</span></td>
+<td>Inicio de sesion exitoso. Rol: ADMIN</td>
+<td>-</td>
+</tr>
+<tr>
+<td>2026-08-31 10:31:35</td>
+<td>auxiliar1</td>
+<td>Autenticacion</td>
+<td><span class="badge-blue">ACCION</span></td>
+<td>Inicio de sesion exitoso. Rol: AUXILIAR</td>
+<td>-</td>
+</tr>
+<tr>
+<td>2026-08-31 10:32:13</td>
+<td>auxiliar1</td>
+<td>Autenticacion</td>
+<td><span class="badge-blue">ACCION</span></td>
+<td>Inicio de sesion exitoso. Rol: AUXILIAR</td>
+<td>-</td>
+</tr>
+<tr>
+<td>2026-08-31 10:32:50</td>
+<td>auxiliar1</td>
+<td>Autenticacion</td>
+<td><span class="badge-blue">ACCION</span></td>
+<td>Inicio de sesion exitoso. Rol: AUXILIAR</td>
+<td>-</td>
+</tr>
+<tr>
+<td>2026-08-31 10:33:34</td>
+<td>auxiliar1</td>
+<td>Autenticacion</td>
+<td><span class="badge-blue">ACCION</span></td>
+<td>Inicio de sesion exitoso. Rol: AUXILIAR</td>
+<td>-</td>
+</tr>
+<tr>
+<td>2026-08-31 10:34:44</td>
+<td>auxiliar1</td>
+<td>Autenticacion</td>
+<td><span class="badge-blue">ACCION</span></td>
+<td>Inicio de sesion exitoso. Rol: AUXILIAR</td>
+<td>-</td>
+</tr>
+<tr>
+<td>2026-08-31 10:35:52</td>
+<td>auxiliar1</td>
+<td>Autenticacion</td>
+<td><span class="badge-blue">ACCION</span></td>
+<td>Inicio de sesion exitoso. Rol: AUXILIAR</td>
+<td>-</td>
+</tr>
+<tr>
+<td>2026-08-31 12:46:55</td>
+<td>admin1</td>
+<td>Autenticacion</td>
+<td><span class="badge-blue">ACCION</span></td>
+<td>Inicio de sesion exitoso. Rol: ADMIN</td>
+<td>-</td>
+</tr>
+<tr>
+<td>2026-08-31 12:52:21</td>
+<td>admin1</td>
+<td>Ubicaciones</td>
+<td><span class="badge-blue">ACCION</span></td>
+<td>Asignación exitosa del animal A-111 a la celda [4][4]</td>
+<td>-</td>
+</tr>
+<tr>
+<td>2026-08-31 12:52:41</td>
+<td>admin1</td>
+<td>Ubicaciones</td>
+<td><span class="badge-blue">ACCION</span></td>
+<td>Celda [4][4] liberada automaticamente al cambiar de estado el animal: A-111</td>
+<td>-</td>
+</tr>
+<tr>
+<td>2026-08-31 12:52:41</td>
+<td>admin1</td>
+<td>Ubicaciones</td>
+<td><span class="badge-blue">ACCION</span></td>
+<td>Asignación exitosa del animal A-111 a la celda [1][1]</td>
+<td>-</td>
+</tr>
+<tr>
+<td>2026-08-31 12:53:04</td>
+<td>admin1</td>
+<td>Ubicaciones</td>
+<td><span class="badge-blue">ACCION</span></td>
+<td>Asignación exitosa del animal A-222 a la celda [3][2]</td>
+<td>-</td>
+</tr>
+<tr>
+<td>2026-08-31 12:54:19</td>
+<td>admin1</td>
+<td>Animales</td>
+<td><span class="badge-blue">ACCION</span></td>
+<td>Registro exitoso de animal: A-444 (444)</td>
+<td>-</td>
+</tr>
+<tr>
+<td>2026-08-31 12:55:07</td>
+<td>admin1</td>
+<td>Adoptantes</td>
+<td><span class="badge-blue">ACCION</span></td>
+<td>Adoptante registrado exitosamente: AD-111</td>
+<td>-</td>
+</tr>
+<tr>
+<td>2026-08-31 12:55:12</td>
+<td>admin1</td>
+<td>Solicitudes</td>
+<td><span class="badge-blue">ACCION</span></td>
+<td>Solicitud registrada con exito: S-111</td>
+<td>-</td>
+</tr>
+<tr>
+<td>2026-08-31 12:55:31</td>
+<td>admin1</td>
+<td>Rescates</td>
+<td><span class="badge-blue">ACCION</span></td>
+<td>Rescate R-111 registrado con exito.</td>
+<td>-</td>
+</tr>
+<tr>
+<td>2026-08-31 12:56:05</td>
+<td>admin1</td>
+<td>Animales</td>
+<td><span class="badge-blue">ACCION</span></td>
+<td>Registro exitoso de animal: A-111 (11)</td>
+<td>-</td>
+</tr>
+<tr>
+<td>2026-08-31 12:56:08</td>
+<td>admin1</td>
+<td>Rescates</td>
+<td><span class="badge-blue">ACCION</span></td>
+<td>Rescate R-111 atendido vinculando al animal existente A-111</td>
+<td>-</td>
+</tr>
+<tr>
+<td>2026-08-31 12:56:36</td>
+<td>admin1</td>
+<td>Rescates</td>
+<td><span class="badge-blue">ACCION</span></td>
+<td>Rescate R-222 registrado con exito.</td>
+<td>-</td>
+</tr>
+<tr>
+<td>2026-08-31 12:56:44</td>
+<td>admin1</td>
+<td>Rescates</td>
+<td><span class="badge-blue">ACCION</span></td>
+<td>Rescate R-222 atendido autogenerando al animal A-001</td>
+<td>-</td>
+</tr>
+<tr>
+<td>2026-08-31 15:21:47</td>
+<td>admin1</td>
+<td>Autenticacion</td>
+<td><span class="badge-blue">ACCION</span></td>
+<td>Inicio de sesion exitoso. Rol: ADMIN</td>
+<td>-</td>
+</tr>
+<tr>
+<td>2026-08-31 15:27:04</td>
+<td>admin1</td>
+<td>Autenticacion</td>
+<td><span class="badge-blue">ACCION</span></td>
+<td>Inicio de sesion exitoso. Rol: ADMIN</td>
+<td>-</td>
+</tr>
+<tr>
+<td>2026-08-31 15:28:21</td>
+<td>admin1</td>
+<td>Animales</td>
+<td><span class="badge-blue">ACCION</span></td>
+<td>Registro exitoso de animal: A-111 (111)</td>
+<td>-</td>
+</tr>
+<tr>
+<td>2026-08-31 15:28:46</td>
+<td>admin1</td>
+<td>Adoptantes</td>
+<td><span class="badge-blue">ACCION</span></td>
+<td>Adoptante registrado exitosamente: AD-111</td>
+<td>-</td>
+</tr>
+<tr>
+<td>2026-08-31 15:29:03</td>
+<td>admin1</td>
+<td>Solicitudes</td>
+<td><span class="badge-blue">ACCION</span></td>
+<td>Solicitud registrada con exito: S-111</td>
+<td>-</td>
+</tr>
+<tr>
+<td>2026-08-31 15:29:11</td>
+<td>admin1</td>
+<td>Solicitudes</td>
+<td><span class="badge-blue">ACCION</span></td>
+<td>Solicitud S-111 aprobada con exito. Animal A-111 adoptado.</td>
+<td>-</td>
+</tr>
+<tr>
+<td>2026-08-31 15:29:37</td>
+<td>admin1</td>
+<td>Rescates</td>
+<td><span class="badge-blue">ACCION</span></td>
+<td>Rescate R-111 registrado con exito.</td>
+<td>-</td>
+</tr>
+<tr>
+<td>2026-08-31 15:31:28</td>
+<td>admin1</td>
+<td>Rescates</td>
+<td><span class="badge-blue">ACCION</span></td>
+<td>Rescate R-111 atendido autogenerando al animal A-001</td>
+<td>-</td>
+</tr>
+<tr>
+<td>2026-08-31 15:33:32</td>
+<td>admin1</td>
+<td>Animales</td>
+<td><span class="badge-blue">ACCION</span></td>
+<td>Actualizacion exitosa de animal: A-111</td>
+<td>-</td>
+</tr>
+<tr>
+<td>2026-08-31 15:33:38</td>
+<td>admin1</td>
+<td>Ubicaciones</td>
+<td><span class="badge-blue">ACCION</span></td>
+<td>Asignación exitosa del animal A-111 a la celda [0][0]</td>
+<td>-</td>
+</tr>
+<tr>
+<td>2026-08-31 15:34:44</td>
+<td>admin1</td>
+<td>Reportes</td>
+<td><span class="badge-blue">ACCION</span></td>
+<td>Generación de reporte HTML: reporte_animales.html</td>
+<td>-</td>
+</tr>
+<tr>
+<td>2026-08-31 15:35:00</td>
+<td>admin1</td>
+<td>Reportes</td>
+<td><span class="badge-blue">ACCION</span></td>
+<td>Generación de reporte HTML: reporte_adopciones.html</td>
+<td>-</td>
+</tr>
+<tr>
+<td>2026-08-31 15:35:11</td>
+<td>admin1</td>
+<td>Reportes</td>
+<td><span class="badge-blue">ACCION</span></td>
+<td>Generación de reporte HTML: reporte_ocupacion.html</td>
+<td>-</td>
+</tr>
+</tbody></table>
+<div class="summary">
+<b>Total de eventos registrados en bitácora de acciones:</b> 47
+</div>
+</div>
+</body>
+</html>
