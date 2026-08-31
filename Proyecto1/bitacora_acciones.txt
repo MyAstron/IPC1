@@ -1,0 +1,2 @@
+2026-08-31 09:33:34|admin1|Autenticacion|ACCION|Inicio de sesion exitoso. Rol: ADMIN|
+2026-08-31 09:33:48|auxiliar1|Autenticacion|ACCION|Inicio de sesion exitoso. Rol: AUXILIAR|
