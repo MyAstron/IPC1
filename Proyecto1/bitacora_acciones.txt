@@ -1,2 +1,21 @@
 2026-08-31 09:33:34|admin1|Autenticacion|ACCION|Inicio de sesion exitoso. Rol: ADMIN|
 2026-08-31 09:33:48|auxiliar1|Autenticacion|ACCION|Inicio de sesion exitoso. Rol: AUXILIAR|
+2026-08-31 09:51:23|admin1|Autenticacion|ACCION|Inicio de sesion exitoso. Rol: ADMIN|
+2026-08-31 10:16:23|admin1|Autenticacion|ACCION|Inicio de sesion exitoso. Rol: ADMIN|
+2026-08-31 10:18:10|admin1|Adoptantes|ACCION|Adoptante registrado exitosamente: AD-111|
+2026-08-31 10:18:45|admin1|Animales|ACCION|Registro exitoso de animal: A-111 (111)|
+2026-08-31 10:19:05|admin1|Animales|ACCION|Registro exitoso de animal: A-222 (222)|
+2026-08-31 10:19:33|admin1|Animales|ACCION|Registro exitoso de animal: A-333 (33)|
+2026-08-31 10:19:50|admin1|Animales|ACCION|Actualizacion exitosa de animal: A-333|
+2026-08-31 10:20:00|admin1|Animales|ACCION|Actualizacion exitosa de animal: A-222|
+2026-08-31 10:20:08|admin1|Animales|ACCION|Actualizacion exitosa de animal: A-222|
+2026-08-31 10:20:25|admin1|Animales|ACCION|Actualizacion exitosa de animal: A-222|
+2026-08-31 10:20:50|admin1|Adoptantes|ACCION|Adoptante editado exitosamente: AD-111|
+2026-08-31 10:28:11|admin1|Autenticacion|ACCION|Inicio de sesion exitoso. Rol: ADMIN|
+2026-08-31 10:29:39|admin1|Autenticacion|ACCION|Inicio de sesion exitoso. Rol: ADMIN|
+2026-08-31 10:31:35|auxiliar1|Autenticacion|ACCION|Inicio de sesion exitoso. Rol: AUXILIAR|
+2026-08-31 10:32:13|auxiliar1|Autenticacion|ACCION|Inicio de sesion exitoso. Rol: AUXILIAR|
+2026-08-31 10:32:50|auxiliar1|Autenticacion|ACCION|Inicio de sesion exitoso. Rol: AUXILIAR|
+2026-08-31 10:33:34|auxiliar1|Autenticacion|ACCION|Inicio de sesion exitoso. Rol: AUXILIAR|
+2026-08-31 10:34:44|auxiliar1|Autenticacion|ACCION|Inicio de sesion exitoso. Rol: AUXILIAR|
+2026-08-31 10:35:52|auxiliar1|Autenticacion|ACCION|Inicio de sesion exitoso. Rol: AUXILIAR|

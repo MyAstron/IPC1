@@ -1,3 +1,11 @@
 2026-08-31 09:31:06|admin1|Autenticacion|ERROR|Intento de inicio de sesion fallido (Intentos fallidos: 1)|
 2026-08-31 09:31:32|admin1|Autenticacion|ERROR|Intento de inicio de sesion fallido (Intentos fallidos: 2)|
 2026-08-31 09:31:49|auxiliar1|Autenticacion|ERROR|Intento de inicio de sesion fallido (Intentos fallidos: 3)|
+2026-08-31 10:17:32|admin1|Adoptantes|ERROR|Codigo de adoptante invalido: ADD-111|
+2026-08-31 10:17:43|admin1|Adoptantes|ERROR|Codigo de adoptante invalido: ADD-AAA|
+2026-08-31 10:17:56|admin1|Adoptantes|ERROR|Codigo de adoptante invalido: AD-AAA|
+2026-08-31 10:18:05|admin1|Adoptantes|ERROR|Telefono invalido: 111111|
+2026-08-31 10:19:26|admin1|Animales|ERROR|Error de validacion al intentar registrar animal: A-333|
+2026-08-31 10:20:46|admin1|Adoptantes|ERROR|Codigo de adoptante duplicado: AD-111|
+2026-08-31 10:35:14|Invitado|Autenticacion|ERROR|Intento de inicio de sesion fallido (Intentos fallidos: 1)|
+2026-08-31 10:35:45|Invitado|Autenticacion|ERROR|Intento de inicio de sesion fallido (Intentos fallidos: 2)|

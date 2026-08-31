@@ -6,6 +6,7 @@ import cris.sic.refugio.servicio.AutenticacionServicio;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JButton;
+import javax.swing.JTabbedPane;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
@@ -32,6 +33,13 @@ public class JFrameMain extends JFrame {
         JButton btnCerrarSesion = new JButton("Cerrar Sesión");
         btnCerrarSesion.setBounds(630, 30, 120, 30);
         add(btnCerrarSesion);
+
+        // Panel de pestañas para albergar los modulos core
+        JTabbedPane pestanas = new JTabbedPane();
+        pestanas.setBounds(10, 80, 775, 470);
+        pestanas.addTab("Animales", new AnimalPanel());
+        pestanas.addTab("Adoptantes", new AdoptantePanel());
+        add(pestanas);
 
         // Evento para cerrar sesion
         btnCerrarSesion.addActionListener(new ActionListener() {
