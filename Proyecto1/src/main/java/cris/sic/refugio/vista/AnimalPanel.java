@@ -243,8 +243,8 @@ public class AnimalPanel extends JPanel {
         scrollTable.setBounds(320, 120, 450, 320);
         add(scrollTable);
 
-        // Carga inicial
-        cargarTabla(AnimalServicio.filtrarAnimales("", "", "", "TODOS"));
+        // Carga inicial directamente de la bitacora
+        buscar();
 
         // Eventos
         btnRegistrar.addActionListener(new ActionListener() {
@@ -452,6 +452,7 @@ public class AnimalPanel extends JPanel {
 
     // Modulo para ejecutar la busqueda con filtros y actualizar la tabla
     public void buscar() {
+        AnimalServicio.cargarDesdeBitacora();
         String fc = UIUtils.formatearCodigo("A-", txtFiltroCodigo.getText().trim());
         String fn = txtFiltroNombre.getText().trim();
         String fe = txtFiltroEspecie.getText().trim();

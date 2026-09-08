@@ -1,0 +1,2 @@
+admin1|Refugio2026|ADMIN
+auxiliar1|Refugio2026|AUXILIAR

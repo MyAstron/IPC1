@@ -154,8 +154,8 @@ public class AdoptantePanel extends JPanel {
         scrollTable.setBounds(320, 120, 450, 320);
         add(scrollTable);
 
-        // Carga inicial
-        cargarTabla(AdoptanteServicio.filtrarAdoptantes("", "", ""));
+        // Carga inicial directamente de la bitacora
+        buscar();
 
         // Eventos
         btnRegistrar.addActionListener(new ActionListener() {
@@ -255,6 +255,7 @@ public class AdoptantePanel extends JPanel {
 
     // Modulo para ejecutar la busqueda con filtros y actualizar la tabla
     public void buscar() {
+        AdoptanteServicio.cargarDesdeBitacora();
         String fc = UIUtils.formatearCodigo("AD-", txtFiltroCodigo.getText().trim());
         String fn = txtFiltroNombre.getText().trim();
         String fd = txtFiltroDpi.getText().trim();

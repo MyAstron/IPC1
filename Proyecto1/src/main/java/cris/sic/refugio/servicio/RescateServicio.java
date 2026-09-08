@@ -119,6 +119,7 @@ public class RescateServicio {
                 Animal nuevoAnimal = new Animal(codigoAnimalFinal, nom, esp, 0, "EN_TRATAMIENTO", "DISPONIBLE");
                 BaseDatosMemoria.animales[BaseDatosMemoria.contadorAnimales] = nuevoAnimal;
                 BaseDatosMemoria.contadorAnimales++;
+                BitacoraServicio.registrarBitacoraAnimal(usuarioActivo, "REGISTRO", nuevoAnimal);
             }
         } else {
             if (BaseDatosMemoria.contadorAnimales >= BaseDatosMemoria.MAX_ANIMALES) {
@@ -133,6 +134,7 @@ public class RescateServicio {
             Animal nuevoAnimal = new Animal(codigoAnimalFinal, nom, esp, 0, "EN_TRATAMIENTO", "DISPONIBLE");
             BaseDatosMemoria.animales[BaseDatosMemoria.contadorAnimales] = nuevoAnimal;
             BaseDatosMemoria.contadorAnimales++;
+            BitacoraServicio.registrarBitacoraAnimal(usuarioActivo, "REGISTRO", nuevoAnimal);
         }
 
         // 3. Registrar el Rescate
@@ -140,6 +142,7 @@ public class RescateServicio {
         BaseDatosMemoria.rescates[BaseDatosMemoria.contadorRescates] = nuevoRescate;
         BaseDatosMemoria.contadorRescates++;
 
+        BitacoraServicio.registrarBitacoraRescate(usuarioActivo, "REGISTRO", nuevoRescate);
         BitacoraServicio.registrarAccion(usuarioActivo, "Rescates", 
             "Registro unificado exitoso: Rescate " + codigoRescate + " vinculado al animal " + codigoAnimalFinal);
         return "SUCCESS";
@@ -184,6 +187,7 @@ public class RescateServicio {
         BaseDatosMemoria.rescates[BaseDatosMemoria.contadorRescates] = nuevo;
         BaseDatosMemoria.contadorRescates++;
 
+        BitacoraServicio.registrarBitacoraRescate(usuarioActivo, "REGISTRO", nuevo);
         BitacoraServicio.registrarAccion(usuarioActivo, "Rescates", "Rescate " + codigo + " registrado con exito.");
         return "SUCCESS";
     }
@@ -246,6 +250,7 @@ public class RescateServicio {
             Animal nuevoAnimal = new Animal(nuevoCodigo, nombre, especie, 0, "EN_TRATAMIENTO", "DISPONIBLE");
             BaseDatosMemoria.animales[BaseDatosMemoria.contadorAnimales] = nuevoAnimal;
             BaseDatosMemoria.contadorAnimales++;
+            BitacoraServicio.registrarBitacoraAnimal(usuarioActivo, "REGISTRO", nuevoAnimal);
 
             codigoAnimalVinculado = nuevoCodigo;
             BitacoraServicio.registrarAccion(usuarioActivo, "Rescates", 
@@ -255,6 +260,7 @@ public class RescateServicio {
         // Cambiar estado del rescate a ATENDIDO y guardar el codigo del animal vinculado
         rescate.setEstado("ATENDIDO");
         rescate.setCodigoAnimalVinculado(codigoAnimalVinculado);
+        BitacoraServicio.registrarBitacoraRescate(usuarioActivo, "ATENCION", rescate);
 
         return "SUCCESS";
     }
@@ -267,6 +273,7 @@ public class RescateServicio {
             Rescate r = BaseDatosMemoria.rescates[i];
             if (r != null && r.getCodigoAnimalVinculado().equals(codigoAnimal)) {
                 String codRescate = r.getCodigo();
+                BitacoraServicio.registrarBitacoraRescate(usuarioActivo, "ELIMINACION", r);
                 // Desplazar elementos en el arreglo estatico para eliminar el rescate
                 for (int j = i; j < BaseDatosMemoria.contadorRescates - 1; j++) {
                     BaseDatosMemoria.rescates[j] = BaseDatosMemoria.rescates[j + 1];
@@ -337,5 +344,10 @@ public class RescateServicio {
             }
         }
         return resultado;
+    }
+
+    // Modulo para recargar los rescates directamente desde el archivo de bitacora
+    public static void cargarDesdeBitacora() {
+        PersistenciaServicio.cargarRescatesDesdeBitacora();
     }
 }

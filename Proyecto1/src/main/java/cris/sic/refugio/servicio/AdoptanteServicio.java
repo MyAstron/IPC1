@@ -123,6 +123,7 @@ public class AdoptanteServicio {
         BaseDatosMemoria.contadorAdoptantes++;
 
         BitacoraServicio.registrarAccion(usuarioActivo, "Adoptantes", "Adoptante registrado exitosamente: " + codigo);
+        BitacoraServicio.registrarBitacoraAdoptante(usuarioActivo, "REGISTRO", nuevo);
         return "SUCCESS";
     }
 
@@ -145,6 +146,7 @@ public class AdoptanteServicio {
                 ad.setTelefono(telefono);
 
                 BitacoraServicio.registrarAccion(usuarioActivo, "Adoptantes", "Adoptante editado exitosamente: " + codigo);
+                BitacoraServicio.registrarBitacoraAdoptante(usuarioActivo, "ACTUALIZACION", ad);
                 return "SUCCESS";
             }
         }
@@ -193,5 +195,10 @@ public class AdoptanteServicio {
             }
         }
         return resultado;
+    }
+
+    // Modulo para recargar los adoptantes directamente desde el archivo de bitacora
+    public static void cargarDesdeBitacora() {
+        PersistenciaServicio.cargarAdoptantesDesdeBitacora();
     }
 }

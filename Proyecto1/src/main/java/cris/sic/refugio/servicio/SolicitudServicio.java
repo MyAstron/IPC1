@@ -113,6 +113,7 @@ public class SolicitudServicio {
         BaseDatosMemoria.contadorSolicitudes++;
 
         BitacoraServicio.registrarAccion(usuarioActivo, "Solicitudes", "Solicitud registrada con exito: " + codigo);
+        BitacoraServicio.registrarBitacoraSolicitud(usuarioActivo, "REGISTRO", nueva);
         return "SUCCESS";
     }
 
@@ -148,12 +149,14 @@ public class SolicitudServicio {
         if (animal == null || animal.getEstadoAdopcion().equals("ELIMINADO")) {
             solicitud.setEstado("RECHAZADA");
             BitacoraServicio.registrarError(usuarioActivo, "Solicitudes", "Solicitud rechazada automaticamente por animal inexistente o eliminado: " + solicitud.getCodigo());
+            BitacoraServicio.registrarBitacoraSolicitud(usuarioActivo, "RECHAZO_POR_ELIMINACION", solicitud);
             return "El animal vinculado ya no se encuentra en el refugio.";
         }
 
         if (!animal.getEstadoAdopcion().equals("DISPONIBLE")) {
             solicitud.setEstado("RECHAZADA");
             BitacoraServicio.registrarError(usuarioActivo, "Solicitudes", "Solicitud rechazada automaticamente por animal no disponible: " + solicitud.getCodigo());
+            BitacoraServicio.registrarBitacoraSolicitud(usuarioActivo, "RECHAZO_NO_DISPONIBLE", solicitud);
             return "El animal ya no esta disponible para adopcion.";
         }
 
@@ -162,6 +165,7 @@ public class SolicitudServicio {
 
         // Cambiar el estado del animal a ADOPTADO
         animal.setEstadoAdopcion("ADOPTADO");
+        BitacoraServicio.registrarBitacoraAnimal(usuarioActivo, "ACTUALIZACION", animal);
 
         // Liberar la celda en la matriz
         UbicacionServicio.liberarAnimal(animal.getCodigo(), usuarioActivo);
@@ -173,10 +177,12 @@ public class SolicitudServicio {
                 s.setEstado("RECHAZADA");
                 BitacoraServicio.registrarAccion(usuarioActivo, "Solicitudes", 
                     "Rechazo automatico de la solicitud " + s.getCodigo() + " al aprobarse otra para el mismo animal " + animal.getCodigo());
+                BitacoraServicio.registrarBitacoraSolicitud(usuarioActivo, "RECHAZO_AUTOMATICO", s);
             }
         }
 
         BitacoraServicio.registrarAccion(usuarioActivo, "Solicitudes", "Solicitud " + codigo + " aprobada con exito. Animal " + animal.getCodigo() + " adoptado.");
+        BitacoraServicio.registrarBitacoraSolicitud(usuarioActivo, "APROBACION", solicitud);
         return "SUCCESS";
     }
 
@@ -190,6 +196,7 @@ public class SolicitudServicio {
                 }
                 s.setEstado("RECHAZADA");
                 BitacoraServicio.registrarAccion(usuarioActivo, "Solicitudes", "Solicitud " + codigo + " rechazada manualmente.");
+                BitacoraServicio.registrarBitacoraSolicitud(usuarioActivo, "RECHAZO_MANUAL", s);
                 return "SUCCESS";
             }
         }
@@ -244,5 +251,10 @@ public class SolicitudServicio {
             }
         }
         return resultado;
+    }
+
+    // Modulo para recargar las solicitudes directamente desde el archivo de bitacora
+    public static void cargarDesdeBitacora() {
+        PersistenciaServicio.cargarSolicitudesDesdeBitacora();
     }
 }

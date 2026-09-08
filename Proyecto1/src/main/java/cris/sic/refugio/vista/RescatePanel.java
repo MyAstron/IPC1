@@ -321,6 +321,7 @@ public class RescatePanel extends JPanel {
 
     // Modulo para refrescar el contenido de la tabla segun los filtros
     public void buscar() {
+        RescateServicio.cargarDesdeBitacora();
         String fc = UIUtils.formatearCodigo("R-", txtFiltroCodigo.getText().trim());
         String fp = (String) cbFiltroPrioridad.getSelectedItem();
         String fe = (String) cbFiltroEstado.getSelectedItem();

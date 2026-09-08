@@ -70,6 +70,7 @@ public class AnimalServicio {
         BaseDatosMemoria.contadorAnimales++;
 
         BitacoraServicio.registrarAccion(usuarioActivo, "Animales", "Registro exitoso de animal: " + codigo + " (" + nombre + ")");
+        BitacoraServicio.registrarBitacoraAnimal(usuarioActivo, "REGISTRO", nuevo);
         return "SUCCESS";
     }
 
@@ -93,6 +94,7 @@ public class AnimalServicio {
                 a.setEstadoAdopcion(estadoAdopcion);
 
                 BitacoraServicio.registrarAccion(usuarioActivo, "Animales", "Actualizacion exitosa de animal: " + codigo);
+                BitacoraServicio.registrarBitacoraAnimal(usuarioActivo, "ACTUALIZACION", a);
                 return "SUCCESS";
             }
         }
@@ -114,6 +116,7 @@ public class AnimalServicio {
                 RescateServicio.eliminarRescatePorAnimal(codigo, usuarioActivo);
 
                 BitacoraServicio.registrarAccion(usuarioActivo, "Animales", "Baja logica aplicada al animal: " + codigo);
+                BitacoraServicio.registrarBitacoraAnimal(usuarioActivo, "BAJA_LOGICA", a);
                 return "SUCCESS";
             }
         }
@@ -178,5 +181,10 @@ public class AnimalServicio {
             }
         }
         return resultado;
+    }
+
+    // Modulo para recargar los animales directamente desde el archivo de bitacora
+    public static void cargarDesdeBitacora() {
+        PersistenciaServicio.cargarAnimalesDesdeBitacora();
     }
 }

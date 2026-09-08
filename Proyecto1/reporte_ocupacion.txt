@@ -1,0 +1,30 @@
+================================================================================
+               REFUGIO DE ANIMALES - SISTEMA DE GESTION
+               REPORTE DE OCUPACIÓN DEL REFUGIO (MATRIZ 5X5)
+================================================================================
+Fecha y Hora de Generación : 2026-09-07 19:30:27
+Generado por el Usuario    : admin1
+--------------------------------------------------------------------------------
+
+REPRESENTACIÓN VISUAL DE LA MATRIZ DE CELDAS:
+
+       Columna 0    Columna 1    Columna 2    Columna 3    Columna 4
+    +------------+------------+------------+------------+------------+
+F0  |   LIBRE    |   LIBRE    |   LIBRE    |   LIBRE    |   LIBRE    |
+    +------------+------------+------------+------------+------------+
+F1  |   LIBRE    |   LIBRE    |   LIBRE    |   LIBRE    |   LIBRE    |
+    +------------+------------+------------+------------+------------+
+F2  |   LIBRE    |   LIBRE    |   LIBRE    |   LIBRE    |   LIBRE    |
+    +------------+------------+------------+------------+------------+
+F3  |   LIBRE    |   LIBRE    |   LIBRE    |   LIBRE    |   LIBRE    |
+    +------------+------------+------------+------------+------------+
+F4  |   LIBRE    |   LIBRE    |   LIBRE    |   LIBRE    |   LIBRE    |
+    +------------+------------+------------+------------+------------+
+
+RESUMEN DE OCUPACIÓN DE LA MATRIZ:
+ - Dimensiones de la Matriz        : 5 x 5
+ - Total de Celdas Físicas         : 25
+ - Celdas Ocupadas                 : 0
+ - Celdas Libres / Disponibles     : 25
+ - Porcentaje de Ocupación Refugio : 0.00%
+================================================================================

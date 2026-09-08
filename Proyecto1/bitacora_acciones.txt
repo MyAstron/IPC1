@@ -96,3 +96,47 @@
 2026-08-31 16:51:49|admin1|Animales|ACCION|Registro exitoso de animal: A-456 (4567)|
 2026-08-31 16:52:19|admin1|Ubicaciones|ACCION|Asignación exitosa del animal A-456 a la celda [1][1]|
 2026-08-31 16:52:27|admin1|Ubicaciones|ACCION|Asignación exitosa del animal A-001 a la celda [2][2]|
+2026-08-31 19:51:16|admin1|Autenticacion|ACCION|Inicio de sesion exitoso. Rol: ADMIN|
+2026-09-07 19:30:27|admin1|Reportes|ACCION|Generación de reporte general consolidado TXT: reporte_general_vectores_matriz.txt|
+2026-09-07 19:30:27|admin1|Reportes|ACCION|Generación de reporte TXT: reporte_ocupacion.txt|
+2026-09-07 19:33:49|admin1|Autenticacion|ACCION|Inicio de sesion exitoso. Rol: ADMIN|
+2026-09-07 19:34:32|admin1|Rescates|ACCION|Registro unificado exitoso: Rescate R-111 vinculado al animal A-001|
+2026-09-07 19:34:54|admin1|Adoptantes|ACCION|Adoptante registrado exitosamente: AD-111|
+2026-09-07 19:35:08|admin1|Animales|ACCION|Registro exitoso de animal: A-111 (111)|
+2026-09-07 19:35:19|admin1|Solicitudes|ACCION|Solicitud registrada con exito: S-111|
+2026-09-07 19:35:32|admin1|Animales|ACCION|Actualizacion exitosa de animal: A-001|
+2026-09-07 19:35:36|admin1|Autenticacion|ACCION|Inicio de sesion exitoso. Rol: ADMIN|
+2026-09-07 19:36:17|admin1|Autenticacion|ACCION|Inicio de sesion exitoso. Rol: ADMIN|
+2026-09-07 19:36:33|admin1|Autenticacion|ACCION|Inicio de sesion exitoso. Rol: ADMIN|
+2026-09-07 19:43:20|admin|Animales|ACCION|Registro exitoso de animal: A-901 (Firulais)|
+2026-09-07 19:43:20|admin|Animales|ACCION|Actualizacion exitosa de animal: A-901|
+2026-09-07 19:43:20|admin|Adoptantes|ACCION|Adoptante registrado exitosamente: AD-901|
+2026-09-07 19:43:20|admin|Adoptantes|ACCION|Adoptante editado exitosamente: AD-901|
+2026-09-07 19:43:20|admin|Solicitudes|ACCION|Solicitud registrada con exito: S-901|
+2026-09-07 19:43:20|admin|Solicitudes|ACCION|Solicitud S-901 aprobada con exito. Animal A-901 adoptado.|
+2026-09-07 19:43:20|admin|Rescates|ACCION|Rescate R-901 registrado con exito.|
+2026-09-07 19:43:20|admin|Rescates|ACCION|Rescate R-901 atendido autogenerando al animal A-001|
+2026-09-07 19:43:20|admin|Animales|ACCION|Registro exitoso de animal: A-902 (Manchas)|
+2026-09-07 19:43:20|admin|Ubicaciones|ACCION|Asignación exitosa del animal A-902 a la celda [0][0]|
+2026-09-07 19:43:20|admin|Ubicaciones|ACCION|Celda [0][0] liberada manualmente. Se retiro al animal: A-902|
+2026-09-07 19:45:11|admin1|Autenticacion|ACCION|Inicio de sesion exitoso. Rol: ADMIN|
+2026-09-07 19:45:23|admin1|Animales|ACCION|Registro exitoso de animal: A-111 (111)|
+2026-09-07 19:45:32|admin1|Adoptantes|ACCION|Adoptante registrado exitosamente: AD-111|
+2026-09-07 19:45:41|admin1|Solicitudes|ACCION|Solicitud registrada con exito: S-111|
+2026-09-07 19:45:55|admin1|Rescates|ACCION|Registro unificado exitoso: Rescate R-111 vinculado al animal A-001|
+2026-09-07 19:46:01|admin1|Ubicaciones|ACCION|Asignación exitosa del animal A-111 a la celda [0][0]|
+2026-09-07 19:46:12|admin1|Autenticacion|ACCION|Inicio de sesion exitoso. Rol: ADMIN|
+2026-09-07 19:46:34|admin1|Autenticacion|ACCION|Inicio de sesion exitoso. Rol: ADMIN|
+2026-09-07 19:52:26|admin1|Autenticacion|ACCION|Inicio de sesion exitoso. Rol: ADMIN|
+2026-09-07 19:52:35|admin1|Autenticacion|ACCION|Inicio de sesion exitoso. Rol: ADMIN|
+2026-09-07 20:03:29|admin1|Autenticacion|ACCION|Inicio de sesion exitoso. Rol: ADMIN|
+2026-09-07 20:03:48|admin1|Reportes|ACCION|Generación de reporte general consolidado TXT: reporte_general_vectores_matriz.txt|
+2026-09-07 20:03:50|admin1|Reportes|ACCION|Generación de reporte general consolidado TXT: reporte_general_vectores_matriz.txt|
+2026-09-07 20:05:18|admin1|Reportes|ACCION|Generación de reporte general consolidado TXT: reporte_general_vectores_matriz.txt|
+2026-09-07 20:05:18|admin1|Persistencia|ACCION|Guardado exitoso de todos los datos en archivos .txt|
+2026-09-07 20:05:34|admin1|Reportes|ACCION|Generación de reporte general consolidado TXT: reporte_general_vectores_matriz.txt|
+2026-09-07 20:05:41|admin1|Reportes|ACCION|Generación de reporte general consolidado TXT: reporte_general_vectores_matriz.txt|
+2026-09-07 20:05:48|admin1|Reportes|ACCION|Generación de reporte general consolidado TXT: reporte_general_vectores_matriz.txt|
+2026-09-07 20:07:10|admin1|Autenticacion|ACCION|Inicio de sesion exitoso. Rol: ADMIN|
+2026-09-07 20:08:23|admin1|Autenticacion|ACCION|Inicio de sesion exitoso. Rol: ADMIN|
+2026-09-07 20:08:28|admin1|Autenticacion|ACCION|Inicio de sesion exitoso. Rol: ADMIN|

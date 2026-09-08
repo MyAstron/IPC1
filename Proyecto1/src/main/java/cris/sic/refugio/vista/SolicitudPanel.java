@@ -240,6 +240,7 @@ public class SolicitudPanel extends JPanel {
 
     // Modulo para refrescar el contenido de la tabla
     public void buscar() {
+        SolicitudServicio.cargarDesdeBitacora();
         String fc = UIUtils.formatearCodigo("S-", txtFiltroCodigo.getText().trim());
         String fa = UIUtils.formatearCodigo("A-", txtFiltroAnimal.getText().trim());
         String fad = UIUtils.formatearCodigo("AD-", txtFiltroAdoptante.getText().trim());

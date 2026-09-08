@@ -23,6 +23,12 @@ public class PersistenciaServicio {
     private static final String ARCHIVO_RESCATES = "rescates.txt";
     private static final String ARCHIVO_UBICACIONES = "ubicaciones.txt";
 
+    public static final String ARCHIVO_BITACORA_ANIMALES = "bitacora_animales.txt";
+    public static final String ARCHIVO_BITACORA_ADOPTANTES = "bitacora_adoptantes.txt";
+    public static final String ARCHIVO_BITACORA_SOLICITUDES = "bitacora_solicitudes.txt";
+    public static final String ARCHIVO_BITACORA_RESCATES = "bitacora_rescates.txt";
+    public static final String ARCHIVO_BITACORA_UBICACIONES = "bitacora_ubicaciones.txt";
+
     // Modulo para guardar todos los datos del sistema en sus respectivos archivos
     public static String guardarTodo(String usuarioActivo) {
         try {
@@ -32,6 +38,7 @@ public class PersistenciaServicio {
             guardarSolicitudes();
             guardarRescates();
             guardarUbicaciones();
+            ReporteTextoServicio.generarReporteGeneralVectoresYMatrizTxt(usuarioActivo);
             BitacoraServicio.registrarAccion(usuarioActivo, "Persistencia", "Guardado exitoso de todos los datos en archivos .txt");
             return "SUCCESS";
         } catch (Exception e) {
@@ -43,11 +50,11 @@ public class PersistenciaServicio {
     // Modulo para cargar todos los datos desde los archivos al iniciar la aplicacion
     public static void cargarTodo() {
         cargarUsuarios();
-        cargarAnimales();
-        cargarAdoptantes();
-        cargarSolicitudes();
-        cargarRescates();
-        cargarUbicaciones();
+        cargarAnimalesDesdeBitacora();
+        cargarAdoptantesDesdeBitacora();
+        cargarSolicitudesDesdeBitacora();
+        cargarRescatesDesdeBitacora();
+        cargarUbicacionesDesdeBitacora();
     }
 
     // Modulo para guardar usuarios
@@ -252,6 +259,240 @@ public class PersistenciaServicio {
                         int c = Integer.parseInt(p[1]);
                         if (f >= 0 && f < BaseDatosMemoria.FILAS_REFUGIO && c >= 0 && c < BaseDatosMemoria.COLUMNAS_REFUGIO) {
                             BaseDatosMemoria.ubicacionesRefugio[f][c] = p[2];
+                        }
+                    } catch (Exception ignored) {}
+                }
+            }
+        } catch (Exception ignored) {}
+    }
+
+    // Modulo para cargar animales directamente desde su archivo de bitacora
+    public static void cargarAnimalesDesdeBitacora() {
+        File file = new File(ARCHIVO_BITACORA_ANIMALES);
+        if (!file.exists()) {
+            cargarAnimales();
+            return;
+        }
+
+        try (BufferedReader br = new BufferedReader(new FileReader(file))) {
+            String linea;
+            BaseDatosMemoria.contadorAnimales = 0;
+            while ((linea = br.readLine()) != null) {
+                if (linea.trim().isEmpty()) continue;
+                String[] p = linea.split("\\|", -1);
+                if (p.length >= 9) {
+                    String codigo = p[3];
+                    String nombre = p[4];
+                    String especie = p[5];
+                    int edad = 0;
+                    try { edad = Integer.parseInt(p[6]); } catch (Exception ignored) {}
+                    String estadoClinico = p[7];
+                    String estadoAdopcion = p[8];
+
+                    Animal existente = null;
+                    for (int i = 0; i < BaseDatosMemoria.contadorAnimales; i++) {
+                        Animal a = BaseDatosMemoria.animales[i];
+                        if (a != null && a.getCodigo().equals(codigo)) {
+                            existente = a;
+                            break;
+                        }
+                    }
+
+                    if (existente != null) {
+                        existente.setNombre(nombre);
+                        existente.setEspecie(especie);
+                        existente.setEdad(edad);
+                        existente.setEstadoClinico(estadoClinico);
+                        existente.setEstadoAdopcion(estadoAdopcion);
+                    } else if (BaseDatosMemoria.contadorAnimales < BaseDatosMemoria.MAX_ANIMALES) {
+                        BaseDatosMemoria.animales[BaseDatosMemoria.contadorAnimales] = new Animal(codigo, nombre, especie, edad, estadoClinico, estadoAdopcion);
+                        BaseDatosMemoria.contadorAnimales++;
+                    }
+                }
+            }
+        } catch (Exception ignored) {}
+    }
+
+    // Modulo para cargar adoptantes directamente desde su archivo de bitacora
+    public static void cargarAdoptantesDesdeBitacora() {
+        File file = new File(ARCHIVO_BITACORA_ADOPTANTES);
+        if (!file.exists()) {
+            cargarAdoptantes();
+            return;
+        }
+
+        try (BufferedReader br = new BufferedReader(new FileReader(file))) {
+            String linea;
+            BaseDatosMemoria.contadorAdoptantes = 0;
+            while ((linea = br.readLine()) != null) {
+                if (linea.trim().isEmpty()) continue;
+                String[] p = linea.split("\\|", -1);
+                if (p.length >= 7) {
+                    String codigo = p[3];
+                    String nombre = p[4];
+                    String dpi = p[5];
+                    String telefono = p[6];
+
+                    Adoptante existente = null;
+                    for (int i = 0; i < BaseDatosMemoria.contadorAdoptantes; i++) {
+                        Adoptante ad = BaseDatosMemoria.adoptantes[i];
+                        if (ad != null && ad.getCodigo().equals(codigo)) {
+                            existente = ad;
+                            break;
+                        }
+                    }
+
+                    if (existente != null) {
+                        existente.setNombre(nombre);
+                        existente.setDpi(dpi);
+                        existente.setTelefono(telefono);
+                    } else if (BaseDatosMemoria.contadorAdoptantes < BaseDatosMemoria.MAX_ADOPTANTES) {
+                        BaseDatosMemoria.adoptantes[BaseDatosMemoria.contadorAdoptantes] = new Adoptante(codigo, nombre, dpi, telefono);
+                        BaseDatosMemoria.contadorAdoptantes++;
+                    }
+                }
+            }
+        } catch (Exception ignored) {}
+    }
+
+    // Modulo para cargar solicitudes directamente desde su archivo de bitacora
+    public static void cargarSolicitudesDesdeBitacora() {
+        File file = new File(ARCHIVO_BITACORA_SOLICITUDES);
+        if (!file.exists()) {
+            cargarSolicitudes();
+            return;
+        }
+
+        try (BufferedReader br = new BufferedReader(new FileReader(file))) {
+            String linea;
+            BaseDatosMemoria.contadorSolicitudes = 0;
+            while ((linea = br.readLine()) != null) {
+                if (linea.trim().isEmpty()) continue;
+                String[] p = linea.split("\\|", -1);
+                if (p.length >= 8) {
+                    String codigo = p[3];
+                    String codigoAnimal = p[4];
+                    String codigoAdoptante = p[5];
+                    String fecha = p[6];
+                    String estado = p[7];
+
+                    Solicitud existente = null;
+                    for (int i = 0; i < BaseDatosMemoria.contadorSolicitudes; i++) {
+                        Solicitud s = BaseDatosMemoria.solicitudes[i];
+                        if (s != null && s.getCodigo().equals(codigo)) {
+                            existente = s;
+                            break;
+                        }
+                    }
+
+                    if (existente != null) {
+                        existente.setCodigoAnimal(codigoAnimal);
+                        existente.setCodigoAdoptante(codigoAdoptante);
+                        existente.setFecha(fecha);
+                        existente.setEstado(estado);
+                    } else if (BaseDatosMemoria.contadorSolicitudes < BaseDatosMemoria.MAX_SOLICITUDES) {
+                        BaseDatosMemoria.solicitudes[BaseDatosMemoria.contadorSolicitudes] = new Solicitud(codigo, codigoAnimal, codigoAdoptante, fecha, estado);
+                        BaseDatosMemoria.contadorSolicitudes++;
+                    }
+                }
+            }
+        } catch (Exception ignored) {}
+    }
+
+    // Modulo para cargar rescates directamente desde su archivo de bitacora
+    public static void cargarRescatesDesdeBitacora() {
+        File file = new File(ARCHIVO_BITACORA_RESCATES);
+        if (!file.exists()) {
+            cargarRescates();
+            return;
+        }
+
+        try (BufferedReader br = new BufferedReader(new FileReader(file))) {
+            String linea;
+            BaseDatosMemoria.contadorRescates = 0;
+            while ((linea = br.readLine()) != null) {
+                if (linea.trim().isEmpty()) continue;
+                String[] p = linea.split("\\|", -1);
+                if (p.length >= 8) {
+                    String operacion = p[2];
+                    String codigo = p[3];
+                    String direccion = p[4];
+                    String prioridad = p[5];
+                    String estado = p[6];
+                    String fecha = p[7];
+                    String animalVinculado = (p.length >= 9) ? p[8] : "";
+
+                    if (operacion.equals("ELIMINACION")) {
+                        for (int i = 0; i < BaseDatosMemoria.contadorRescates; i++) {
+                            Rescate r = BaseDatosMemoria.rescates[i];
+                            if (r != null && r.getCodigo().equals(codigo)) {
+                                for (int j = i; j < BaseDatosMemoria.contadorRescates - 1; j++) {
+                                    BaseDatosMemoria.rescates[j] = BaseDatosMemoria.rescates[j + 1];
+                                }
+                                BaseDatosMemoria.rescates[BaseDatosMemoria.contadorRescates - 1] = null;
+                                BaseDatosMemoria.contadorRescates--;
+                                break;
+                            }
+                        }
+                    } else {
+                        Rescate existente = null;
+                        for (int i = 0; i < BaseDatosMemoria.contadorRescates; i++) {
+                            Rescate r = BaseDatosMemoria.rescates[i];
+                            if (r != null && r.getCodigo().equals(codigo)) {
+                                existente = r;
+                                break;
+                            }
+                        }
+
+                        if (existente != null) {
+                            existente.setDireccionDescripcion(direccion);
+                            existente.setPrioridad(prioridad);
+                            existente.setEstado(estado);
+                            existente.setFecha(fecha);
+                            existente.setCodigoAnimalVinculado(animalVinculado);
+                        } else if (BaseDatosMemoria.contadorRescates < BaseDatosMemoria.MAX_RESCATES) {
+                            BaseDatosMemoria.rescates[BaseDatosMemoria.contadorRescates] = new Rescate(codigo, direccion, prioridad, estado, fecha, animalVinculado);
+                            BaseDatosMemoria.contadorRescates++;
+                        }
+                    }
+                }
+            }
+        } catch (Exception ignored) {}
+    }
+
+    // Modulo para cargar ubicaciones directamente desde su archivo de bitacora
+    public static void cargarUbicacionesDesdeBitacora() {
+        File file = new File(ARCHIVO_BITACORA_UBICACIONES);
+        if (!file.exists()) {
+            cargarUbicaciones();
+            return;
+        }
+
+        // Limpiar la matriz primero
+        for (int f = 0; f < BaseDatosMemoria.FILAS_REFUGIO; f++) {
+            for (int c = 0; c < BaseDatosMemoria.COLUMNAS_REFUGIO; c++) {
+                BaseDatosMemoria.ubicacionesRefugio[f][c] = null;
+            }
+        }
+
+        try (BufferedReader br = new BufferedReader(new FileReader(file))) {
+            String linea;
+            while ((linea = br.readLine()) != null) {
+                if (linea.trim().isEmpty()) continue;
+                String[] p = linea.split("\\|", -1);
+                if (p.length >= 6) {
+                    try {
+                        String operacion = p[2];
+                        int f = Integer.parseInt(p[3]);
+                        int c = Integer.parseInt(p[4]);
+                        String animal = p[5];
+
+                        if (f >= 0 && f < BaseDatosMemoria.FILAS_REFUGIO && c >= 0 && c < BaseDatosMemoria.COLUMNAS_REFUGIO) {
+                            if (operacion.equals("ASIGNACION") && !animal.equals("LIBRE")) {
+                                BaseDatosMemoria.ubicacionesRefugio[f][c] = animal;
+                            } else {
+                                BaseDatosMemoria.ubicacionesRefugio[f][c] = null;
+                            }
                         }
                     } catch (Exception ignored) {}
                 }

@@ -17,6 +17,7 @@ public class UbicacionServicio {
             for (int c = 0; c < BaseDatosMemoria.COLUMNAS_REFUGIO; c++) {
                 if (BaseDatosMemoria.ubicacionesRefugio[f][c] != null && BaseDatosMemoria.ubicacionesRefugio[f][c].equals(codigoAnimal)) {
                     BaseDatosMemoria.ubicacionesRefugio[f][c] = null;
+                    BitacoraServicio.registrarBitacoraUbicacion(usuarioActivo, "LIBERACION_AUTOMATICA", f, c, codigoAnimal);
                     BitacoraServicio.registrarAccion(usuarioActivo, "Ubicaciones", 
                         "Celda [" + f + "][" + c + "] liberada automaticamente al cambiar de estado el animal: " + codigoAnimal);
                 }
@@ -61,6 +62,7 @@ public class UbicacionServicio {
 
         // Asignar en la nueva celda
         BaseDatosMemoria.ubicacionesRefugio[fila][columna] = codigoAnimal;
+        BitacoraServicio.registrarBitacoraUbicacion(usuarioActivo, "ASIGNACION", fila, columna, codigoAnimal);
         BitacoraServicio.registrarAccion(usuarioActivo, "Ubicaciones", 
             "Asignación exitosa del animal " + codigoAnimal + " a la celda [" + fila + "][" + columna + "]");
         return "SUCCESS";
@@ -79,8 +81,14 @@ public class UbicacionServicio {
         }
 
         BaseDatosMemoria.ubicacionesRefugio[fila][columna] = null;
+        BitacoraServicio.registrarBitacoraUbicacion(usuarioActivo, "LIBERACION", fila, columna, animal);
         BitacoraServicio.registrarAccion(usuarioActivo, "Ubicaciones", 
             "Celda [" + fila + "][" + columna + "] liberada manualmente. Se retiro al animal: " + animal);
         return "SUCCESS";
+    }
+
+    // Modulo para recargar la matriz de ubicaciones directamente desde el archivo de bitacora
+    public static void cargarDesdeBitacora() {
+        PersistenciaServicio.cargarUbicacionesDesdeBitacora();
     }
 }

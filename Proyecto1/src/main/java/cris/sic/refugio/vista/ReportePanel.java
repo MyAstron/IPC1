@@ -4,6 +4,7 @@ import cris.sic.refugio.modelo.Usuario;
 import cris.sic.refugio.servicio.AutenticacionServicio;
 import cris.sic.refugio.servicio.PersistenciaServicio;
 import cris.sic.refugio.servicio.ReporteHtmlServicio;
+import cris.sic.refugio.servicio.ReporteTextoServicio;
 
 import javax.swing.JPanel;
 import javax.swing.JLabel;
@@ -14,7 +15,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.File;
 
-// Panel para la generacion de reportes HTML y persistencia manual en archivos de texto
+// Panel para la generacion de reportes HTML/TXT y persistencia manual en archivos de texto
 public class ReportePanel extends JPanel {
 
     public ReportePanel() {
@@ -24,29 +25,29 @@ public class ReportePanel extends JPanel {
         lblTitulo.setBounds(30, 20, 400, 25);
         add(lblTitulo);
 
-        JButton btnRepAnimales = new JButton("1. Reporte de Animales Rescatados (HTML)");
+        JButton btnRepAnimales = new JButton("1. Reporte de Animales Rescatados (HTML / TXT)");
         btnRepAnimales.setBounds(50, 70, 320, 40);
         add(btnRepAnimales);
 
-        JButton btnRepAdopciones = new JButton("2. Reporte de Adopciones y Solicitudes (HTML)");
+        JButton btnRepAdopciones = new JButton("2. Reporte de Adopciones y Solicitudes (HTML / TXT)");
         btnRepAdopciones.setBounds(50, 130, 320, 40);
         add(btnRepAdopciones);
 
-        JButton btnRepOcupacion = new JButton("3. Reporte de Ocupación del Refugio (HTML)");
+        JButton btnRepOcupacion = new JButton("3. Reporte de Ocupación del Refugio (HTML / TXT)");
         btnRepOcupacion.setBounds(50, 190, 320, 40);
         add(btnRepOcupacion);
 
-        JButton btnRepAcciones = new JButton("4. Reporte Bitácora de Acciones (HTML)");
+        JButton btnRepAcciones = new JButton("4. Reporte Bitácora de Acciones (HTML / TXT)");
         btnRepAcciones.setBounds(400, 70, 320, 40);
         add(btnRepAcciones);
 
-        JButton btnRepErrores = new JButton("5. Reporte Bitácora de Errores (HTML)");
+        JButton btnRepErrores = new JButton("5. Reporte Bitácora de Errores (HTML / TXT)");
         btnRepErrores.setBounds(400, 130, 320, 40);
         add(btnRepErrores);
 
-        JButton btnGuardarTodo = new JButton("💾 Guardar Estado en Archivos (.txt)");
-        btnGuardarTodo.setBounds(400, 190, 320, 40);
-        add(btnGuardarTodo);
+        JButton btnRepGeneralTxt = new JButton("6. Reporte General de Vectores y Matriz (.txt)");
+        btnRepGeneralTxt.setBounds(400, 190, 320, 40);
+        add(btnRepGeneralTxt);
 
         // Eventos
         btnRepAnimales.addActionListener(new ActionListener() {
@@ -99,14 +100,29 @@ public class ReportePanel extends JPanel {
             }
         });
 
-        btnGuardarTodo.addActionListener(new ActionListener() {
+        btnRepGeneralTxt.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
                 Usuario u = AutenticacionServicio.getUsuarioLogueado();
                 String user = (u != null) ? u.getUsuario() : "DESCONOCIDO";
                 String res = PersistenciaServicio.guardarTodo(user);
                 if (res.equals("SUCCESS")) {
-                    JOptionPane.showMessageDialog(ReportePanel.this, "Todos los datos han sido guardados exitosamente en sus archivos de texto.", "Guardado Exitoso", JOptionPane.INFORMATION_MESSAGE);
+                    String archivo = "reporte_general_vectores_matriz.txt";
+                    int opt = JOptionPane.showConfirmDialog(ReportePanel.this, 
+                        "Todos los datos han sido guardados exitosamente en sus archivos de texto (.txt)\n" +
+                        "y se ha generado el reporte consolidado: " + archivo + "\n\n" +
+                        "¿Desea abrir el reporte en su editor de texto predeterminado?", 
+                        "Reporte Consolidado y Persistencia Generada", JOptionPane.YES_NO_OPTION, JOptionPane.INFORMATION_MESSAGE);
+                    if (opt == JOptionPane.YES_OPTION) {
+                        try {
+                            File txtFile = new File(archivo);
+                            if (Desktop.isDesktopSupported() && Desktop.getDesktop().isSupported(Desktop.Action.OPEN)) {
+                                Desktop.getDesktop().open(txtFile);
+                            }
+                        } catch (Exception ex) {
+                            JOptionPane.showMessageDialog(ReportePanel.this, "No se pudo abrir automáticamente el archivo: " + ex.getMessage(), "Aviso", JOptionPane.WARNING_MESSAGE);
+                        }
+                    }
                 } else {
                     JOptionPane.showMessageDialog(ReportePanel.this, res, "Error al Guardar", JOptionPane.ERROR_MESSAGE);
                 }
@@ -114,11 +130,14 @@ public class ReportePanel extends JPanel {
         });
     }
 
-    // Modulo para procesar el resultado de la generacion de un reporte HTML
+    // Modulo para procesar el resultado de la generacion de un reporte HTML y TXT
     private void procesarResultadoReporte(String resultado) {
         if (resultado.startsWith("SUCCESS|")) {
             String archivo = resultado.substring(8);
-            int opt = JOptionPane.showConfirmDialog(this, "Reporte generado con éxito en el archivo: " + archivo + "\n¿Desea abrirlo en su navegador predeterminado?", "Reporte Generado", JOptionPane.YES_NO_OPTION, JOptionPane.INFORMATION_MESSAGE);
+            String archivoTxt = archivo.replace(".html", ".txt");
+            int opt = JOptionPane.showConfirmDialog(this, 
+                "Reportes generados con éxito:\n- " + archivo + " (HTML)\n- " + archivoTxt + " (TXT)\n\n¿Desea abrir el reporte HTML en su navegador predeterminado?", 
+                "Reportes Generados", JOptionPane.YES_NO_OPTION, JOptionPane.INFORMATION_MESSAGE);
             if (opt == JOptionPane.YES_OPTION) {
                 try {
                     File htmlFile = new File(archivo);

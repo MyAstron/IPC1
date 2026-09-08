@@ -97,7 +97,8 @@ public class ReporteHtmlServicio {
             pw.println("</div>");
             pw.println(generarPie());
 
-            BitacoraServicio.registrarAccion(usuarioActivo, "Reportes", "Generación de reporte HTML: " + nombreArchivo);
+            ReporteTextoServicio.generarReporteAnimalesTxt(usuarioActivo);
+            BitacoraServicio.registrarAccion(usuarioActivo, "Reportes", "Generación de reporte HTML y TXT: " + nombreArchivo);
             return "SUCCESS|" + nombreArchivo;
         } catch (Exception e) {
             BitacoraServicio.registrarError(usuarioActivo, "Reportes", "Error al generar reporte de animales: " + e.getMessage());
@@ -153,7 +154,8 @@ public class ReporteHtmlServicio {
             pw.println("</div>");
             pw.println(generarPie());
 
-            BitacoraServicio.registrarAccion(usuarioActivo, "Reportes", "Generación de reporte HTML: " + nombreArchivo);
+            ReporteTextoServicio.generarReporteAdopcionesTxt(usuarioActivo);
+            BitacoraServicio.registrarAccion(usuarioActivo, "Reportes", "Generación de reporte HTML y TXT: " + nombreArchivo);
             return "SUCCESS|" + nombreArchivo;
         } catch (Exception e) {
             BitacoraServicio.registrarError(usuarioActivo, "Reportes", "Error al generar reporte de adopciones: " + e.getMessage());
@@ -200,7 +202,8 @@ public class ReporteHtmlServicio {
             pw.println("</div>");
             pw.println(generarPie());
 
-            BitacoraServicio.registrarAccion(usuarioActivo, "Reportes", "Generación de reporte HTML: " + nombreArchivo);
+            ReporteTextoServicio.generarReporteOcupacionTxt(usuarioActivo);
+            BitacoraServicio.registrarAccion(usuarioActivo, "Reportes", "Generación de reporte HTML y TXT: " + nombreArchivo);
             return "SUCCESS|" + nombreArchivo;
         } catch (Exception e) {
             BitacoraServicio.registrarError(usuarioActivo, "Reportes", "Error al generar reporte de ocupacion: " + e.getMessage());
@@ -251,7 +254,8 @@ public class ReporteHtmlServicio {
             pw.println("</div>");
             pw.println(generarPie());
 
-            BitacoraServicio.registrarAccion(usuarioActivo, "Reportes", "Generación de reporte HTML: " + nombreArchivo);
+            ReporteTextoServicio.generarReporteBitacoraAccionesTxt(usuarioActivo);
+            BitacoraServicio.registrarAccion(usuarioActivo, "Reportes", "Generación de reporte HTML y TXT: " + nombreArchivo);
             return "SUCCESS|" + nombreArchivo;
         } catch (Exception e) {
             BitacoraServicio.registrarError(usuarioActivo, "Reportes", "Error al generar bitacora de acciones: " + e.getMessage());
@@ -300,7 +304,8 @@ public class ReporteHtmlServicio {
             pw.println("</div>");
             pw.println(generarPie());
 
-            BitacoraServicio.registrarAccion(usuarioActivo, "Reportes", "Generación de reporte HTML: " + nombreArchivo);
+            ReporteTextoServicio.generarReporteBitacoraErroresTxt(usuarioActivo);
+            BitacoraServicio.registrarAccion(usuarioActivo, "Reportes", "Generación de reporte HTML y TXT: " + nombreArchivo);
             return "SUCCESS|" + nombreArchivo;
         } catch (Exception e) {
             BitacoraServicio.registrarError(usuarioActivo, "Reportes", "Error al generar bitacora de errores: " + e.getMessage());

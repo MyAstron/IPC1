@@ -2,6 +2,7 @@ package cris.sic.refugio.vista;
 
 import cris.sic.refugio.modelo.Usuario;
 import cris.sic.refugio.servicio.AutenticacionServicio;
+import cris.sic.refugio.servicio.BitacoraServicio;
 
 import javax.swing.JFrame;
 import javax.swing.JLabel;
@@ -75,6 +76,7 @@ public class JFrameMain extends JFrame {
                 LoginFrame lf = new LoginFrame();
                 lf.setVisible(true);
                 dispose();
+                BitacoraServicio.registrarAccion(nombreUser, "Autenticacion", "Inicio de sesion exitoso. Rol: " + rolUser);
             }
         });
     }

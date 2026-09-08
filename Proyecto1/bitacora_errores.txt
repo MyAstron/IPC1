@@ -34,3 +34,4 @@
 2026-08-31 16:51:46|admin1|Animales|ERROR|Error de validacion al intentar registrar animal: A-456|
 2026-08-31 16:52:11|admin1|Ubicaciones|ERROR|Intento de asignar animal adoptado a una celda: A-123|
 2026-08-31 16:52:15|admin1|Ubicaciones|ERROR|Intento de asignar animal inexistente o eliminado: A-567|
+2026-09-07 19:34:44|admin1|Ubicaciones|ERROR|Intento de asignar animal inexistente o eliminado: A-111|

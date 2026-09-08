@@ -149,6 +149,7 @@ public class UbicacionPanel extends JPanel {
 
     // Modulo para actualizar el texto y color de los botones de la cuadricula segun el estado en memoria
     public void actualizarCuadricula() {
+        UbicacionServicio.cargarDesdeBitacora();
         String[][] ubi = UbicacionServicio.getUbicaciones();
         for (int f = 0; f < BaseDatosMemoria.FILAS_REFUGIO; f++) {
             for (int c = 0; c < BaseDatosMemoria.COLUMNAS_REFUGIO; c++) {

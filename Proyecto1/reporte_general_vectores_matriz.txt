@@ -1,0 +1,64 @@
+================================================================================
+               REFUGIO DE ANIMALES - SISTEMA DE GESTION
+               REPORTE GENERAL CONSOLIDADO DE VECTORES Y MATRIZ
+================================================================================
+Fecha y Hora de Generación : 2026-09-07 20:05:48
+Generado por el Usuario    : admin1
+--------------------------------------------------------------------------------
+
+1. MATRIZ DE UBICACIONES DEL REFUGIO (5x5)
+================================================================================
+       Columna 0    Columna 1    Columna 2    Columna 3    Columna 4
+    +------------+------------+------------+------------+------------+
+F0  |  [A-111  ] |   LIBRE    |   LIBRE    |   LIBRE    |   LIBRE    |
+    +------------+------------+------------+------------+------------+
+F1  |   LIBRE    |   LIBRE    |   LIBRE    |   LIBRE    |   LIBRE    |
+    +------------+------------+------------+------------+------------+
+F2  |   LIBRE    |   LIBRE    |   LIBRE    |   LIBRE    |   LIBRE    |
+    +------------+------------+------------+------------+------------+
+F3  |   LIBRE    |   LIBRE    |   LIBRE    |   LIBRE    |   LIBRE    |
+    +------------+------------+------------+------------+------------+
+F4  |   LIBRE    |   LIBRE    |   LIBRE    |   LIBRE    |   LIBRE    |
+    +------------+------------+------------+------------+------------+
+Resumen Matriz: Celdas Totales: 25 | Ocupadas: 1 | Libres: 24 | Ocupación: 4.00%
+
+2. VECTOR ESTÁTICO DE ANIMALES RESCATADOS
+================================================================================
+CÓDIGO   | NOMBRE               | ESPECIE         | EDAD   | ESTADO CLÍNICO   | ADOPCIÓN    
+--------------------------------------------------------------------------------
+A-111    | 111                  | Gato            | 11     | SANO             | DISPONIBLE  
+A-001    | 11111                | Perro           | 0      | EN_TRATAMIENTO   | DISPONIBLE  
+Total Animales Activos en Vector: 2 / 100
+
+3. VECTOR ESTÁTICO DE ADOPTANTES REGISTRADOS
+================================================================================
+CÓDIGO     | NOMBRE                    | DPI              | TELÉFONO    
+--------------------------------------------------------------------------------
+AD-111     | 1111                      | 1111111111111    | 11111111    
+Total Adoptantes en Vector: 1 / 100
+
+4. VECTOR ESTÁTICO DE SOLICITUDES DE ADOPCIÓN
+================================================================================
+SOLICITUD  | CÓDIGO ANIMAL  | CÓDIGO ADOPTANTE | FECHA        | ESTADO      
+--------------------------------------------------------------------------------
+S-111      | A-111          | AD-111           | 07/09/2026   | PENDIENTE   
+Total Solicitudes en Vector: 1 / 100
+
+5. VECTOR ESTÁTICO DE RESCATES URGENTES
+================================================================================
+CÓDIGO   | PRIORIDAD  | ESTADO     | FECHA        | ANIMAL     | DIRECCIÓN / DESCRIPCIÓN
+--------------------------------------------------------------------------------
+R-111    | ALTA       | ATENDIDO   | 07/09/2026   | A-001      | 111111111
+Total Rescates en Vector: 1 / 100
+
+6. VECTOR ESTÁTICO DE USUARIOS DEL SISTEMA
+================================================================================
+NOMBRE DE USUARIO    | ROL ASIGNADO   
+--------------------------------------------------------------------------------
+admin1               | ADMIN          
+auxiliar1            | AUXILIAR       
+Total Usuarios en Vector: 2 / 100
+
+================================================================================
+                         FIN DEL REPORTE CONSOLIDADO
+================================================================================
