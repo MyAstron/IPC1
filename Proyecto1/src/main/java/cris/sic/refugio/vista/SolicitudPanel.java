@@ -16,6 +16,7 @@ import javax.swing.JOptionPane;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 import javax.swing.table.DefaultTableModel;
+import java.awt.Color;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
@@ -42,138 +43,164 @@ public class SolicitudPanel extends JPanel {
 
     public SolicitudPanel() {
         setLayout(null);
+        setBackground(ThemeARAMS.BACKGROUND);
 
         // 1. Panel de Formulario
         JLabel lblForm = new JLabel("DATOS DE LA SOLICITUD");
+        lblForm.setFont(ThemeARAMS.FONT_HEADLINE);
+        lblForm.setForeground(ThemeARAMS.PRIMARY_DARK);
         lblForm.setBounds(20, 10, 200, 20);
         add(lblForm);
 
         // Codigo de Solicitud con Prefijo Estatico S-
         JLabel lblCodigo = new JLabel("Cód. Solicitud:");
+        lblCodigo.setFont(ThemeARAMS.FONT_BODY);
         lblCodigo.setBounds(20, 40, 110, 25);
         add(lblCodigo);
 
-        JLabel lblPrefijoS = new JLabel("S-");
-        lblPrefijoS.setBounds(135, 40, 25, 25);
+        JLabel lblPrefijoS = ThemeARAMS.crearBadgePrefijo("S-");
+        lblPrefijoS.setBounds(135, 40, 28, 25);
         add(lblPrefijoS);
 
         txtCodigo = new JTextField();
-        txtCodigo.setBounds(160, 40, 120, 25);
+        txtCodigo.setBounds(168, 40, 112, 25);
+        ThemeARAMS.aplicarEstiloCampo(txtCodigo);
         UIUtils.aplicarRestriccionNumerica(txtCodigo, 3);
         add(txtCodigo);
 
         // Codigo de Animal con Prefijo Estatico A-
         JLabel lblAnimal = new JLabel("Cód. Animal:");
+        lblAnimal.setFont(ThemeARAMS.FONT_BODY);
         lblAnimal.setBounds(20, 80, 110, 25);
         add(lblAnimal);
 
-        JLabel lblPrefijoA = new JLabel("A-");
-        lblPrefijoA.setBounds(135, 80, 25, 25);
+        JLabel lblPrefijoA = ThemeARAMS.crearBadgePrefijo("A-");
+        lblPrefijoA.setBounds(135, 80, 28, 25);
         add(lblPrefijoA);
 
         txtCodigoAnimal = new JTextField();
-        txtCodigoAnimal.setBounds(160, 80, 120, 25);
+        txtCodigoAnimal.setBounds(168, 80, 112, 25);
+        ThemeARAMS.aplicarEstiloCampo(txtCodigoAnimal);
         UIUtils.aplicarRestriccionNumerica(txtCodigoAnimal, 3);
         add(txtCodigoAnimal);
 
         // Codigo de Adoptante con Prefijo Estatico AD-
         JLabel lblAdoptante = new JLabel("Cód. Adoptante:");
+        lblAdoptante.setFont(ThemeARAMS.FONT_BODY);
         lblAdoptante.setBounds(20, 120, 110, 25);
         add(lblAdoptante);
 
-        JLabel lblPrefijoAD = new JLabel("AD-");
-        lblPrefijoAD.setBounds(135, 120, 30, 25);
+        JLabel lblPrefijoAD = ThemeARAMS.crearBadgePrefijo("AD-");
+        lblPrefijoAD.setBounds(135, 120, 32, 25);
         add(lblPrefijoAD);
 
         txtCodigoAdoptante = new JTextField();
-        txtCodigoAdoptante.setBounds(165, 120, 115, 25);
+        txtCodigoAdoptante.setBounds(172, 120, 108, 25);
+        ThemeARAMS.aplicarEstiloCampo(txtCodigoAdoptante);
         UIUtils.aplicarRestriccionNumerica(txtCodigoAdoptante, 3);
         add(txtCodigoAdoptante);
 
         // Fecha de Solicitud (Solo Lectura con fecha actual del sistema)
         JLabel lblFecha = new JLabel("Fecha Solicitud:");
+        lblFecha.setFont(ThemeARAMS.FONT_BODY);
         lblFecha.setBounds(20, 160, 110, 25);
         add(lblFecha);
 
         txtFecha = new JTextField(UIUtils.obtenerFechaHoy());
         txtFecha.setBounds(135, 160, 145, 25);
         txtFecha.setEditable(false);
+        ThemeARAMS.aplicarEstiloCampo(txtFecha);
         add(txtFecha);
 
         // Botones de Accion
         btnRegistrar = new JButton("Registrar");
-        btnRegistrar.setBounds(20, 210, 120, 25);
+        btnRegistrar.setBounds(20, 210, 120, 28);
+        ThemeARAMS.aplicarEstiloBotonPrincipal(btnRegistrar);
         add(btnRegistrar);
 
         btnAprobar = new JButton("Aprobar");
-        btnAprobar.setBounds(160, 210, 120, 25);
+        btnAprobar.setBounds(160, 210, 120, 28);
         btnAprobar.setEnabled(false); // Deshabilitado inicialmente
+        ThemeARAMS.aplicarEstiloBotonAprobacion(btnAprobar);
         add(btnAprobar);
 
         btnRechazar = new JButton("Rechazar");
-        btnRechazar.setBounds(20, 250, 120, 25);
+        btnRechazar.setBounds(20, 250, 120, 28);
         btnRechazar.setEnabled(false); // Deshabilitado inicialmente
+        ThemeARAMS.aplicarEstiloBotonPeligro(btnRechazar);
         add(btnRechazar);
 
         btnLimpiar = new JButton("Limpiar");
-        btnLimpiar.setBounds(160, 250, 120, 25);
+        btnLimpiar.setBounds(160, 250, 120, 28);
+        ThemeARAMS.aplicarEstiloBotonSecundario(btnLimpiar);
         add(btnLimpiar);
 
         // 2. Panel de Filtros
         JLabel lblFiltros = new JLabel("FILTROS DE BÚSQUEDA");
+        lblFiltros.setFont(ThemeARAMS.FONT_HEADLINE);
+        lblFiltros.setForeground(ThemeARAMS.PRIMARY_DARK);
         lblFiltros.setBounds(320, 10, 200, 20);
         add(lblFiltros);
 
         JLabel lblFCodigo = new JLabel("Código:");
+        lblFCodigo.setFont(ThemeARAMS.FONT_BODY);
         lblFCodigo.setBounds(320, 40, 50, 25);
         add(lblFCodigo);
 
-        JLabel lblFPrefijoS = new JLabel("S-");
-        lblFPrefijoS.setBounds(370, 40, 20, 25);
+        JLabel lblFPrefijoS = ThemeARAMS.crearBadgePrefijo("S-");
+        lblFPrefijoS.setBounds(370, 40, 25, 25);
         add(lblFPrefijoS);
 
         txtFiltroCodigo = new JTextField();
-        txtFiltroCodigo.setBounds(390, 40, 70, 25);
+        txtFiltroCodigo.setBounds(398, 40, 65, 25);
+        ThemeARAMS.aplicarEstiloCampo(txtFiltroCodigo);
         UIUtils.aplicarRestriccionNumerica(txtFiltroCodigo, 3);
         add(txtFiltroCodigo);
 
         JLabel lblFAnimal = new JLabel("Animal:");
+        lblFAnimal.setFont(ThemeARAMS.FONT_BODY);
         lblFAnimal.setBounds(475, 40, 50, 25);
         add(lblFAnimal);
 
-        JLabel lblFPrefijoA = new JLabel("A-");
-        lblFPrefijoA.setBounds(525, 40, 20, 25);
+        JLabel lblFPrefijoA = ThemeARAMS.crearBadgePrefijo("A-");
+        lblFPrefijoA.setBounds(525, 40, 25, 25);
         add(lblFPrefijoA);
 
         txtFiltroAnimal = new JTextField();
-        txtFiltroAnimal.setBounds(545, 40, 90, 25);
+        txtFiltroAnimal.setBounds(553, 40, 80, 25);
+        ThemeARAMS.aplicarEstiloCampo(txtFiltroAnimal);
         UIUtils.aplicarRestriccionNumerica(txtFiltroAnimal, 3);
         add(txtFiltroAnimal);
 
         JLabel lblFAdoptante = new JLabel("Adopt.:");
+        lblFAdoptante.setFont(ThemeARAMS.FONT_BODY);
         lblFAdoptante.setBounds(320, 80, 50, 25);
         add(lblFAdoptante);
 
-        JLabel lblFPrefijoAD = new JLabel("AD-");
-        lblFPrefijoAD.setBounds(370, 80, 25, 25);
+        JLabel lblFPrefijoAD = ThemeARAMS.crearBadgePrefijo("AD-");
+        lblFPrefijoAD.setBounds(370, 80, 30, 25);
         add(lblFPrefijoAD);
 
         txtFiltroAdoptante = new JTextField();
-        txtFiltroAdoptante.setBounds(395, 80, 65, 25);
+        txtFiltroAdoptante.setBounds(405, 80, 60, 25);
+        ThemeARAMS.aplicarEstiloCampo(txtFiltroAdoptante);
         UIUtils.aplicarRestriccionNumerica(txtFiltroAdoptante, 3);
         add(txtFiltroAdoptante);
 
         JLabel lblFEstado = new JLabel("Estado:");
+        lblFEstado.setFont(ThemeARAMS.FONT_BODY);
         lblFEstado.setBounds(475, 80, 50, 25);
         add(lblFEstado);
 
         String[] estados = {"TODOS", "PENDIENTE", "APROBADA", "RECHAZADA"};
         cbFiltroEstado = new JComboBox<>(estados);
+        cbFiltroEstado.setFont(ThemeARAMS.FONT_BODY);
         cbFiltroEstado.setBounds(525, 80, 110, 25);
         add(cbFiltroEstado);
 
         JButton btnFiltrar = new JButton("Filtrar / Buscar");
-        btnFiltrar.setBounds(650, 40, 120, 65);
+        btnFiltrar.setBounds(645, 40, 125, 65);
+        ThemeARAMS.aplicarEstiloBotonPrincipal(btnFiltrar);
         add(btnFiltrar);
 
         // 3. Tabla de Resultados
@@ -185,8 +212,10 @@ public class SolicitudPanel extends JPanel {
             }
         };
         tblSolicitudes = new JTable(tableModel);
+        ThemeARAMS.aplicarEstiloTabla(tblSolicitudes);
         JScrollPane scrollTable = new JScrollPane(tblSolicitudes);
         scrollTable.setBounds(320, 120, 450, 310);
+        scrollTable.getViewport().setBackground(Color.WHITE);
         add(scrollTable);
 
         // Eventos
@@ -368,6 +397,10 @@ public class SolicitudPanel extends JPanel {
                 btnAprobar.setEnabled(false);
                 btnRechazar.setEnabled(false);
             }
+        } else {
+            btnAprobar.setEnabled(false);
+            btnRechazar.setEnabled(false);
+            btnRegistrar.setEnabled(true);
         }
     }
 }

@@ -4,36 +4,72 @@ import cris.sic.refugio.modelo.Usuario;
 import cris.sic.refugio.servicio.AutenticacionServicio;
 import cris.sic.refugio.servicio.BitacoraServicio;
 
+import javax.swing.BorderFactory;
+import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
-import javax.swing.JButton;
+import javax.swing.JPanel;
 import javax.swing.JTabbedPane;
+import javax.swing.SwingConstants;
+import java.awt.Color;
+import java.awt.Cursor;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
-// Ventana principal del sistema, configurada manualmente utilizando Java Swing
+// Ventana principal del sistema, configurada manualmente con diseno ARAMS (Kindred Shelter Systems)
 public class JFrameMain extends JFrame {
 
     public JFrameMain() {
         // Configuracion basica del JFrame principal
-        setTitle("Sistema de Gestion de Refugio de Animales");
+        setTitle("ARAMS — Sistema de Gestión de Refugio de Animales");
         setSize(800, 600);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setLocationRelativeTo(null);
         setLayout(null);
+        getContentPane().setBackground(ThemeARAMS.BACKGROUND);
 
         // Obtener el usuario autenticado
         Usuario u = AutenticacionServicio.getUsuarioLogueado();
-        String nombreUser = (u != null) ? u.getUsuario() : "Invitado";
-        String rolUser = (u != null) ? u.getRol() : "Ninguno";
+        final String nombreUser = (u != null) ? u.getUsuario() : "Invitado";
+        final String rolUser = (u != null) ? u.getRol() : "Ninguno";
 
-        JLabel lblBienvenida = new JLabel("Bienvenido: " + nombreUser + " (" + rolUser + ")");
-        lblBienvenida.setBounds(50, 30, 300, 25);
-        add(lblBienvenida);
+        // 1. TopAppBar Global ARAMS
+        JPanel pnlHeader = new JPanel();
+        pnlHeader.setBounds(0, 0, 800, 65);
+        pnlHeader.setBackground(ThemeARAMS.PRIMARY_DARK);
+        pnlHeader.setLayout(null);
+
+        JLabel lblBrand = new JLabel("🐾 ARAMS");
+        lblBrand.setFont(ThemeARAMS.FONT_DISPLAY);
+        lblBrand.setForeground(Color.WHITE);
+        lblBrand.setBounds(16, 12, 120, 24);
+        pnlHeader.add(lblBrand);
+
+        JLabel lblSubtitle = new JLabel("Kindred Shelter Systems — Refugio de Animales");
+        lblSubtitle.setFont(ThemeARAMS.FONT_SMALL);
+        lblSubtitle.setForeground(ThemeARAMS.PRIMARY_CONTAINER);
+        lblSubtitle.setBounds(16, 38, 300, 16);
+        pnlHeader.add(lblSubtitle);
+
+        // Chip/Badge de Usuario Activo
+        JLabel lblUserBadge = new JLabel("👤 " + nombreUser + " (" + rolUser + ")", SwingConstants.CENTER);
+        lblUserBadge.setFont(ThemeARAMS.FONT_BODY_BOLD);
+        lblUserBadge.setForeground(ThemeARAMS.PRIMARY_DARK);
+        lblUserBadge.setBackground(ThemeARAMS.PRIMARY_CONTAINER);
+        lblUserBadge.setOpaque(true);
+        lblUserBadge.setBorder(BorderFactory.createCompoundBorder(
+            BorderFactory.createLineBorder(new Color(0x70, 0xA8, 0x88), 1),
+            BorderFactory.createEmptyBorder(2, 8, 2, 8)
+        ));
+        lblUserBadge.setBounds(480, 18, 175, 28);
+        pnlHeader.add(lblUserBadge);
 
         JButton btnCerrarSesion = new JButton("Cerrar Sesión");
-        btnCerrarSesion.setBounds(630, 30, 120, 30);
-        add(btnCerrarSesion);
+        btnCerrarSesion.setBounds(665, 18, 115, 28);
+        ThemeARAMS.aplicarEstiloBotonPeligro(btnCerrarSesion);
+        pnlHeader.add(btnCerrarSesion);
+
+        add(pnlHeader);
 
         // Instanciar los paneles correspondientes a los modulos
         final AnimalPanel panelAnimales = new AnimalPanel();
@@ -46,14 +82,17 @@ public class JFrameMain extends JFrame {
 
         // Panel de pestañas para albergar los modulos core
         JTabbedPane pestanas = new JTabbedPane();
-        pestanas.setBounds(10, 80, 777, 470);
-        pestanas.addTab("Animales", panelAnimales);
-        pestanas.addTab("Adoptantes", panelAdoptantes);
-        pestanas.addTab("Solicitudes", panelSolicitudes);
-        pestanas.addTab("Rescates", panelRescates);
-        pestanas.addTab("Ubicaciones", panelUbicaciones);
-        pestanas.addTab("Reportes", panelReportes);
-        pestanas.addTab("Estudiante", panelEstudiante);
+        pestanas.setBounds(10, 75, 777, 475);
+        pestanas.setFont(ThemeARAMS.FONT_BODY_BOLD);
+        pestanas.setBackground(Color.WHITE);
+        pestanas.setForeground(ThemeARAMS.PRIMARY_DARK);
+        pestanas.addTab("🐾 Animales", panelAnimales);
+        pestanas.addTab("👥 Adoptantes", panelAdoptantes);
+        pestanas.addTab("📄 Solicitudes", panelSolicitudes);
+        pestanas.addTab("🚑 Rescates", panelRescates);
+        pestanas.addTab("🗺️ Ubicaciones", panelUbicaciones);
+        pestanas.addTab("📊 Reportes", panelReportes);
+        pestanas.addTab("🎓 Estudiante", panelEstudiante);
         add(pestanas);
 
         // Evento para refrescar la informacion de las tablas y cuadriculas al cambiar de pestaña
@@ -76,7 +115,7 @@ public class JFrameMain extends JFrame {
                 LoginFrame lf = new LoginFrame();
                 lf.setVisible(true);
                 dispose();
-                BitacoraServicio.registrarAccion(nombreUser, "Autenticacion", "Inicio de sesion exitoso. Rol: " + rolUser);
+                BitacoraServicio.registrarAccion(nombreUser, "Autenticacion", "Cierre de sesion exitoso. Rol: " + rolUser);
             }
         });
     }

@@ -20,6 +20,7 @@ import javax.swing.JOptionPane;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 import javax.swing.table.DefaultTableModel;
+import java.awt.Color;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
@@ -53,102 +54,129 @@ public class RescatePanel extends JPanel {
 
     public RescatePanel() {
         setLayout(null);
+        setBackground(ThemeARAMS.BACKGROUND);
 
         // 1. Panel de Formulario Unificado - Registro de Rescate
         JLabel lblForm = new JLabel("REGISTRO UNIFICADO DE RESCATE");
+        lblForm.setFont(ThemeARAMS.FONT_HEADLINE);
+        lblForm.setForeground(ThemeARAMS.PRIMARY_DARK);
         lblForm.setBounds(20, 10, 260, 20);
         add(lblForm);
 
-        // Codigo de Rescate con Prefijo Estatico R-
+        // Codigo de Rescate con Prefijo Estatico R- (Opcional - auto-generado si vacio)
         JLabel lblCodigo = new JLabel("Cód. Rescate:");
+        lblCodigo.setFont(ThemeARAMS.FONT_BODY);
         lblCodigo.setBounds(20, 35, 100, 25);
         add(lblCodigo);
 
-        JLabel lblPrefijoRescate = new JLabel("R-");
-        lblPrefijoRescate.setBounds(130, 35, 25, 25);
+        JLabel lblPrefijoRescate = ThemeARAMS.crearBadgePrefijo("R-");
+        lblPrefijoRescate.setBounds(125, 35, 28, 25);
         add(lblPrefijoRescate);
 
         txtCodigo = new JTextField();
-        txtCodigo.setBounds(155, 35, 125, 25);
+        txtCodigo.setBounds(158, 35, 122, 25);
+        txtCodigo.setToolTipText("Opcional: Deje vacío para auto-generar correlativo R-xxx");
+        ThemeARAMS.aplicarEstiloCampo(txtCodigo);
         UIUtils.aplicarRestriccionNumerica(txtCodigo, 3);
         add(txtCodigo);
 
         // Direccion / Descripcion
         JLabel lblDireccion = new JLabel("Dirección / Desc:");
+        lblDireccion.setFont(ThemeARAMS.FONT_BODY);
         lblDireccion.setBounds(20, 68, 110, 25);
         add(lblDireccion);
 
         txtDireccion = new JTextField();
-        txtDireccion.setBounds(130, 68, 150, 25);
+        txtDireccion.setBounds(125, 68, 155, 25);
+        ThemeARAMS.aplicarEstiloCampo(txtDireccion);
         add(txtDireccion);
 
         // Prioridad
         JLabel lblPrioridad = new JLabel("Prioridad:");
+        lblPrioridad.setFont(ThemeARAMS.FONT_BODY);
         lblPrioridad.setBounds(20, 101, 100, 25);
         add(lblPrioridad);
 
         String[] prioridades = {"ALTA", "MEDIA", "BAJA"};
         cbPrioridad = new JComboBox<>(prioridades);
-        cbPrioridad.setBounds(130, 101, 150, 25);
+        cbPrioridad.setFont(ThemeARAMS.FONT_BODY);
+        cbPrioridad.setBounds(125, 101, 155, 25);
         add(cbPrioridad);
 
-        // Fecha de Solo Lectura (Fecha del sistema por defecto)
+        // Fecha de Rescate (Solo Lectura con fecha actual del sistema)
         JLabel lblFecha = new JLabel("Fecha Rescate:");
+        lblFecha.setFont(ThemeARAMS.FONT_BODY);
         lblFecha.setBounds(20, 134, 110, 25);
         add(lblFecha);
 
         txtFecha = new JTextField(UIUtils.obtenerFechaHoy());
-        txtFecha.setBounds(130, 134, 150, 25);
+        txtFecha.setBounds(125, 134, 155, 25);
         txtFecha.setEditable(false);
+        ThemeARAMS.aplicarEstiloCampo(txtFecha);
         add(txtFecha);
 
         // Subseccion del Animal Rescatado dentro de la misma vista
-        JLabel lblAnimalSec = new JLabel("DATOS DEL ANIMAL RESCATADO");
+        JLabel lblAnimalSec = new JLabel("DATOS DEL ANIMAL ASOCIADO");
+        lblAnimalSec.setFont(ThemeARAMS.FONT_HEADLINE);
+        lblAnimalSec.setForeground(ThemeARAMS.PRIMARY_DARK);
         lblAnimalSec.setBounds(20, 168, 260, 20);
         add(lblAnimalSec);
 
-        // Codigo de Animal con Prefijo Estatico A-
+        // Codigo de Animal con Prefijo Estatico A- (Opcional - auto-generado si vacio)
         JLabel lblCodAnimal = new JLabel("Cód. Animal:");
+        lblCodAnimal.setFont(ThemeARAMS.FONT_BODY);
         lblCodAnimal.setBounds(20, 193, 100, 25);
         add(lblCodAnimal);
 
-        JLabel lblPrefijoAnimal = new JLabel("A-");
-        lblPrefijoAnimal.setBounds(130, 193, 25, 25);
+        JLabel lblPrefijoAnimal = ThemeARAMS.crearBadgePrefijo("A-");
+        lblPrefijoAnimal.setBounds(125, 193, 28, 25);
         add(lblPrefijoAnimal);
 
         txtCodigoAnimal = new JTextField();
-        txtCodigoAnimal.setBounds(155, 193, 125, 25);
+        txtCodigoAnimal.setBounds(158, 193, 122, 25);
+        txtCodigoAnimal.setToolTipText("Opcional: Deje vacío para auto-generar correlativo A-xxx");
+        ThemeARAMS.aplicarEstiloCampo(txtCodigoAnimal);
         UIUtils.aplicarRestriccionNumerica(txtCodigoAnimal, 3);
         add(txtCodigoAnimal);
 
         // Nombre del Animal
         JLabel lblNombreAuto = new JLabel("Nombre Animal:");
+        lblNombreAuto.setFont(ThemeARAMS.FONT_BODY);
         lblNombreAuto.setBounds(20, 226, 100, 25);
         add(lblNombreAuto);
 
         txtNombreAnimal = new JTextField();
-        txtNombreAnimal.setBounds(130, 226, 150, 25);
+        txtNombreAnimal.setBounds(125, 226, 155, 25);
+        ThemeARAMS.aplicarEstiloCampo(txtNombreAnimal);
         add(txtNombreAnimal);
 
         // Especie con RadioButtons (Perro, Gato, Otro) y campo dinamico
         JLabel lblEspecie = new JLabel("Especie:");
+        lblEspecie.setFont(ThemeARAMS.FONT_BODY);
         lblEspecie.setBounds(20, 258, 60, 20);
         add(lblEspecie);
 
         rbPerro = new JRadioButton("Perro");
+        rbPerro.setFont(ThemeARAMS.FONT_BODY);
+        rbPerro.setOpaque(false);
         rbPerro.setBounds(85, 258, 65, 20);
         add(rbPerro);
 
         rbGato = new JRadioButton("Gato");
+        rbGato.setFont(ThemeARAMS.FONT_BODY);
+        rbGato.setOpaque(false);
         rbGato.setBounds(155, 258, 60, 20);
         add(rbGato);
 
         rbOtro = new JRadioButton("Otro:");
+        rbOtro.setFont(ThemeARAMS.FONT_BODY);
+        rbOtro.setOpaque(false);
         rbOtro.setBounds(85, 281, 60, 22);
         add(rbOtro);
 
         txtEspecieOtra = new JTextField();
         txtEspecieOtra.setBounds(145, 281, 135, 22);
+        ThemeARAMS.aplicarEstiloCampo(txtEspecieOtra);
         txtEspecieOtra.setEnabled(false);
         add(txtEspecieOtra);
 
@@ -185,50 +213,61 @@ public class RescatePanel extends JPanel {
         // Botones de Accion del Formulario
         btnRegistrar = new JButton("Registrar Rescate");
         btnRegistrar.setBounds(20, 316, 260, 30);
+        ThemeARAMS.aplicarEstiloBotonPrincipal(btnRegistrar);
         add(btnRegistrar);
 
         btnLimpiar = new JButton("Limpiar Formulario");
         btnLimpiar.setBounds(20, 353, 260, 28);
+        ThemeARAMS.aplicarEstiloBotonSecundario(btnLimpiar);
         add(btnLimpiar);
 
         // 2. Panel de Filtros de Busqueda (Derecha)
         JLabel lblFiltros = new JLabel("FILTROS DE BÚSQUEDA");
+        lblFiltros.setFont(ThemeARAMS.FONT_HEADLINE);
+        lblFiltros.setForeground(ThemeARAMS.PRIMARY_DARK);
         lblFiltros.setBounds(320, 10, 200, 20);
         add(lblFiltros);
 
         JLabel lblFCodigo = new JLabel("Código:");
+        lblFCodigo.setFont(ThemeARAMS.FONT_BODY);
         lblFCodigo.setBounds(320, 40, 50, 25);
         add(lblFCodigo);
 
-        JLabel lblFPrefijo = new JLabel("R-");
-        lblFPrefijo.setBounds(370, 40, 20, 25);
+        JLabel lblFPrefijo = ThemeARAMS.crearBadgePrefijo("R-");
+        lblFPrefijo.setBounds(370, 40, 25, 25);
         add(lblFPrefijo);
 
         txtFiltroCodigo = new JTextField();
-        txtFiltroCodigo.setBounds(390, 40, 75, 25);
+        txtFiltroCodigo.setBounds(398, 40, 67, 25);
+        ThemeARAMS.aplicarEstiloCampo(txtFiltroCodigo);
         UIUtils.aplicarRestriccionNumerica(txtFiltroCodigo, 3);
         add(txtFiltroCodigo);
 
         JLabel lblFPrioridad = new JLabel("Prioridad:");
+        lblFPrioridad.setFont(ThemeARAMS.FONT_BODY);
         lblFPrioridad.setBounds(480, 40, 70, 25);
         add(lblFPrioridad);
 
         String[] filtroPrioridades = {"TODOS", "ALTA", "MEDIA", "BAJA"};
         cbFiltroPrioridad = new JComboBox<>(filtroPrioridades);
+        cbFiltroPrioridad.setFont(ThemeARAMS.FONT_BODY);
         cbFiltroPrioridad.setBounds(550, 40, 85, 25);
         add(cbFiltroPrioridad);
 
         JLabel lblFEstado = new JLabel("Estado:");
+        lblFEstado.setFont(ThemeARAMS.FONT_BODY);
         lblFEstado.setBounds(320, 80, 60, 25);
         add(lblFEstado);
 
         String[] filtroEstados = {"TODOS", "PENDIENTE", "ATENDIDO"};
         cbFiltroEstado = new JComboBox<>(filtroEstados);
+        cbFiltroEstado.setFont(ThemeARAMS.FONT_BODY);
         cbFiltroEstado.setBounds(380, 80, 90, 25);
         add(cbFiltroEstado);
 
         JButton btnFiltrar = new JButton("Filtrar / Buscar");
-        btnFiltrar.setBounds(650, 40, 120, 65);
+        btnFiltrar.setBounds(645, 40, 125, 65);
+        ThemeARAMS.aplicarEstiloBotonPrincipal(btnFiltrar);
         add(btnFiltrar);
 
         // 3. Tabla de Resultados
@@ -240,8 +279,10 @@ public class RescatePanel extends JPanel {
             }
         };
         tblRescates = new JTable(tableModel);
+        ThemeARAMS.aplicarEstiloTabla(tblRescates);
         JScrollPane scrollTable = new JScrollPane(tblRescates);
         scrollTable.setBounds(320, 120, 450, 315);
+        scrollTable.getViewport().setBackground(Color.WHITE);
         add(scrollTable);
 
         // Eventos
@@ -360,13 +401,11 @@ public class RescatePanel extends JPanel {
         String nombreAnimal = txtNombreAnimal.getText().trim();
         
         String especieAnimal = obtenerEspecieSeleccionada();
-        if (especieAnimal == null) {
-            JOptionPane.showMessageDialog(this, "Debe especificar la especie en la caja de texto al seleccionar 'Otro'.", "Validación Requerida", JOptionPane.ERROR_MESSAGE);
-            return;
+        if (especieAnimal == null || especieAnimal.trim().isEmpty()) {
+            especieAnimal = "Desconocido";
         }
-        if (especieAnimal.isEmpty()) {
-            JOptionPane.showMessageDialog(this, "Debe seleccionar una especie para el animal rescatado (Perro, Gato u Otro).", "Validación Requerida", JOptionPane.ERROR_MESSAGE);
-            return;
+        if (nombreAnimal.isEmpty()) {
+            nombreAnimal = "Desconocido";
         }
 
         Usuario u = AutenticacionServicio.getUsuarioLogueado();
@@ -375,7 +414,7 @@ public class RescatePanel extends JPanel {
         String res = RescateServicio.registrarRescateUnificado(codRescate, direccion, prioridad, fecha, 
                                                                codAnimal, nombreAnimal, especieAnimal, user);
         if (res.equals("SUCCESS")) {
-            JOptionPane.showMessageDialog(this, "Rescate y animal asociado registrados con éxito.", "Registro Unificado Exitoso", JOptionPane.INFORMATION_MESSAGE);
+            JOptionPane.showMessageDialog(this, "Rescate y animal asociado registrados con éxito dentro de la transacción unificada.", "Registro Unificado Exitoso", JOptionPane.INFORMATION_MESSAGE);
             limpiarCampos();
             buscar();
         } else {
@@ -439,6 +478,10 @@ public class RescatePanel extends JPanel {
             txtCodigo.setEditable(false);
             txtCodigoAnimal.setEditable(false);
             btnRegistrar.setEnabled(false);
+        } else {
+            txtCodigo.setEditable(true);
+            txtCodigoAnimal.setEditable(true);
+            btnRegistrar.setEnabled(true);
         }
     }
 }

@@ -15,6 +15,7 @@ import javax.swing.JOptionPane;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 import javax.swing.table.DefaultTableModel;
+import java.awt.Color;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
@@ -39,106 +40,129 @@ public class AdoptantePanel extends JPanel {
 
     public AdoptantePanel() {
         setLayout(null);
+        setBackground(ThemeARAMS.BACKGROUND);
 
         // 1. Panel de Formulario
         JLabel lblForm = new JLabel("DATOS DEL ADOPTANTE");
+        lblForm.setFont(ThemeARAMS.FONT_HEADLINE);
+        lblForm.setForeground(ThemeARAMS.PRIMARY_DARK);
         lblForm.setBounds(20, 10, 200, 20);
         add(lblForm);
 
         // Codigo con Prefijo Estatico AD-
         JLabel lblCodigo = new JLabel("Código Adoptante:");
+        lblCodigo.setFont(ThemeARAMS.FONT_BODY);
         lblCodigo.setBounds(20, 40, 110, 25);
         add(lblCodigo);
 
-        JLabel lblPrefijo = new JLabel("AD-");
-        lblPrefijo.setBounds(140, 40, 30, 25);
+        JLabel lblPrefijo = ThemeARAMS.crearBadgePrefijo("AD-");
+        lblPrefijo.setBounds(135, 40, 32, 25);
         add(lblPrefijo);
 
         txtCodigo = new JTextField();
-        txtCodigo.setBounds(170, 40, 110, 25);
+        txtCodigo.setBounds(172, 40, 108, 25);
+        ThemeARAMS.aplicarEstiloCampo(txtCodigo);
         UIUtils.aplicarRestriccionNumerica(txtCodigo, 3);
         add(txtCodigo);
 
         // Nombre
         JLabel lblNombre = new JLabel("Nombre Completo:");
+        lblNombre.setFont(ThemeARAMS.FONT_BODY);
         lblNombre.setBounds(20, 80, 120, 25);
         add(lblNombre);
 
         txtNombre = new JTextField();
-        txtNombre.setBounds(140, 80, 140, 25);
+        txtNombre.setBounds(135, 80, 145, 25);
+        ThemeARAMS.aplicarEstiloCampo(txtNombre);
         add(txtNombre);
 
         // DPI (solo numeros, 13 digitos max)
         JLabel lblDpi = new JLabel("DPI (13 dígitos):");
+        lblDpi.setFont(ThemeARAMS.FONT_BODY);
         lblDpi.setBounds(20, 120, 120, 25);
         add(lblDpi);
 
         txtDpi = new JTextField();
-        txtDpi.setBounds(140, 120, 140, 25);
+        txtDpi.setBounds(135, 120, 145, 25);
+        ThemeARAMS.aplicarEstiloCampo(txtDpi);
         UIUtils.aplicarRestriccionNumerica(txtDpi, 13);
         add(txtDpi);
 
         // Telefono (solo numeros, 8 digitos max)
         JLabel lblTelefono = new JLabel("Teléfono (8 dígitos):");
+        lblTelefono.setFont(ThemeARAMS.FONT_BODY);
         lblTelefono.setBounds(20, 160, 120, 25);
         add(lblTelefono);
 
         txtTelefono = new JTextField();
-        txtTelefono.setBounds(140, 160, 140, 25);
+        txtTelefono.setBounds(135, 160, 145, 25);
+        ThemeARAMS.aplicarEstiloCampo(txtTelefono);
         UIUtils.aplicarRestriccionNumerica(txtTelefono, 8);
         add(txtTelefono);
 
         // Botones del Formulario
         btnRegistrar = new JButton("Registrar");
-        btnRegistrar.setBounds(20, 210, 120, 25);
+        btnRegistrar.setBounds(20, 210, 120, 28);
+        ThemeARAMS.aplicarEstiloBotonPrincipal(btnRegistrar);
         add(btnRegistrar);
 
         btnActualizar = new JButton("Actualizar");
-        btnActualizar.setBounds(160, 210, 120, 25);
+        btnActualizar.setBounds(160, 210, 120, 28);
         btnActualizar.setEnabled(false); // Deshabilitado inicialmente
+        ThemeARAMS.aplicarEstiloBotonSecundario(btnActualizar);
         add(btnActualizar);
 
         btnLimpiar = new JButton("Limpiar");
-        btnLimpiar.setBounds(20, 250, 260, 25);
+        btnLimpiar.setBounds(20, 250, 260, 28);
+        ThemeARAMS.aplicarEstiloBotonSecundario(btnLimpiar);
         add(btnLimpiar);
 
         // 2. Panel de Filtros
         JLabel lblFiltros = new JLabel("FILTROS DE BÚSQUEDA");
+        lblFiltros.setFont(ThemeARAMS.FONT_HEADLINE);
+        lblFiltros.setForeground(ThemeARAMS.PRIMARY_DARK);
         lblFiltros.setBounds(320, 10, 200, 20);
         add(lblFiltros);
 
         JLabel lblFCodigo = new JLabel("Código:");
+        lblFCodigo.setFont(ThemeARAMS.FONT_BODY);
         lblFCodigo.setBounds(320, 40, 50, 25);
         add(lblFCodigo);
 
-        JLabel lblFPrefijo = new JLabel("AD-");
-        lblFPrefijo.setBounds(370, 40, 25, 25);
+        JLabel lblFPrefijo = ThemeARAMS.crearBadgePrefijo("AD-");
+        lblFPrefijo.setBounds(370, 40, 30, 25);
         add(lblFPrefijo);
 
         txtFiltroCodigo = new JTextField();
-        txtFiltroCodigo.setBounds(395, 40, 70, 25);
+        txtFiltroCodigo.setBounds(405, 40, 65, 25);
+        ThemeARAMS.aplicarEstiloCampo(txtFiltroCodigo);
         UIUtils.aplicarRestriccionNumerica(txtFiltroCodigo, 3);
         add(txtFiltroCodigo);
 
         JLabel lblFNombre = new JLabel("Nombre:");
+        lblFNombre.setFont(ThemeARAMS.FONT_BODY);
         lblFNombre.setBounds(475, 40, 55, 25);
         add(lblFNombre);
 
         txtFiltroNombre = new JTextField();
         txtFiltroNombre.setBounds(535, 40, 100, 25);
+        ThemeARAMS.aplicarEstiloCampo(txtFiltroNombre);
         add(txtFiltroNombre);
 
         JLabel lblFDpi = new JLabel("DPI:");
+        lblFDpi.setFont(ThemeARAMS.FONT_BODY);
         lblFDpi.setBounds(320, 80, 50, 25);
         add(lblFDpi);
 
         txtFiltroDpi = new JTextField();
         txtFiltroDpi.setBounds(370, 80, 265, 25);
+        ThemeARAMS.aplicarEstiloCampo(txtFiltroDpi);
         UIUtils.aplicarRestriccionNumerica(txtFiltroDpi, 13);
         add(txtFiltroDpi);
 
         JButton btnFiltrar = new JButton("Filtrar / Buscar");
-        btnFiltrar.setBounds(650, 40, 120, 65);
+        btnFiltrar.setBounds(645, 40, 125, 65);
+        ThemeARAMS.aplicarEstiloBotonPrincipal(btnFiltrar);
         add(btnFiltrar);
 
         // 3. Tabla de Resultados
@@ -150,8 +174,10 @@ public class AdoptantePanel extends JPanel {
             }
         };
         tblAdoptantes = new JTable(tableModel);
+        ThemeARAMS.aplicarEstiloTabla(tblAdoptantes);
         JScrollPane scrollTable = new JScrollPane(tblAdoptantes);
         scrollTable.setBounds(320, 120, 450, 320);
+        scrollTable.getViewport().setBackground(Color.WHITE);
         add(scrollTable);
 
         // Carga inicial directamente de la bitacora
@@ -288,6 +314,9 @@ public class AdoptantePanel extends JPanel {
             txtCodigo.setEditable(false);
             btnActualizar.setEnabled(true);
             btnRegistrar.setEnabled(false);
+        } else {
+            btnActualizar.setEnabled(false);
+            btnRegistrar.setEnabled(true);
         }
     }
 }

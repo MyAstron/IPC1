@@ -18,6 +18,7 @@ import javax.swing.JOptionPane;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 import javax.swing.table.DefaultTableModel;
+import java.awt.Color;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
@@ -53,54 +54,69 @@ public class AnimalPanel extends JPanel {
 
     public AnimalPanel() {
         setLayout(null);
+        setBackground(ThemeARAMS.BACKGROUND);
 
         // 1. Panel de Formulario
         JLabel lblForm = new JLabel("DATOS DEL ANIMAL");
+        lblForm.setFont(ThemeARAMS.FONT_HEADLINE);
+        lblForm.setForeground(ThemeARAMS.PRIMARY_DARK);
         lblForm.setBounds(20, 10, 200, 20);
         add(lblForm);
 
         // Codigo con Prefijo Estatico A-
         JLabel lblCodigo = new JLabel("Código Animal:");
+        lblCodigo.setFont(ThemeARAMS.FONT_BODY);
         lblCodigo.setBounds(20, 40, 100, 25);
         add(lblCodigo);
 
-        JLabel lblPrefijo = new JLabel("A-");
-        lblPrefijo.setBounds(130, 40, 25, 25);
+        JLabel lblPrefijo = ThemeARAMS.crearBadgePrefijo("A-");
+        lblPrefijo.setBounds(125, 40, 28, 25);
         add(lblPrefijo);
 
         txtCodigo = new JTextField();
-        txtCodigo.setBounds(155, 40, 125, 25);
+        txtCodigo.setBounds(158, 40, 122, 25);
+        ThemeARAMS.aplicarEstiloCampo(txtCodigo);
         UIUtils.aplicarRestriccionNumerica(txtCodigo, 3);
         add(txtCodigo);
 
         // Nombre
         JLabel lblNombre = new JLabel("Nombre:");
+        lblNombre.setFont(ThemeARAMS.FONT_BODY);
         lblNombre.setBounds(20, 75, 100, 25);
         add(lblNombre);
 
         txtNombre = new JTextField();
-        txtNombre.setBounds(130, 75, 150, 25);
+        txtNombre.setBounds(125, 75, 155, 25);
+        ThemeARAMS.aplicarEstiloCampo(txtNombre);
         add(txtNombre);
 
         // Especie con RadioButtons (Perro, Gato, Otro) y campo dinamico
         JLabel lblEspecie = new JLabel("Especie:");
+        lblEspecie.setFont(ThemeARAMS.FONT_BODY);
         lblEspecie.setBounds(20, 110, 60, 20);
         add(lblEspecie);
 
         rbPerro = new JRadioButton("Perro");
+        rbPerro.setFont(ThemeARAMS.FONT_BODY);
+        rbPerro.setOpaque(false);
         rbPerro.setBounds(85, 110, 65, 20);
         add(rbPerro);
 
         rbGato = new JRadioButton("Gato");
+        rbGato.setFont(ThemeARAMS.FONT_BODY);
+        rbGato.setOpaque(false);
         rbGato.setBounds(155, 110, 60, 20);
         add(rbGato);
 
         rbOtro = new JRadioButton("Otro:");
+        rbOtro.setFont(ThemeARAMS.FONT_BODY);
+        rbOtro.setOpaque(false);
         rbOtro.setBounds(85, 135, 60, 22);
         add(rbOtro);
 
         txtEspecieOtra = new JTextField();
         txtEspecieOtra.setBounds(145, 135, 135, 22);
+        ThemeARAMS.aplicarEstiloCampo(txtEspecieOtra);
         txtEspecieOtra.setEnabled(false);
         add(txtEspecieOtra);
 
@@ -136,98 +152,119 @@ public class AnimalPanel extends JPanel {
 
         // Edad (solo numeros, max 2 digitos)
         JLabel lblEdad = new JLabel("Edad:");
+        lblEdad.setFont(ThemeARAMS.FONT_BODY);
         lblEdad.setBounds(20, 165, 100, 25);
         add(lblEdad);
 
         txtEdad = new JTextField();
-        txtEdad.setBounds(130, 165, 150, 25);
+        txtEdad.setBounds(125, 165, 155, 25);
+        ThemeARAMS.aplicarEstiloCampo(txtEdad);
         UIUtils.aplicarRestriccionNumerica(txtEdad, 2);
         add(txtEdad);
 
         // Estado Clinico
         JLabel lblClinico = new JLabel("E. Clínico:");
+        lblClinico.setFont(ThemeARAMS.FONT_BODY);
         lblClinico.setBounds(20, 200, 100, 25);
         add(lblClinico);
 
         String[] estadosClinicos = {"SANO", "EN_TRATAMIENTO", "RECUPERADO"};
         cbEstadoClinico = new JComboBox<>(estadosClinicos);
-        cbEstadoClinico.setBounds(130, 200, 150, 25);
+        cbEstadoClinico.setFont(ThemeARAMS.FONT_BODY);
+        cbEstadoClinico.setBounds(125, 200, 155, 25);
         add(cbEstadoClinico);
 
         // Estado Adopcion
         JLabel lblAdopcion = new JLabel("E. Adopción:");
+        lblAdopcion.setFont(ThemeARAMS.FONT_BODY);
         lblAdopcion.setBounds(20, 235, 100, 25);
         add(lblAdopcion);
 
         String[] estadosAdopcion = {"DISPONIBLE", "ADOPTADO"};
         cbEstadoAdopcion = new JComboBox<>(estadosAdopcion);
-        cbEstadoAdopcion.setBounds(130, 235, 150, 25);
+        cbEstadoAdopcion.setFont(ThemeARAMS.FONT_BODY);
+        cbEstadoAdopcion.setBounds(125, 235, 155, 25);
         add(cbEstadoAdopcion);
 
         // Botones del Formulario
         btnRegistrar = new JButton("Registrar");
         btnRegistrar.setBounds(20, 280, 120, 28);
+        ThemeARAMS.aplicarEstiloBotonPrincipal(btnRegistrar);
         add(btnRegistrar);
 
         btnActualizar = new JButton("Actualizar");
         btnActualizar.setBounds(160, 280, 120, 28);
         btnActualizar.setEnabled(false); // Deshabilitado inicialmente
+        ThemeARAMS.aplicarEstiloBotonSecundario(btnActualizar);
         add(btnActualizar);
 
         btnEliminar = new JButton("Eliminar");
         btnEliminar.setBounds(20, 318, 120, 28);
         btnEliminar.setEnabled(false); // Deshabilitado inicialmente
+        ThemeARAMS.aplicarEstiloBotonPeligro(btnEliminar);
         add(btnEliminar);
 
         btnLimpiar = new JButton("Limpiar");
         btnLimpiar.setBounds(160, 318, 120, 28);
+        ThemeARAMS.aplicarEstiloBotonSecundario(btnLimpiar);
         add(btnLimpiar);
 
         // 2. Panel de Filtros
         JLabel lblFiltros = new JLabel("FILTROS DE BÚSQUEDA");
+        lblFiltros.setFont(ThemeARAMS.FONT_HEADLINE);
+        lblFiltros.setForeground(ThemeARAMS.PRIMARY_DARK);
         lblFiltros.setBounds(320, 10, 200, 20);
         add(lblFiltros);
 
         JLabel lblFCodigo = new JLabel("Código:");
+        lblFCodigo.setFont(ThemeARAMS.FONT_BODY);
         lblFCodigo.setBounds(320, 40, 50, 25);
         add(lblFCodigo);
 
-        JLabel lblFPrefijo = new JLabel("A-");
-        lblFPrefijo.setBounds(370, 40, 20, 25);
+        JLabel lblFPrefijo = ThemeARAMS.crearBadgePrefijo("A-");
+        lblFPrefijo.setBounds(370, 40, 25, 25);
         add(lblFPrefijo);
 
         txtFiltroCodigo = new JTextField();
-        txtFiltroCodigo.setBounds(390, 40, 75, 25);
+        txtFiltroCodigo.setBounds(398, 40, 67, 25);
+        ThemeARAMS.aplicarEstiloCampo(txtFiltroCodigo);
         UIUtils.aplicarRestriccionNumerica(txtFiltroCodigo, 3);
         add(txtFiltroCodigo);
 
         JLabel lblFNombre = new JLabel("Nombre:");
+        lblFNombre.setFont(ThemeARAMS.FONT_BODY);
         lblFNombre.setBounds(475, 40, 55, 25);
         add(lblFNombre);
 
         txtFiltroNombre = new JTextField();
         txtFiltroNombre.setBounds(535, 40, 100, 25);
+        ThemeARAMS.aplicarEstiloCampo(txtFiltroNombre);
         add(txtFiltroNombre);
 
         JLabel lblFEspecie = new JLabel("Especie:");
+        lblFEspecie.setFont(ThemeARAMS.FONT_BODY);
         lblFEspecie.setBounds(320, 80, 55, 25);
         add(lblFEspecie);
 
         txtFiltroEspecie = new JTextField();
         txtFiltroEspecie.setBounds(375, 80, 90, 25);
+        ThemeARAMS.aplicarEstiloCampo(txtFiltroEspecie);
         add(txtFiltroEspecie);
 
         JLabel lblFEstado = new JLabel("Estado:");
+        lblFEstado.setFont(ThemeARAMS.FONT_BODY);
         lblFEstado.setBounds(475, 80, 55, 25);
         add(lblFEstado);
 
         String[] opcionesFiltroEstado = {"TODOS", "DISPONIBLE", "ADOPTADO"};
         cbFiltroEstado = new JComboBox<>(opcionesFiltroEstado);
+        cbFiltroEstado.setFont(ThemeARAMS.FONT_BODY);
         cbFiltroEstado.setBounds(540, 80, 90, 25);
         add(cbFiltroEstado);
 
         JButton btnFiltrar = new JButton("Filtrar / Buscar");
-        btnFiltrar.setBounds(650, 40, 120, 65);
+        btnFiltrar.setBounds(645, 40, 125, 65);
+        ThemeARAMS.aplicarEstiloBotonPrincipal(btnFiltrar);
         add(btnFiltrar);
 
         // 3. Tabla de Resultados
@@ -239,8 +276,10 @@ public class AnimalPanel extends JPanel {
             }
         };
         tblAnimales = new JTable(tableModel);
+        ThemeARAMS.aplicarEstiloTabla(tblAnimales);
         JScrollPane scrollTable = new JScrollPane(tblAnimales);
         scrollTable.setBounds(320, 120, 450, 320);
+        scrollTable.getViewport().setBackground(Color.WHITE);
         add(scrollTable);
 
         // Carga inicial directamente de la bitacora
@@ -494,6 +533,10 @@ public class AnimalPanel extends JPanel {
             btnActualizar.setEnabled(true);
             btnEliminar.setEnabled(true);
             btnRegistrar.setEnabled(false);
+        } else {
+            btnActualizar.setEnabled(false);
+            btnEliminar.setEnabled(false);
+            btnRegistrar.setEnabled(true);
         }
     }
 }

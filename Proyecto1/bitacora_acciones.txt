@@ -140,3 +140,13 @@
 2026-09-07 20:07:10|admin1|Autenticacion|ACCION|Inicio de sesion exitoso. Rol: ADMIN|
 2026-09-07 20:08:23|admin1|Autenticacion|ACCION|Inicio de sesion exitoso. Rol: ADMIN|
 2026-09-07 20:08:28|admin1|Autenticacion|ACCION|Inicio de sesion exitoso. Rol: ADMIN|
+2026-09-07 20:36:28|admin1|Autenticacion|ACCION|Inicio de sesion exitoso. Rol: ADMIN|
+2026-09-07 20:39:34|admin1|Animales|ACCION|Registro exitoso de animal: A-222 (22)|
+2026-09-07 20:40:00|admin1|Adoptantes|ACCION|Adoptante registrado exitosamente: AD-333|
+2026-09-07 20:40:25|admin1|Solicitudes|ACCION|Solicitud registrada con exito: S-444|
+2026-09-07 20:40:47|admin1|Ubicaciones|ACCION|Asignación exitosa del animal A-222 a la celda [0][1]|
+2026-09-07 20:40:52|admin1|Ubicaciones|ACCION|Celda [0][1] liberada automaticamente al cambiar de estado el animal: A-222|
+2026-09-07 20:40:52|admin1|Ubicaciones|ACCION|Asignación exitosa del animal A-222 a la celda [1][2]|
+2026-09-07 20:46:41|admin1|Autenticacion|ACCION|Cierre de sesion exitoso. Rol: ADMIN|
+2026-09-07 20:47:03|admin1|Autenticacion|ACCION|Inicio de sesion exitoso. Rol: ADMIN|
+2026-09-07 20:47:53|admin1|Autenticacion|ACCION|Cierre de sesion exitoso. Rol: ADMIN|

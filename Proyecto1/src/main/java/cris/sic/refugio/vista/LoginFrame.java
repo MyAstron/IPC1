@@ -4,16 +4,19 @@ import cris.sic.refugio.modelo.Usuario;
 import cris.sic.refugio.servicio.AutenticacionServicio;
 import cris.sic.refugio.servicio.BitacoraServicio;
 
+import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
-import javax.swing.JTextField;
-import javax.swing.JPasswordField;
-import javax.swing.JButton;
 import javax.swing.JOptionPane;
+import javax.swing.JPanel;
+import javax.swing.JPasswordField;
+import javax.swing.JTextField;
+import javax.swing.SwingConstants;
+import java.awt.Color;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
-// Formulario de inicio de sesion con validacion de credenciales y bloqueo de intentos fallidos
+// Formulario de inicio de sesion con identidad ARAMS, validacion de credenciales y bloqueo de intentos fallidos
 public class LoginFrame extends JFrame {
 
     private JTextField txtUsuario;
@@ -23,37 +26,63 @@ public class LoginFrame extends JFrame {
 
     public LoginFrame() {
         // Configuracion basica del JFrame de Login
-        setTitle("Inicio de Sesion");
-        setSize(400, 280);
+        setTitle("ARAMS — Iniciar Sesión");
+        setSize(420, 340);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setLocationRelativeTo(null);
         setResizable(false);
         setLayout(null);
+        getContentPane().setBackground(ThemeARAMS.BACKGROUND);
 
-        // Componentes de la interfaz de usuario
-        JLabel lblTitulo = new JLabel("ACCESO AL SISTEMA");
-        lblTitulo.setBounds(130, 20, 150, 25);
-        add(lblTitulo);
+        // Header Superior con Marca ARAMS
+        JPanel pnlHeader = new JPanel();
+        pnlHeader.setBounds(0, 0, 420, 70);
+        pnlHeader.setBackground(ThemeARAMS.PRIMARY_DARK);
+        pnlHeader.setLayout(null);
 
+        JLabel lblLogo = new JLabel("🐾 ARAMS", SwingConstants.CENTER);
+        lblLogo.setFont(ThemeARAMS.FONT_DISPLAY);
+        lblLogo.setForeground(Color.WHITE);
+        lblLogo.setBounds(0, 12, 420, 26);
+        pnlHeader.add(lblLogo);
+
+        JLabel lblSub = new JLabel("Kindred Shelter Systems — Acceso al Sistema", SwingConstants.CENTER);
+        lblSub.setFont(ThemeARAMS.FONT_SMALL);
+        lblSub.setForeground(ThemeARAMS.PRIMARY_CONTAINER);
+        lblSub.setBounds(0, 40, 420, 16);
+        pnlHeader.add(lblSub);
+
+        add(pnlHeader);
+
+        // Campos de Acceso
         JLabel lblUsuario = new JLabel("Usuario:");
-        lblUsuario.setBounds(50, 70, 80, 25);
+        lblUsuario.setFont(ThemeARAMS.FONT_BODY_BOLD);
+        lblUsuario.setForeground(ThemeARAMS.TEXT_MAIN);
+        lblUsuario.setBounds(50, 95, 100, 22);
         add(lblUsuario);
 
         txtUsuario = new JTextField();
-        txtUsuario.setBounds(150, 70, 180, 25);
+        txtUsuario.setBounds(50, 120, 320, 30);
+        ThemeARAMS.aplicarEstiloCampo(txtUsuario);
         add(txtUsuario);
 
         JLabel lblContrasena = new JLabel("Contraseña:");
-        lblContrasena.setBounds(50, 110, 80, 25);
+        lblContrasena.setFont(ThemeARAMS.FONT_BODY_BOLD);
+        lblContrasena.setForeground(ThemeARAMS.TEXT_MAIN);
+        lblContrasena.setBounds(50, 160, 100, 22);
         add(lblContrasena);
 
         txtContrasena = new JPasswordField();
-        txtContrasena.setBounds(150, 110, 180, 25);
+        txtContrasena.setBounds(50, 185, 320, 30);
+        ThemeARAMS.aplicarEstiloCampo(txtContrasena);
         add(txtContrasena);
 
-        btnIngresar = new JButton("Ingresar");
-        btnIngresar.setBounds(150, 160, 100, 30);
+        btnIngresar = new JButton("Iniciar Sesión");
+        btnIngresar.setBounds(50, 235, 320, 36);
+        ThemeARAMS.aplicarEstiloBotonPrincipal(btnIngresar);
         add(btnIngresar);
+
+        getRootPane().setDefaultButton(btnIngresar);
 
         // Evento para procesar la autenticacion al hacer clic en el boton
         btnIngresar.addActionListener(new ActionListener() {
