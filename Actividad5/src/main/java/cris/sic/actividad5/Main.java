@@ -32,12 +32,6 @@ public class Main {
             @Override
             public void run() {
                 VentanaPrincipal ventana = new VentanaPrincipal(gestor);
-
-                // Cargar los cursos iniciales en el combo de la ventana
-                for (Curso c : gestor.getCursos()) {
-                    ventana.getCbCursosAsociados().addItem(c);
-                }
-
                 ventana.setVisible(true);
             }
         });

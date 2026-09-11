@@ -2,20 +2,25 @@ package cris.sic.actividad5.vista;
 
 import cris.sic.actividad5.controlador.GestorAcademico;
 import cris.sic.actividad5.modelo.Curso;
+import cris.sic.actividad5.modelo.TareaAcademica;
 
 import javax.swing.BorderFactory;
 import javax.swing.JButton;
 import javax.swing.JComboBox;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
 import javax.swing.JTextField;
+import javax.swing.SwingConstants;
 import javax.swing.border.TitledBorder;
 import java.awt.Color;
 import java.awt.Cursor;
 import java.awt.Font;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 
 /**
  * Ventana principal de la aplicacion desarrollada exclusivamente con Java Swing nativo (sin GUI Builder).
@@ -55,9 +60,13 @@ public class VentanaPrincipal extends JFrame {
     private JButton btnLimpiarConsola;
 
     // ==========================================================
-    // ESPACIO RESERVADO PARA MODULO DE TEMPERATURA (FASE 3)
+    // COMPONENTES DEL MODULO DE CONVERSION DE TEMPERATURA (FASE 3)
     // ==========================================================
     private JPanel panelTemperatura;
+    private JTextField txtTemperaturaC;
+    private JButton btnConvertirFahrenheit;
+    private JButton btnConvertirKelvin;
+    private JLabel lblResultadoConversion;
 
     // Tipografias institucionales reutilizables
     private final Font FONT_TITULO = new Font("SansSerif", Font.BOLD, 15);
@@ -85,8 +94,14 @@ public class VentanaPrincipal extends JFrame {
         // Paso 2.4: Construccion del Area de Visualizacion y Reportes
         construirAreaVisualizacion();
 
-        // Preparacion del contenedor para Fase 3 (Conversion de Temperatura)
-        prepararContenedorTemperatura();
+        // Paso 3.1 - 3.3: Construccion del Modulo de Conversion de Temperatura (Fase 3)
+        construirPanelTemperatura();
+
+        // Cargar cursos iniciales existentes al selector de cursos
+        actualizarComboCursos();
+
+        // Paso 4: Configuracion de eventos y validaciones (Fase 4)
+        configurarEventos();
     }
 
     /**
@@ -310,10 +325,11 @@ public class VentanaPrincipal extends JFrame {
     }
 
     /**
-     * Prepara el contenedor inferior izquierdo para albergar la Fase 3 (Conversion de Temperatura).
-     * Muestra un panel de estado mientras se implementa la Fase 3.
+     * Paso 3.1, 3.2 y 3.3: Construye el modulo de conversion de temperatura.
+     * Incluye campo para entrada en Celsius, botones para conversion a Fahrenheit y Kelvin,
+     * y etiqueta de salida estilizada para presentar el resultado.
      */
-    private void prepararContenedorTemperatura() {
+    private void construirPanelTemperatura() {
         panelTemperatura = new JPanel();
         panelTemperatura.setLayout(null);
         panelTemperatura.setBounds(20, 450, 430, 175);
@@ -329,11 +345,50 @@ public class VentanaPrincipal extends JFrame {
         );
         panelTemperatura.setBorder(borde);
 
-        JLabel lblInfoFase3 = new JLabel("Espacio reservado para la Fase 3 del planificador.");
-        lblInfoFase3.setFont(FONT_ETIQUETA);
-        lblInfoFase3.setForeground(Color.GRAY);
-        lblInfoFase3.setBounds(30, 60, 360, 25);
-        panelTemperatura.add(lblInfoFase3);
+        // Paso 3.1: Etiqueta y Campo de Texto para Temperatura en Celsius
+        JLabel lblTemp = new JLabel("Temperatura (°C):");
+        lblTemp.setFont(FONT_ETIQUETA);
+        lblTemp.setBounds(20, 30, 120, 25);
+        panelTemperatura.add(lblTemp);
+
+        txtTemperaturaC = new JTextField();
+        txtTemperaturaC.setBounds(150, 30, 250, 25);
+        txtTemperaturaC.setToolTipText("Ingrese un valor numerico en grados Celsius (ej. 25 o 36.5)");
+        panelTemperatura.add(txtTemperaturaC);
+
+        // Paso 3.2: Botones de Accion para Conversion a Fahrenheit y Kelvin
+        btnConvertirFahrenheit = new JButton("Convertir a °F");
+        btnConvertirFahrenheit.setFont(FONT_BOTON);
+        btnConvertirFahrenheit.setBounds(20, 70, 185, 32);
+        btnConvertirFahrenheit.setBackground(new Color(210, 105, 45)); // Tono calido/ambar
+        btnConvertirFahrenheit.setForeground(Color.WHITE);
+        btnConvertirFahrenheit.setFocusPainted(false);
+        btnConvertirFahrenheit.setCursor(new Cursor(Cursor.HAND_CURSOR));
+        btnConvertirFahrenheit.setToolTipText("Formula: (°C * 9/5) + 32");
+        panelTemperatura.add(btnConvertirFahrenheit);
+
+        btnConvertirKelvin = new JButton("Convertir a K");
+        btnConvertirKelvin.setFont(FONT_BOTON);
+        btnConvertirKelvin.setBounds(215, 70, 185, 32);
+        btnConvertirKelvin.setBackground(new Color(45, 125, 175)); // Tono azul termico
+        btnConvertirKelvin.setForeground(Color.WHITE);
+        btnConvertirKelvin.setFocusPainted(false);
+        btnConvertirKelvin.setCursor(new Cursor(Cursor.HAND_CURSOR));
+        btnConvertirKelvin.setToolTipText("Formula: °C + 273.15");
+        panelTemperatura.add(btnConvertirKelvin);
+
+        // Paso 3.3: Area de Salida y Etiqueta Estilizada de Resultado
+        lblResultadoConversion = new JLabel("Resultado: Ingrese un valor y presione una escala", SwingConstants.CENTER);
+        lblResultadoConversion.setFont(new Font("SansSerif", Font.BOLD, 12));
+        lblResultadoConversion.setForeground(new Color(25, 45, 75));
+        lblResultadoConversion.setOpaque(true);
+        lblResultadoConversion.setBackground(new Color(240, 245, 252));
+        lblResultadoConversion.setBorder(BorderFactory.createCompoundBorder(
+            BorderFactory.createLineBorder(new Color(195, 215, 235), 1),
+            BorderFactory.createEmptyBorder(4, 8, 4, 8)
+        ));
+        lblResultadoConversion.setBounds(20, 115, 380, 36);
+        panelTemperatura.add(lblResultadoConversion);
 
         add(panelTemperatura);
     }
@@ -396,5 +451,324 @@ public class VentanaPrincipal extends JFrame {
 
     public JPanel getPanelTemperatura() {
         return panelTemperatura;
+    }
+
+    public JTextField getTxtTemperaturaC() {
+        return txtTemperaturaC;
+    }
+
+    public JButton getBtnConvertirFahrenheit() {
+        return btnConvertirFahrenheit;
+    }
+
+    public JButton getBtnConvertirKelvin() {
+        return btnConvertirKelvin;
+    }
+
+    public JLabel getLblResultadoConversion() {
+        return lblResultadoConversion;
+    }
+
+    // ==========================================================
+    // FASE 4: CONFIGURACION DE EVENTOS, VALIDACIONES Y LOGICA
+    // ==========================================================
+
+    /**
+     * Paso 4.1 a 4.4: Vincula los escuchadores de eventos (ActionListener)
+     * a cada uno de los botones interactivos de la interfaz grafica.
+     */
+    private void configurarEventos() {
+        // Evento Paso 4.1: Registrar Curso
+        btnRegistrarCurso.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                registrarCurso();
+            }
+        });
+
+        // Evento Paso 4.2: Agregar Tarea Academica
+        btnAgregarTarea.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                agregarTarea();
+            }
+        });
+
+        // Evento Paso 4.3: Mostrar Informacion Consolidada
+        btnMostrarInformacion.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                mostrarInformacionConsolidada();
+            }
+        });
+
+        // Evento Auxiliar: Limpiar Consola de Reporte
+        btnLimpiarConsola.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                limpiarConsola();
+            }
+        });
+
+        // Evento Paso 4.4: Conversion a Fahrenheit
+        btnConvertirFahrenheit.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                convertirAFahrenheit();
+            }
+        });
+
+        // Evento Paso 4.4: Conversion a Kelvin
+        btnConvertirKelvin.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                convertirAKelvin();
+            }
+        });
+    }
+
+    /**
+     * Paso 4.1: Logica para registrar un nuevo Curso.
+     * Valida campos vacios con JOptionPane, verifica que el codigo sea unico,
+     * instancia el Curso, lo agrega al gestor y actualiza el selector JComboBox.
+     */
+    private void registrarCurso() {
+        String codigo = txtCodigoCurso.getText().trim();
+        String nombre = txtNombreCurso.getText().trim();
+        String tutor = txtTutorCurso.getText().trim();
+
+        // Validacion de campos vacios con JOptionPane
+        if (codigo.isEmpty() || nombre.isEmpty() || tutor.isEmpty()) {
+            JOptionPane.showMessageDialog(
+                this,
+                "Todos los campos del curso son obligatorios:\n- Código del Curso\n- Nombre del Curso\n- Tutor / Catedrático",
+                "Validación - Campos Vacíos",
+                JOptionPane.WARNING_MESSAGE
+            );
+            return;
+        }
+
+        // Validacion de unicidad de codigo
+        if (gestor.buscarCursoPorCodigo(codigo) != null) {
+            JOptionPane.showMessageDialog(
+                this,
+                "Ya existe un curso registrado con el código '" + codigo + "'.\nPor favor ingrese un código único.",
+                "Validación - Código Duplicado",
+                JOptionPane.ERROR_MESSAGE
+            );
+            return;
+        }
+
+        // Instanciar el objeto Curso y agregarlo a la coleccion
+        Curso nuevoCurso = new Curso(codigo, nombre, tutor);
+        boolean registrado = gestor.registrarCurso(nuevoCurso);
+
+        if (registrado) {
+            // Incorporar el nuevo curso al JComboBox y seleccionarlo
+            cbCursosAsociados.addItem(nuevoCurso);
+            cbCursosAsociados.setSelectedItem(nuevoCurso);
+
+            // Limpiar los campos del formulario de cursos
+            txtCodigoCurso.setText("");
+            txtNombreCurso.setText("");
+            txtTutorCurso.setText("");
+
+            JOptionPane.showMessageDialog(
+                this,
+                "¡Curso registrado exitosamente!\n\n" + nuevoCurso.getInformacion(),
+                "Registro Exitoso",
+                JOptionPane.INFORMATION_MESSAGE
+            );
+
+            // Refrescar automaticamente el reporte en la consola
+            mostrarInformacionConsolidada();
+        } else {
+            JOptionPane.showMessageDialog(
+                this,
+                "Ocurrió un error inesperado al registrar el curso.",
+                "Error",
+                JOptionPane.ERROR_MESSAGE
+            );
+        }
+    }
+
+    /**
+     * Paso 4.2: Logica para registrar una nueva Tarea Academica.
+     * Valida que existan cursos disponibles, valida campos vacios,
+     * instancia TareaAcademica vinculada al curso seleccionado y la almacena.
+     */
+    private void agregarTarea() {
+        // Validar que exista al menos un curso registrado en el sistema
+        if (gestor.getTotalCursos() == 0 || cbCursosAsociados.getSelectedItem() == null) {
+            JOptionPane.showMessageDialog(
+                this,
+                "No es posible agregar tareas porque no existe ningún curso registrado.\nPrimero registre al menos un curso en el Módulo 1.",
+                "Validación - Sin Cursos",
+                JOptionPane.WARNING_MESSAGE
+            );
+            return;
+        }
+
+        Curso cursoSeleccionado = (Curso) cbCursosAsociados.getSelectedItem();
+        String titulo = txtTituloTarea.getText().trim();
+        String descripcion = txtDescripcionTarea.getText().trim();
+        String fechaEntrega = txtFechaEntrega.getText().trim();
+
+        // Validar campos obligatorios de la tarea con JOptionPane
+        if (titulo.isEmpty() || descripcion.isEmpty() || fechaEntrega.isEmpty()) {
+            JOptionPane.showMessageDialog(
+                this,
+                "Todos los campos de la tarea son obligatorios:\n- Título de la Tarea\n- Descripción\n- Fecha de Entrega",
+                "Validación - Campos Vacíos",
+                JOptionPane.WARNING_MESSAGE
+            );
+            return;
+        }
+
+        // Instanciar y almacenar la tarea academica
+        TareaAcademica nuevaTarea = new TareaAcademica(cursoSeleccionado, titulo, descripcion, fechaEntrega);
+        boolean agregada = gestor.registrarTarea(nuevaTarea);
+
+        if (agregada) {
+            // Limpiar los campos del formulario de tareas
+            txtTituloTarea.setText("");
+            txtDescripcionTarea.setText("");
+            txtFechaEntrega.setText("");
+
+            JOptionPane.showMessageDialog(
+                this,
+                "¡Tarea académica agregada exitosamente!\n\n"
+                + "Curso: " + cursoSeleccionado.getCodigo() + " - " + cursoSeleccionado.getNombre() + "\n"
+                + "Tarea: " + nuevaTarea.getTitulo() + "\n"
+                + "Entrega: " + nuevaTarea.getFechaEntrega(),
+                "Tarea Registrada",
+                JOptionPane.INFORMATION_MESSAGE
+            );
+
+            // Refrescar automaticamente el reporte en pantalla
+            mostrarInformacionConsolidada();
+        } else {
+            JOptionPane.showMessageDialog(
+                this,
+                "Ocurrió un error al vincular la tarea con el curso.",
+                "Error",
+                JOptionPane.ERROR_MESSAGE
+            );
+        }
+    }
+
+    /**
+     * Paso 4.3: Logica del evento 'Mostrar Informacion'.
+     * Recorre los listados a traves del gestor academico y construye el reporte
+     * de salida estructurado dentro del JTextArea.
+     */
+    public void mostrarInformacionConsolidada() {
+        String reporte = gestor.generarReporteConsolidado();
+        txtAreaConsola.setText(reporte);
+        txtAreaConsola.setCaretPosition(0); // Desplazar hacia arriba
+    }
+
+    /**
+     * Metodo auxiliar para restablecer el area de texto de reportes.
+     */
+    private void limpiarConsola() {
+        txtAreaConsola.setText("=== CONSOLA DE VISUALIZACIÓN LIMPIA ===\n\n"
+                            + "Presione 'Mostrar Información Consolidada' para recargar el listado.\n");
+    }
+
+    /**
+     * Paso 4.4: Logica de conversion de temperatura de Celsius a Fahrenheit.
+     * Valida que la entrada sea numerica utilizando un bloque try-catch (NumberFormatException).
+     * Aplica la formula: °F = (°C * 9/5) + 32.
+     */
+    private void convertirAFahrenheit() {
+        String texto = txtTemperaturaC.getText().trim();
+
+        if (texto.isEmpty()) {
+            JOptionPane.showMessageDialog(
+                this,
+                "Debe ingresar un valor numérico para la temperatura en °C.",
+                "Validación - Entrada Vacía",
+                JOptionPane.WARNING_MESSAGE
+            );
+            lblResultadoConversion.setText("Error: Ingrese un valor en °C");
+            lblResultadoConversion.setForeground(new Color(180, 40, 40));
+            return;
+        }
+
+        try {
+            double celsius = Double.parseDouble(texto);
+            if (Double.isNaN(celsius) || Double.isInfinite(celsius)) {
+                throw new NumberFormatException("Valor no finito");
+            }
+            double fahrenheit = (celsius * 9.0 / 5.0) + 32.0;
+
+            String salida = String.format("%.2f °C  =  %.2f °F", celsius, fahrenheit);
+            lblResultadoConversion.setText("Resultado: " + salida);
+            lblResultadoConversion.setForeground(new Color(190, 80, 20));
+        } catch (NumberFormatException ex) {
+            JOptionPane.showMessageDialog(
+                this,
+                "El valor ingresado '" + texto + "' no es un número válido.\n"
+                + "Asegúrese de ingresar solo números reales (ej. 25, -10, 36.5).",
+                "Error - Formato Numérico Inválido",
+                JOptionPane.ERROR_MESSAGE
+            );
+            lblResultadoConversion.setText("Error: Formato numérico incorrecto ('" + texto + "')");
+            lblResultadoConversion.setForeground(new Color(180, 40, 40));
+        }
+    }
+
+    /**
+     * Paso 4.4: Logica de conversion de temperatura de Celsius a Kelvin.
+     * Valida que la entrada sea numerica utilizando un bloque try-catch (NumberFormatException).
+     * Aplica la formula: K = °C + 273.15.
+     */
+    private void convertirAKelvin() {
+        String texto = txtTemperaturaC.getText().trim();
+
+        if (texto.isEmpty()) {
+            JOptionPane.showMessageDialog(
+                this,
+                "Debe ingresar un valor numérico para la temperatura en °C.",
+                "Validación - Entrada Vacía",
+                JOptionPane.WARNING_MESSAGE
+            );
+            lblResultadoConversion.setText("Error: Ingrese un valor en °C");
+            lblResultadoConversion.setForeground(new Color(180, 40, 40));
+            return;
+        }
+
+        try {
+            double celsius = Double.parseDouble(texto);
+            if (Double.isNaN(celsius) || Double.isInfinite(celsius)) {
+                throw new NumberFormatException("Valor no finito");
+            }
+            double kelvin = celsius + 273.15;
+
+            String salida = String.format("%.2f °C  =  %.2f K", celsius, kelvin);
+            lblResultadoConversion.setText("Resultado: " + salida);
+            lblResultadoConversion.setForeground(new Color(30, 100, 160));
+        } catch (NumberFormatException ex) {
+            JOptionPane.showMessageDialog(
+                this,
+                "El valor ingresado '" + texto + "' no es un número válido.\n"
+                + "Asegúrese de ingresar solo números reales (ej. 25, -10, 36.5).",
+                "Error - Formato Numérico Inválido",
+                JOptionPane.ERROR_MESSAGE
+            );
+            lblResultadoConversion.setText("Error: Formato numérico incorrecto ('" + texto + "')");
+            lblResultadoConversion.setForeground(new Color(180, 40, 40));
+        }
+    }
+
+    /**
+     * Actualiza los elementos del JComboBox de cursos a partir de la lista en memoria.
+     */
+    public void actualizarComboCursos() {
+        cbCursosAsociados.removeAllItems();
+        for (Curso c : gestor.getCursos()) {
+            cbCursosAsociados.addItem(c);
+        }
     }
 }
