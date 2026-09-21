@@ -1,16 +1,20 @@
-/*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- */
-
 package cris.sic.practica2;
 
+import cris.sic.practica2.vista.VentanaPrincipal;
+
+import javax.swing.SwingUtilities;
+
 /**
- *
- * @author cris_sic
+ * Punto de entrada principal de la Práctica 2: Simulador Espacial.
+ * Inicializa y despliega la Ventana Principal de Swing con navegación CardLayout.
  */
 public class Practica2 {
 
     public static void main(String[] args) {
-        System.out.println("Hello World!");
+        // Inicializar la interfaz gráfica en el hilo despachador de eventos (EDT)
+        SwingUtilities.invokeLater(() -> {
+            VentanaPrincipal ventana = new VentanaPrincipal();
+            ventana.setVisible(true);
+        });
     }
 }
