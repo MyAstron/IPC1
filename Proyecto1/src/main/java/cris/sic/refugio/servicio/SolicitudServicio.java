@@ -23,6 +23,21 @@ public class SolicitudServicio {
         }
         return true;
     }
+    // Modulo de Verificar la cantidad de solicitudes hechar por un mismo usuario
+    public static int contarPendientesDeAdoptante(String codigoAdoptante, String usuarioActivo){
+        int cantidadSolicitudes = 1;
+        
+        for (int i = 0; i < BaseDatosMemoria.contadorSolicitudes; i++) {
+            Solicitud sol_i = BaseDatosMemoria.solicitudes[i];
+            for (int j = 0; j < BaseDatosMemoria.contadorSolicitudes; j++){
+                Solicitud sol_j = BaseDatosMemoria.solicitudes[j];
+                if (sol_i == sol_j && sol_j.getEstado().equals("PENDIENTE")) {
+                    cantidadSolicitudes++;
+                }
+            }
+        }
+        return cantidadSolicitudes;
+    }
 
     // Modulo para buscar si un codigo de solicitud ya esta registrado
     public static boolean existeCodigo(String codigo) {
@@ -107,6 +122,11 @@ public class SolicitudServicio {
             BitacoraServicio.registrarError(usuarioActivo, "Solicitudes", "Capacidad maxima de solicitudes alcanzada.");
             return "No hay suficiente espacio para registrar mas solicitudes.";
         }
+        
+        if (SolicitudServicio.contarPendientesDeAdoptante(codigoAdoptante, usuarioActivo) > 2){
+            BitacoraServicio.registrarError(usuarioActivo, "Solicitudes", "Adoptante con mas de 2 solicitudes en el sistema: " + codigoAdoptante);
+            return "El adoptante "+codigoAdoptante+" tiene mas de 2 solcitudes pendientes.";
+        }
 
         Solicitud nueva = new Solicitud(codigo, codigoAnimal, codigoAdoptante, fecha, "PENDIENTE");
         BaseDatosMemoria.solicitudes[BaseDatosMemoria.contadorSolicitudes] = nueva;
@@ -114,6 +134,7 @@ public class SolicitudServicio {
 
         BitacoraServicio.registrarAccion(usuarioActivo, "Solicitudes", "Solicitud registrada con exito: " + codigo);
         BitacoraServicio.registrarBitacoraSolicitud(usuarioActivo, "REGISTRO", nueva);
+//        SolicitudServicio.contarPendientesDeAdoptante(codigoAdoptante, usuarioActivo);
         return "SUCCESS";
     }
 

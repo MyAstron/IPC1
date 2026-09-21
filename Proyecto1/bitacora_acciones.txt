@@ -150,3 +150,23 @@
 2026-09-07 20:46:41|admin1|Autenticacion|ACCION|Cierre de sesion exitoso. Rol: ADMIN|
 2026-09-07 20:47:03|admin1|Autenticacion|ACCION|Inicio de sesion exitoso. Rol: ADMIN|
 2026-09-07 20:47:53|admin1|Autenticacion|ACCION|Cierre de sesion exitoso. Rol: ADMIN|
+2026-09-19 08:36:10|admin1|Autenticacion|ACCION|Inicio de sesion exitoso. Rol: ADMIN|
+2026-09-19 08:36:44|admin1|Solicitudes|ACCION|Solicitud registrada con exito: S-112|
+2026-09-19 08:42:59|admin1|Autenticacion|ACCION|Inicio de sesion exitoso. Rol: ADMIN|
+2026-09-19 09:00:20|admin1|Autenticacion|ACCION|Inicio de sesion exitoso. Rol: ADMIN|
+2026-09-19 09:00:30|admin1|Ubicaciones|ACCION|Celda [0][0] liberada automaticamente al cambiar de estado el animal: A-111|
+2026-09-19 09:00:30|admin1|Solicitudes|ACCION|Rechazo automatico de la solicitud S-112 al aprobarse otra para el mismo animal A-111|
+2026-09-19 09:00:30|admin1|Solicitudes|ACCION|Solicitud S-111 aprobada con exito. Animal A-111 adoptado.|
+2026-09-19 09:02:20|admin1|Ubicaciones|ACCION|Celda [1][2] liberada automaticamente al cambiar de estado el animal: A-222|
+2026-09-19 09:02:20|admin1|Solicitudes|ACCION|Solicitud S-444 aprobada con exito. Animal A-222 adoptado.|
+2026-09-19 09:02:32|admin1|Animales|ACCION|Registro exitoso de animal: A-888 (888)|
+2026-09-19 09:03:49|admin1|Solicitudes|ACCION|Solicitud registrada con exito: S-147|
+2026-09-19 09:04:04|admin1|Animales|ACCION|Registro exitoso de animal: A-899 (999)|
+2026-09-19 09:06:08|admin1|Autenticacion|ACCION|Inicio de sesion exitoso. Rol: ADMIN|
+2026-09-19 09:06:26|admin1|Solicitudes|ACCION|Solicitud registrada con exito: S-899|
+2026-09-19 09:06:37|admin1|Animales|ACCION|Registro exitoso de animal: A-788 (78)|
+2026-09-19 09:06:55|admin1|Solicitudes|ACCION|Solicitud S-147 aprobada con exito. Animal A-888 adoptado.|
+2026-09-19 09:07:03|admin1|Solicitudes|ACCION|Solicitud registrada con exito: S-788|
+2026-09-19 09:11:14|admin1|Autenticacion|ACCION|Inicio de sesion exitoso. Rol: ADMIN|
+2026-09-19 09:11:22|admin1|Reportes|ACCION|Generación de reporte TXT: reporte_adopciones.txt|
+2026-09-19 09:11:22|admin1|Reportes|ACCION|Generación de reporte HTML y TXT: reporte_adopciones.html|

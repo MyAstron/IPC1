@@ -1,0 +1,24 @@
+================================================================================
+               REFUGIO DE ANIMALES - SISTEMA DE GESTION
+               REPORTE DE ADOPCIONES Y SOLICITUDES (VECTOR ESTÁTICO)
+================================================================================
+Fecha y Hora de Generación : 2026-09-19 09:11:22
+Generado por el Usuario    : admin1
+--------------------------------------------------------------------------------
+
+SOLICITUD  | CÓDIGO ANIMAL  | CÓDIGO ADOPTANTE | FECHA        | ESTADO      
+--------------------------------------------------------------------------------
+S-111      | A-111          | AD-111           | 07/09/2026   | APROBADA    
+S-444      | A-222          | AD-333           | 07/09/2026   | APROBADA    
+S-112      | A-111          | AD-333           | 19/09/2026   | RECHAZADA   
+S-147      | A-888          | AD-333           | 19/09/2026   | APROBADA    
+S-899      | A-899          | AD-333           | 19/09/2026   | PENDIENTE   
+S-788      | A-788          | AD-333           | 19/09/2026   | PENDIENTE   
+--------------------------------------------------------------------------------
+RESUMEN ESTADÍSTICO:
+ - Total de Solicitudes            : 6
+ - Solicitudes Aprobadas           : 3
+ - Solicitudes Pendientes          : 2
+ - Solicitudes Rechazadas          : 1
+ - Capacidad Máxima del Vector     : 100
+================================================================================

@@ -2,6 +2,7 @@ package cris.sic.refugio.servicio;
 
 import cris.sic.refugio.modelo.Animal;
 import cris.sic.refugio.modelo.Solicitud;
+import cris.sic.refugio.servicio.SolicitudServicio;
 import cris.sic.refugio.persistencia.BaseDatosMemoria;
 
 import java.io.BufferedReader;
@@ -112,7 +113,7 @@ public class ReporteHtmlServicio {
         try (PrintWriter pw = new PrintWriter(new FileWriter(nombreArchivo))) {
             pw.println(generarEncabezado("Reporte de Adopciones y Solicitudes", usuarioActivo));
             pw.println("<table>");
-            pw.println("<thead><tr><th>Código Solicitud</th><th>Código Animal</th><th>Código Adoptante</th><th>Fecha</th><th>Estado</th></tr></thead>");
+            pw.println("<thead><tr><th>Código Solicitud</th><th>Código Animal</th><th>Código Adoptante</th><th>Fecha</th><th>Estado</th><th>Pendientes del Adoptantes</th></tr></thead>");
             pw.println("<tbody>");
 
             int total = 0;
@@ -141,6 +142,7 @@ public class ReporteHtmlServicio {
                     pw.println("<td>" + s.getCodigoAdoptante() + "</td>");
                     pw.println("<td>" + s.getFecha() + "</td>");
                     pw.println("<td><span class=\"" + badge + "\">" + s.getEstado() + "</span></td>");
+                    pw.println("<td>" + s.getFecha() + "</td>");
                     pw.println("</tr>");
                 }
             }
