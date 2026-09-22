@@ -4,16 +4,15 @@ import cris.sic.practica2.modelo.Partida;
 import cris.sic.practica2.modelo.Piloto;
 
 /**
- * Administrador central de persistencia en memoria del juego.
- * Gestiona el almacenamiento de pilotos y partidas utilizando exclusivamente
- * arreglos/vectores nativos de Java con crecimiento dinámico para evitar
- * excepciones ArrayIndexOutOfBoundsException.
+ * Administrador central de datos y persistencia del juego.
+ * Gestiona el almacenamiento activo en memoria mediante vectores nativos de Java
+ * y sincroniza de forma transparente con el disco local cifrado a través de GestorArchivos.
  */
 public class GestorDatos {
 
     private static GestorDatos instancia;
 
-    private static final int CAPACIDAD_INICIAL = 2; // Capacidad inicial pequeña para probar expansión dinámica
+    private static final int CAPACIDAD_INICIAL = 2; // Capacidad inicial para soporte de expansión dinámica
 
     private Piloto[] pilotos;
     private int contadorPilotos;
@@ -21,11 +20,18 @@ public class GestorDatos {
     private Partida[] partidas;
     private int contadorPartidas;
 
+    /**
+     * Constructor principal. Inicializa los vectores en memoria e invoca automáticamente
+     * la carga de datos cifrados desde disco (.txt) para restaurar el estado previo.
+     */
     public GestorDatos() {
         this.pilotos = new Piloto[CAPACIDAD_INICIAL];
         this.contadorPilotos = 0;
         this.partidas = new Partida[CAPACIDAD_INICIAL];
         this.contadorPartidas = 0;
+
+        // Restaurar estado persistido en disco al iniciar la aplicación
+        cargarDatosDesdeDisco();
     }
 
     /**
@@ -41,11 +47,63 @@ public class GestorDatos {
     }
 
     // ==========================================
+    // MÉTODOS DE SINCRONIZACIÓN CON DISCO
+    // ==========================================
+
+    /**
+     * Carga y descifra los registros de pilotos y partidas almacenados en disco (.txt),
+     * reconstruyendo los vectores de memoria activa.
+     */
+    public synchronized void cargarDatosDesdeDisco() {
+        // Cargar pilotos desde pilotos.txt
+        Piloto[] pilotosCargados = GestorArchivos.cargarPilotos();
+        if (pilotosCargados != null && pilotosCargados.length > 0) {
+            for (Piloto p : pilotosCargados) {
+                if (p != null) {
+                    if (contadorPilotos >= pilotos.length) {
+                        redimensionarPilotos();
+                    }
+                    pilotos[contadorPilotos++] = p;
+                }
+            }
+            System.out.println("[PERSISTENCIA] " + contadorPilotos + " pilotos restaurados y descifrados desde disco.");
+        }
+
+        // Cargar partidas desde partidas.txt
+        Partida[] partidasCargadas = GestorArchivos.cargarPartidas();
+        if (partidasCargadas != null && partidasCargadas.length > 0) {
+            for (Partida p : partidasCargadas) {
+                if (p != null) {
+                    if (contadorPartidas >= partidas.length) {
+                        redimensionarPartidas();
+                    }
+                    partidas[contadorPartidas++] = p;
+                }
+            }
+            System.out.println("[PERSISTENCIA] " + contadorPartidas + " partidas restauradas y descifradas desde disco.");
+        }
+    }
+
+    /**
+     * Guarda el estado actual del vector de pilotos en disco con cifrado simétrico.
+     */
+    public synchronized void guardarPilotosEnDisco() {
+        GestorArchivos.guardarPilotos(obtenerPilotos());
+    }
+
+    /**
+     * Guarda el estado actual del vector de partidas en disco con cifrado simétrico.
+     */
+    public synchronized void guardarPartidasEnDisco() {
+        GestorArchivos.guardarPartidas(obtenerPartidas());
+    }
+
+    // ==========================================
     // MÉTODOS PARA GESTIÓN DE PILOTOS
     // ==========================================
 
     /**
-     * Inserta un nuevo piloto en el arreglo.
+     * Inserta un nuevo piloto en el arreglo y lo persiste cifrado en disco.
      * Si el arreglo está lleno, se redimensiona automáticamente al doble de tamaño.
      *
      * @param piloto Objeto piloto a insertar
@@ -68,6 +126,41 @@ public class GestorDatos {
 
         pilotos[contadorPilotos] = piloto;
         contadorPilotos++;
+
+        // Sincronizar inmediatamente con disco (.txt cifrado)
+        guardarPilotosEnDisco();
+        return true;
+    }
+
+    /**
+     * Elimina un piloto del vector de memoria por su nombre y actualiza el archivo en disco.
+     *
+     * @param nombre Nombre del piloto a eliminar
+     * @return true si fue encontrado y eliminado, false en caso contrario
+     */
+    public synchronized boolean eliminarPiloto(String nombre) {
+        if (nombre == null) return false;
+        int indice = -1;
+        for (int i = 0; i < contadorPilotos; i++) {
+            if (pilotos[i].getNombre().equalsIgnoreCase(nombre.trim())) {
+                indice = i;
+                break;
+            }
+        }
+
+        if (indice == -1) {
+            return false;
+        }
+
+        // Desplazar elementos hacia la izquierda
+        for (int i = indice; i < contadorPilotos - 1; i++) {
+            pilotos[i] = pilotos[i + 1];
+        }
+        pilotos[contadorPilotos - 1] = null;
+        contadorPilotos--;
+
+        // Sincronizar actualización con disco
+        guardarPilotosEnDisco();
         return true;
     }
 
@@ -149,8 +242,8 @@ public class GestorDatos {
     // ==========================================
 
     /**
-     * Inserta una nueva partida jugada en el vector de partidas.
-     * Actualiza automáticamente el punteo máximo del piloto involucrado.
+     * Inserta una nueva partida jugada en el vector de partidas y la persiste cifrada en disco.
+     * Actualiza automáticamente el punteo máximo del piloto involucrado tanto en memoria como en disco.
      *
      * @param partida Partida jugada a registrar
      * @return true si se insertó con éxito, false si el parámetro es nulo
@@ -172,8 +265,12 @@ public class GestorDatos {
         Piloto piloto = buscarPiloto(partida.getNombrePiloto());
         if (piloto != null) {
             piloto.actualizarPunteoMaximo(partida.getPuntajeObtenido());
+            // Guardar cambios en el piloto (récord actualizado)
+            guardarPilotosEnDisco();
         }
 
+        // Persistir partidas en disco (.txt cifrado)
+        guardarPartidasEnDisco();
         return true;
     }
 

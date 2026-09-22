@@ -67,6 +67,9 @@ public class VentanaPrincipal extends JFrame {
      */
     public void mostrarPanel(String nombrePanel) {
         this.panelActual = nombrePanel;
+        if (PANEL_CREAR_PILOTO.equals(nombrePanel)) {
+            panelCrearPiloto.actualizarTablaPilotos();
+        }
         cardLayout.show(panelContenedor, nombrePanel);
     }
 
