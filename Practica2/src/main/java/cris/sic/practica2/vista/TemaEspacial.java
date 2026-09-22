@@ -21,6 +21,7 @@ public class TemaEspacial {
     public static final Color AZUL_OSCURO = new Color(0x0D, 0x47, 0xA1);          // Azul marino oscuro
     public static final Color AMARILLO_ORO = new Color(0xFF, 0xD7, 0x00);         // Oro/Estrellas
     public static final Color ROJO_PELIGRO = new Color(0xE5, 0x39, 0x35);         // Alerta / Salir
+    public static final Color VERDE_EXITO = new Color(0x00, 0xE6, 0x76);          // Verde éxito / Puntuación
     public static final Color TEXTO_BLANCO = Color.WHITE;
     public static final Color TEXTO_SECUNDARIO = new Color(0xB0, 0xBE, 0xC5);     // Gris azulado claro
 

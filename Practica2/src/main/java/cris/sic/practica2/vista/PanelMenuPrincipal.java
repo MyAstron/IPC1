@@ -1,5 +1,8 @@
 package cris.sic.practica2.vista;
 
+import cris.sic.practica2.datos.GestorDatos;
+import cris.sic.practica2.modelo.Piloto;
+
 import javax.swing.BorderFactory;
 import javax.swing.Box;
 import javax.swing.BoxLayout;
@@ -58,7 +61,7 @@ public class PanelMenuPrincipal extends JPanel {
 
         // Botón 1: JUGAR
         btnJugar = crearBotonMenu("🎮  Jugar", TemaEspacial.AZUL_PRIMARIO, TemaEspacial.TEXTO_BLANCO);
-        btnJugar.addActionListener(e -> ventanaPrincipal.mostrarPanel(VentanaPrincipal.PANEL_JUEGO));
+        btnJugar.addActionListener(e -> iniciarAccionJugar());
         contenedorCentral.add(btnJugar);
         contenedorCentral.add(Box.createVerticalStrut(15));
 
@@ -108,6 +111,61 @@ public class PanelMenuPrincipal extends JPanel {
         btn.setPreferredSize(new Dimension(320, 48));
         TemaEspacial.aplicarEstiloBoton(btn, fondo, textoColor);
         return btn;
+    }
+
+    /**
+     * Valida la existencia de pilotos registrados y despliega el diálogo de selección de nave
+     * antes de arrancar la partida y el bucle de juego (Fase 4).
+     */
+    private void iniciarAccionJugar() {
+        Piloto[] pilotos = GestorDatos.getInstancia().obtenerPilotos();
+        if (pilotos == null || pilotos.length == 0) {
+            JOptionPane.showMessageDialog(
+                    this,
+                    "⚠️ No hay ningún piloto registrado en el sistema.\n" +
+                            "Por favor registre al menos un piloto antes de iniciar una misión espacial.",
+                    "Piloto Requerido",
+                    JOptionPane.WARNING_MESSAGE
+            );
+            ventanaPrincipal.mostrarPanel(VentanaPrincipal.PANEL_CREAR_PILOTO);
+            return;
+        }
+
+        Piloto pilotoSeleccionado;
+        if (pilotos.length == 1) {
+            pilotoSeleccionado = pilotos[0];
+        } else {
+            String[] opciones = new String[pilotos.length];
+            for (int i = 0; i < pilotos.length; i++) {
+                opciones[i] = (i + 1) + ". " + pilotos[i].getNombre() + " — " + pilotos[i].getTipoNave() +
+                        " (" + pilotos[i].getNivelDificultad() + " | Vel: " + pilotos[i].getVelocidadMovimiento() + " px/f)";
+            }
+
+            String seleccion = (String) JOptionPane.showInputDialog(
+                    this,
+                    "Seleccione el piloto para iniciar la misión espacial:",
+                    "Selección de Piloto para la Batalla",
+                    JOptionPane.QUESTION_MESSAGE,
+                    null,
+                    opciones,
+                    opciones[0]
+            );
+
+            if (seleccion == null) {
+                // Usuario canceló la selección
+                return;
+            }
+
+            pilotoSeleccionado = pilotos[0];
+            for (int i = 0; i < opciones.length; i++) {
+                if (opciones[i].equals(seleccion)) {
+                    pilotoSeleccionado = pilotos[i];
+                    break;
+                }
+            }
+        }
+
+        ventanaPrincipal.iniciarPartida(pilotoSeleccionado);
     }
 
     private void accionSalir() {

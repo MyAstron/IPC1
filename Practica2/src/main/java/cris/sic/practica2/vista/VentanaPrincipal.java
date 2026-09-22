@@ -1,9 +1,13 @@
 package cris.sic.practica2.vista;
 
+import cris.sic.practica2.modelo.Piloto;
+
 import javax.swing.JFrame;
 import javax.swing.JPanel;
 import java.awt.CardLayout;
 import java.awt.Dimension;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
 
 /**
  * Ventana Principal de la aplicación Swing.
@@ -38,6 +42,16 @@ public class VentanaPrincipal extends JFrame {
         setResizable(false);
         setLocationRelativeTo(null);
 
+        // Limpiar recursos e hilos al cerrar la ventana
+        addWindowListener(new WindowAdapter() {
+            @Override
+            public void windowClosing(WindowEvent e) {
+                if (panelJuego != null) {
+                    panelJuego.detenerPartida();
+                }
+            }
+        });
+
         // Inicializar CardLayout y contenedor
         cardLayout = new CardLayout();
         panelContenedor = new JPanel(cardLayout);
@@ -62,15 +76,33 @@ public class VentanaPrincipal extends JFrame {
 
     /**
      * Alterna la vista activa en el contenedor utilizando el CardLayout.
+     * Si se abandona el panel de juego, detiene el bucle de renderizado.
      *
      * @param nombrePanel Identificador de la vista (PANEL_MENU, PANEL_CREAR_PILOTO, etc.)
      */
     public void mostrarPanel(String nombrePanel) {
+        // Detener bucle de juego si se navega a otra pantalla
+        if (PANEL_JUEGO.equals(this.panelActual) && !PANEL_JUEGO.equals(nombrePanel)) {
+            panelJuego.detenerPartida();
+        }
+
         this.panelActual = nombrePanel;
         if (PANEL_CREAR_PILOTO.equals(nombrePanel)) {
             panelCrearPiloto.actualizarTablaPilotos();
+        } else if (PANEL_JUEGO.equals(nombrePanel)) {
+            panelJuego.solicitarFoco();
         }
         cardLayout.show(panelContenedor, nombrePanel);
+    }
+
+    /**
+     * Inicia una nueva partida configurando la nave con el piloto y mostrando el panel de juego.
+     *
+     * @param piloto Piloto seleccionado para la partida
+     */
+    public void iniciarPartida(Piloto piloto) {
+        panelJuego.iniciarPartida(piloto);
+        mostrarPanel(PANEL_JUEGO);
     }
 
     /**

@@ -65,10 +65,10 @@ public class Piloto {
     }
 
     /**
-     * Retorna el tiempo de recarga en milisegundos según la nave seleccionada:
-     * - Explorador: 2000 ms (2.0s)
-     * - Caza Estelar: 1000 ms (1.0s)
-     * - Acorazado: 300 ms (0.3s)
+     * Retorna el tiempo de recarga y cadencia del hilo de disparo en milisegundos:
+     * - Explorador (Fácil): 2000 ms (sleep de 2.0s)
+     * - Caza Estelar (Normal): 1000 ms (sleep de 1.0s)
+     * - Acorazado (Difícil): 300 ms (sleep de 0.3s)
      */
     public long getTiempoRecargaMs() {
         switch (tipoNave) {
@@ -79,6 +79,31 @@ public class Piloto {
             case NAVE_EXPLORADOR:
             default:
                 return 2000;
+        }
+    }
+
+    /**
+     * Alias explícito para el tiempo de sleep del hilo de disparo según el enunciado.
+     */
+    public long getSleepDisparoMs() {
+        return getTiempoRecargaMs();
+    }
+
+    /**
+     * Retorna el tiempo de sleep del hilo de movimiento de la nave según su dificultad:
+     * - Explorador (Fácil): Sleep corto (12 ms) -> Movimiento ágil, fluido y rápido.
+     * - Caza Estelar (Normal): Sleep estándar (25 ms) -> Respuesta de vuelo balanceada.
+     * - Acorazado (Difícil): Sleep mayor (50 ms) -> Nave pesada y lenta al esquivar.
+     */
+    public long getSleepMovimientoMs() {
+        switch (tipoNave) {
+            case NAVE_ACORAZADO:
+                return 50;
+            case NAVE_CAZA_ESTELAR:
+                return 25;
+            case NAVE_EXPLORADOR:
+            default:
+                return 12;
         }
     }
 
