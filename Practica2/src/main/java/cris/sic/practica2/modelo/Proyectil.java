@@ -127,7 +127,47 @@ public class Proyectil extends Thread {
         return x;
     }
 
+    public void setX(int x) {
+        this.x = x;
+    }
+
     public int getY() {
         return y;
+    }
+
+    public void setY(int y) {
+        this.y = y;
+    }
+
+    public int getAncho() {
+        return ancho;
+    }
+
+    public int getAlto() {
+        return alto;
+    }
+
+    public int getVelocidad() {
+        return velocidad;
+    }
+
+    public Color getColorPlasma() {
+        return colorPlasma;
+    }
+
+    public int getLimiteMaxX() {
+        return limiteMaxX;
+    }
+
+    /**
+     * Realiza un avance manual de posición en el eje X (útil para pruebas unitarias sin esperar hilos).
+     */
+    public void avanzarPaso() {
+        if (activo && !enPausa) {
+            x += velocidad;
+            if (x >= limiteMaxX) {
+                activo = false;
+            }
+        }
     }
 }

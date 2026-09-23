@@ -52,6 +52,7 @@ public class NaveJugador {
     private volatile boolean disparandoContinuo;
     private volatile boolean enPausa;
     private volatile boolean enEjecucion;
+    private int disparosRealizados;
 
     // Hilos dedicados de control del jugador
     private HiloMovimientoJugador hiloMovimiento;
@@ -86,6 +87,7 @@ public class NaveJugador {
         this.bloqueado = false;
         this.enPausa = false;
         this.enEjecucion = true;
+        this.disparosRealizados = 0;
         this.tickAnimacion = 0;
         this.tickBloqueo = 0;
         detenerMovimiento();
@@ -269,6 +271,7 @@ public class NaveJugador {
 
         Proyectil nuevoProyectil = new Proyectil(proyX, proyY, colorLaser, maxX);
         panelJuego.agregarProyectil(nuevoProyectil);
+        disparosRealizados++;
 
         // Iniciar recarga con el sleep de cadencia en un hilo independiente
         long tiempoRecarga = (piloto != null) ? piloto.getTiempoRecargaMs() : 1000;
@@ -626,5 +629,21 @@ public class NaveJugador {
 
     public boolean isPuedeDisparar() {
         return puedeDisparar;
+    }
+
+    public boolean isDisparandoContinuo() {
+        return disparandoContinuo;
+    }
+
+    public PanelJuego getPanelJuego() {
+        return panelJuego;
+    }
+
+    public void setPanelJuego(PanelJuego panelJuego) {
+        this.panelJuego = panelJuego;
+    }
+
+    public int getDisparosRealizados() {
+        return disparosRealizados;
     }
 }

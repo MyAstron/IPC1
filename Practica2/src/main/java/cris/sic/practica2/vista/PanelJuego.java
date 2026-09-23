@@ -70,9 +70,9 @@ public class PanelJuego extends JPanel {
     private volatile boolean partidaTerminada;
 
     // Vectores nativos para objetos espaciales (sin colecciones de terceros)
-    private static final int MAX_PROYECTILES = 120;
+    private static final int CAPACIDAD_INICIAL_PROYECTILES = 64;
     private static final int MAX_ELEMENTOS = 60;
-    private final Proyectil[] proyectiles;
+    private Proyectil[] proyectiles;
     private int totalProyectiles;
     private final ElementoEspacial[] elementos;
     private int totalElementos;
@@ -113,7 +113,7 @@ public class PanelJuego extends JPanel {
         this.ventanaPrincipal = ventanaPrincipal;
         this.random = new Random();
         this.estrellas = new Estrella[TOTAL_ESTRELLAS];
-        this.proyectiles = new Proyectil[MAX_PROYECTILES];
+        this.proyectiles = new Proyectil[CAPACIDAD_INICIAL_PROYECTILES];
         this.totalProyectiles = 0;
         this.elementos = new ElementoEspacial[MAX_ELEMENTOS];
         this.totalElementos = 0;
@@ -185,9 +185,7 @@ public class PanelJuego extends JPanel {
                 solicitarFoco();
                 if (e.getButton() == MouseEvent.BUTTON1 && naveJugador != null && !estaEnPausa() && !partidaTerminada) {
                     controlPorMouseActivo = true;
-                    int maxX = getWidth() > 0 ? getWidth() : 1000;
-                    int maxY = getHeight() > 0 ? getHeight() : 600;
-                    naveJugador.moverHacia(e.getX(), e.getY(), 0, ALTO_HUD, maxX, maxY);
+                    // Removed immediate ship move on click to prevent teleport.
                 }
             }
 
@@ -358,13 +356,37 @@ public class PanelJuego extends JPanel {
 
     /**
      * Registra un nuevo proyectil en el vector nativo e inicia su hilo independiente.
+     * Si el vector alcanza su capacidad máxima, se redimensiona automáticamente al doble.
      */
     public synchronized void agregarProyectil(Proyectil p) {
         if (p == null || partidaTerminada) return;
-        if (totalProyectiles < MAX_PROYECTILES) {
-            proyectiles[totalProyectiles++] = p;
-            p.start();
+        if (totalProyectiles >= proyectiles.length) {
+            redimensionarProyectiles();
         }
+        proyectiles[totalProyectiles++] = p;
+        p.start();
+    }
+
+    /**
+     * Redimensiona el vector de proyectiles al doble de su capacidad actual.
+     */
+    private void redimensionarProyectiles() {
+        Proyectil[] nuevoArreglo = new Proyectil[proyectiles.length * 2];
+        for (int i = 0; i < totalProyectiles; i++) {
+            nuevoArreglo[i] = proyectiles[i];
+        }
+        proyectiles = nuevoArreglo;
+    }
+
+    /**
+     * Retorna una copia de los proyectiles actualmente activos en el panel.
+     */
+    public synchronized Proyectil[] obtenerProyectiles() {
+        Proyectil[] copia = new Proyectil[totalProyectiles];
+        for (int i = 0; i < totalProyectiles; i++) {
+            copia[i] = proyectiles[i];
+        }
+        return copia;
     }
 
     /**
