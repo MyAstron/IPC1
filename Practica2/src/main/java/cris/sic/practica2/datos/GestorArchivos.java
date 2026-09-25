@@ -12,32 +12,60 @@ import java.io.FileWriter;
 import java.io.IOException;
 
 /**
- * Gestor de persistencia en disco (.txt) para pilotos y partidas.
- * Utiliza exclusivamente librerías nativas de java.io.* y aplica cifrado reversible
- * mediante Encriptador.procesar() antes de escribir y después de leer los datos.
+ * Gestor centralizado de persistencia en disco (.txt) para pilotos, partidas y reportes.
+ * Cumple con el requerimiento de almacenamiento centralizado en './src/datos/':
+ * - Todos los archivos persistentes y generados en ejecución residen en ./src/datos/
+ * - Crea automáticamente el directorio './src/datos/' si no existe.
+ * - Utiliza exclusivamente librerías nativas de java.io.* y aplica cifrado reversible
+ *   mediante Encriptador.procesar() antes de escribir y después de leer los datos.
  */
 public class GestorArchivos {
 
+    public static final String RUTA_DATOS_RELATIVA = "src" + File.separator + "datos";
     public static final String ARCHIVO_PILOTOS = "pilotos.txt";
     public static final String ARCHIVO_PARTIDAS = "partidas.txt";
+    public static final String ARCHIVO_REPORTE_GRAFICA = "reporte_grafica.png";
+    public static final String ARCHIVO_REPORTE_HTML = "reporte_partidas.html";
 
     /**
-     * Resuelve la ubicación del archivo considerando si la aplicación se ejecuta
-     * desde la raíz del repositorio o dentro de la carpeta Practica2.
+     * Retorna el directorio centralizado de datos (./src/datos/), creándolo automáticamente
+     * si aún no existe en el sistema de archivos.
      *
-     * @param nombreArchivo Nombre del archivo a localizar
-     * @return Objeto File con la ruta correspondiente
+     * @return Objeto File representativo del directorio de datos
      */
-    private static File obtenerArchivo(String nombreArchivo) {
+    public static File obtenerDirectorioDatos() {
+        // Evaluar si estamos en la raíz del proyecto o en el directorio superior del repositorio
         File dirPractica2 = new File("Practica2");
+        File dirBase;
         if (dirPractica2.exists() && dirPractica2.isDirectory()) {
-            return new File(dirPractica2, nombreArchivo);
+            dirBase = new File(dirPractica2, RUTA_DATOS_RELATIVA);
+        } else {
+            dirBase = new File(RUTA_DATOS_RELATIVA);
         }
-        return new File(nombreArchivo);
+
+        // Crear directorio de forma automática si no existe
+        if (!dirBase.exists()) {
+            boolean creado = dirBase.mkdirs();
+            if (creado) {
+                System.out.println("[GESTOR ARCHIVOS] Directorio de datos creado: " + dirBase.getAbsolutePath());
+            }
+        }
+        return dirBase;
     }
 
     /**
-     * Inicializa los archivos en disco si aún no existen.
+     * Resuelve la ubicación absoluta/relativa de un archivo específico dentro de ./src/datos/.
+     *
+     * @param nombreArchivo Nombre del archivo a localizar o crear
+     * @return Objeto File con la ruta dentro de ./src/datos/
+     */
+    public static File obtenerArchivo(String nombreArchivo) {
+        File dirDatos = obtenerDirectorioDatos();
+        return new File(dirDatos, nombreArchivo);
+    }
+
+    /**
+     * Inicializa los archivos en disco dentro de ./src/datos/ si aún no existen.
      */
     public static void inicializarArchivos() {
         try {
@@ -60,7 +88,7 @@ public class GestorArchivos {
 
     /**
      * Convierte el arreglo de pilotos a formato CSV (Nombre,TipoNave,PunteoMaximo),
-     * cifra la cadena mediante Encriptador.procesar() y la almacena en pilotos.txt.
+     * cifra la cadena mediante Encriptador.procesar() y la almacena en ./src/datos/pilotos.txt.
      *
      * @param pilotos Arreglo de objetos Piloto a persistir
      */
@@ -94,7 +122,7 @@ public class GestorArchivos {
     }
 
     /**
-     * Lee el contenido cifrado de pilotos.txt, aplica Encriptador.procesar()
+     * Lee el contenido cifrado de ./src/datos/pilotos.txt, aplica Encriptador.procesar()
      * para descifrarlo a texto plano y reconstruye las instancias de Piloto en un arreglo.
      *
      * @return Arreglo Piloto[] con los pilotos recuperados de disco
@@ -158,7 +186,7 @@ public class GestorArchivos {
 
     /**
      * Convierte el arreglo de partidas a formato CSV (nombrePiloto,puntajeObtenido,fecha,enemigosDestruidos),
-     * cifra la cadena mediante Encriptador.procesar() y la almacena en partidas.txt.
+     * cifra la cadena mediante Encriptador.procesar() y la almacena en ./src/datos/partidas.txt.
      *
      * @param partidas Arreglo de objetos Partida a persistir
      */
@@ -193,7 +221,7 @@ public class GestorArchivos {
     }
 
     /**
-     * Lee el contenido cifrado de partidas.txt, aplica Encriptador.procesar()
+     * Lee el contenido cifrado de ./src/datos/partidas.txt, aplica Encriptador.procesar()
      * para descifrarlo a texto plano y reconstruye las instancias de Partida en un arreglo.
      *
      * @return Arreglo Partida[] con las partidas recuperadas de disco

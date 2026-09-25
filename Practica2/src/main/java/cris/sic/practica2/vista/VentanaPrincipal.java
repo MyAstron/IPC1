@@ -89,6 +89,8 @@ public class VentanaPrincipal extends JFrame {
         this.panelActual = nombrePanel;
         if (PANEL_CREAR_PILOTO.equals(nombrePanel)) {
             panelCrearPiloto.actualizarTablaPilotos();
+        } else if (PANEL_REPORTES.equals(nombrePanel)) {
+            panelReportes.actualizarReportes();
         } else if (PANEL_JUEGO.equals(nombrePanel)) {
             panelJuego.solicitarFoco();
         }
