@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang='es'>
+<head>
+  <meta charset='UTF-8'>
+  <title>Simulador Espacial - Reporte General</title>
+  <style>
+    body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: #0B0E17; color: #FFFFFF; margin: 0; padding: 25px; }
+    .container { max-width: 1000px; margin: 0 auto; background-color: #161B26; padding: 30px; border-radius: 12px; border: 1px solid #00E5FF; box-shadow: 0 0 25px rgba(0,229,255,0.2); }
+    h1 { color: #00E5FF; text-align: center; margin-top: 0; border-bottom: 2px solid #00E5FF; padding-bottom: 12px; }
+    h2 { color: #FFD700; margin-top: 30px; border-bottom: 1px solid #0D47A1; padding-bottom: 6px; }
+    .meta { text-align: center; color: #B0BEC5; font-size: 14px; margin-bottom: 25px; }
+    table { width: 100%; border-collapse: collapse; margin-top: 15px; margin-bottom: 25px; }
+    th { background-color: #0D47A1; color: #00E5FF; padding: 12px; text-align: left; font-size: 14px; border: 1px solid #1E88E5; }
+    td { padding: 10px 12px; border: 1px solid #232D3F; font-size: 13px; }
+    tr:nth-child(even) { background-color: #0E1422; }
+    tr:hover { background-color: #1C2638; }
+    .chart-box { text-align: center; margin: 30px 0; background: #0B0E17; padding: 20px; border-radius: 8px; border: 1px solid #1E88E5; }
+    .chart-box img { max-width: 100%; height: auto; border-radius: 6px; }
+    .footer { text-align: center; color: #B0BEC5; font-size: 12px; margin-top: 40px; padding-top: 15px; border-top: 1px solid #232D3F; }
+    .pdf-tip { background: #0D47A1; color: #FFD700; padding: 12px; border-radius: 8px; text-align: center; margin-top: 20px; font-weight: bold; }
+  </style>
+</head>
+<body>
+  <div class='container'>
+    <h1>🚀 SIMULADOR DE VUELO ESPACIAL — REPORTE GENERAL</h1>
+    <div class='meta'>Universidad de San Carlos de Guatemala — IPC1 | Práctica 2</div>
+    <h2>🏆 Top de Pilotos y Récords Máximos</h2>
+    <table>
+      <thead><tr><th>#</th><th>Piloto</th><th>Tipo de Nave</th><th>Dificultad</th><th>Punteo Máximo</th></tr></thead>
+      <tbody>
+        <tr><td>1</td><td><b>Darth Vader</b></td><td>Acorazado</td><td>Difícil</td><td><b style='color:#00E676;'>1250 pts</b></td></tr>
+        <tr><td>2</td><td><b>Luke Skywalker</b></td><td>Caza Estelar</td><td>Normal</td><td><b style='color:#00E676;'>980 pts</b></td></tr>
+        <tr><td>3</td><td><b>Han Solo</b></td><td>Explorador</td><td>Fácil</td><td><b style='color:#00E676;'>620 pts</b></td></tr>
+        <tr><td>4</td><td><b>esteban</b></td><td>Acorazado</td><td>Difícil</td><td><b style='color:#00E676;'>430 pts</b></td></tr>
+        <tr><td>5</td><td><b>Cris</b></td><td>Caza Estelar</td><td>Normal</td><td><b style='color:#00E676;'>350 pts</b></td></tr>
+      </tbody>
+    </table>
+    <h2>📈 Gráfica Estadística de Rendimiento</h2>
+    <div class='chart-box'>
+      <img src='reporte_grafica.png' alt='Gráfica de Rendimiento Espacial'>
+    </div>
+    <h2>📜 Historial Completo de Misiones</h2>
+    <table>
+      <thead><tr><th>#</th><th>Piloto</th><th>Puntaje Obtenido</th><th>Bajas Enemigas</th><th>Fecha y Hora</th></tr></thead>
+      <tbody>
+        <tr><td>1</td><td>CapitanVanguard</td><td><b>950 pts</b></td><td>22</td><td>2026-09-21 16:10:00</td></tr>
+        <tr><td>2</td><td>pablo</td><td><b>60 pts</b></td><td>3</td><td>2026-09-21 19:03:25</td></tr>
+        <tr><td>3</td><td>esteban</td><td><b>430 pts</b></td><td>21</td><td>2026-09-21 19:05:28</td></tr>
+        <tr><td>4</td><td>Cris</td><td><b>350 pts</b></td><td>14</td><td>2026-09-21 19:08:57</td></tr>
+        <tr><td>5</td><td>esteban</td><td><b>50 pts</b></td><td>2</td><td>2026-09-21 21:38:16</td></tr>
+        <tr><td>6</td><td>Cris</td><td><b>90 pts</b></td><td>4</td><td>2026-09-22 16:02:46</td></tr>
+        <tr><td>7</td><td>Cris</td><td><b>130 pts</b></td><td>5</td><td>2026-09-23 08:21:00</td></tr>
+        <tr><td>8</td><td>Cris</td><td><b>250 pts</b></td><td>4</td><td>2026-09-23 09:24:51</td></tr>
+        <tr><td>9</td><td>Han Solo</td><td><b>450 pts</b></td><td>15</td><td>2026-09-24 20:44:40</td></tr>
+        <tr><td>10</td><td>Luke Skywalker</td><td><b>980 pts</b></td><td>32</td><td>2026-09-24 20:44:40</td></tr>
+        <tr><td>11</td><td>Darth Vader</td><td><b>1250 pts</b></td><td>48</td><td>2026-09-24 20:44:40</td></tr>
+        <tr><td>12</td><td>Han Solo</td><td><b>620 pts</b></td><td>21</td><td>2026-09-24 20:44:40</td></tr>
+        <tr><td>13</td><td>Cris</td><td><b>0 pts</b></td><td>0</td><td>2026-09-24 20:48:51</td></tr>
+        <tr><td>14</td><td>Han Solo</td><td><b>450 pts</b></td><td>15</td><td>2026-09-24 20:56:22</td></tr>
+        <tr><td>15</td><td>Luke Skywalker</td><td><b>980 pts</b></td><td>32</td><td>2026-09-24 20:56:22</td></tr>
+        <tr><td>16</td><td>Darth Vader</td><td><b>1250 pts</b></td><td>48</td><td>2026-09-24 20:56:22</td></tr>
+        <tr><td>17</td><td>Han Solo</td><td><b>620 pts</b></td><td>21</td><td>2026-09-24 20:56:22</td></tr>
+      </tbody>
+    </table>
+    <div class='pdf-tip'>💡 Para guardar este reporte en PDF: Presione <u>Ctrl + P</u> (o Archivo &gt; Imprimir) en su navegador y seleccione la opción 'Guardar como PDF'.</div>
+    <div class='footer'>Reporte generado automáticamente por el Simulador Espacial — IPC1 2026.</div>
+  </div>
+</body>
+</html>
