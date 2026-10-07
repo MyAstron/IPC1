@@ -160,4 +160,26 @@ public class ListaSimpleVehiculos {
     public boolean puedeAgregarMas() {
         return tamaño < CAPACIDAD_MAXIMA;
     }
+
+    /**
+     * Retorna una representación en texto de todos los vehículos contenidos en la lista enlazada simple.
+     *
+     * @return Cadena con la descripción de los vehículos
+     */
+    public String recorrer() {
+        if (estaVacia()) {
+            return "(Sin vehículos registrados)";
+        }
+        StringBuilder sb = new StringBuilder();
+        NodoSimple actual = cabeza;
+        int i = 1;
+        while (actual != null) {
+            sb.append("  [").append(i++).append("] ").append(actual.getDato());
+            if (actual.getSiguiente() != null) {
+                sb.append("\n");
+            }
+            actual = actual.getSiguiente();
+        }
+        return sb.toString();
+    }
 }

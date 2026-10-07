@@ -1,5 +1,7 @@
     package cris.sic.proyecto2;
 
+import cris.sic.proyecto2.estructuras.ListaDobleResidentes;
+import cris.sic.proyecto2.estructuras.ListaSimpleVehiculos;
 import cris.sic.proyecto2.modelo.EstadoVehiculo;
 import cris.sic.proyecto2.modelo.Residente;
 import cris.sic.proyecto2.modelo.Vehiculo;
@@ -186,15 +188,153 @@ public class Proyecto2 {
         }
         System.out.println();
 
-        // -------------------------------------------------------------------------
-        // RESUMEN FINAL
-        // -------------------------------------------------------------------------
         System.out.println("======================================================================");
         System.out.println("   RESULTADO DE INSPECCIÓN FASE 1: " + pruebasPasadas + "/" + pruebasTotales + " PRUEBAS SUPERADAS");
         if (pruebasPasadas == pruebasTotales) {
             System.out.println("   ESTADO: [FASE 1 COMPLETADA CON ÉXITO]");
         } else {
             System.out.println("   ESTADO: [SE DETECTARON FALLOS EN FASE 1]");
+        }
+        System.out.println("======================================================================\n");
+
+        // =====================================================================
+        // PUNTO DE INSPECCIÓN FASE 2: ESTRUCTURAS DINÁMICAS LINEALES
+        // =====================================================================
+        System.out.println("======================================================================");
+        System.out.println("   RESIPARK - PUNTO DE INSPECCIÓN FASE 2: LISTAS SIMPLES Y DOBLES     ");
+        System.out.println("======================================================================\n");
+
+        int pruebasPasadasF2 = 0;
+        int pruebasTotalesF2 = 0;
+
+        // -------------------------------------------------------------------------
+        // PRUEBA 2.1: Inserción y búsqueda en ListaDobleResidentes
+        // -------------------------------------------------------------------------
+        pruebasTotalesF2++;
+        System.out.println(">>> PRUEBA 2.1: Inserción y búsqueda por ID en ListaDobleResidentes");
+        ListaDobleResidentes listaResidentes = new ListaDobleResidentes();
+        Residente resA = new Residente("R-201", "Mario Silva", "Casa C-01", true);
+        Residente resB = new Residente("R-202", "Elena Morales", "Casa C-02", false);
+        Residente resC = new Residente("R-203", "Pedro Ruiz", "Casa C-03", true);
+
+        boolean insResA = listaResidentes.insertar(resA);
+        boolean insResB = listaResidentes.insertar(resB);
+        boolean insResC = listaResidentes.insertar(resC);
+        boolean insDuplicado = listaResidentes.insertar(new Residente("R-201", "Otro", "Casa X", false));
+
+        Residente encontradoB = listaResidentes.buscarPorId("R-202");
+        Residente noExiste = listaResidentes.buscarPorId("R-999");
+
+        System.out.println("   Insertados 3 residentes: " + (insResA && insResB && insResC));
+        System.out.println("   Intento de insertar ID duplicado R-201: " + insDuplicado + " (Esperado: false)");
+        System.out.println("   Búsqueda R-202: " + (encontradoB != null ? encontradoB.getNombre() : "null"));
+        System.out.println("   Búsqueda R-999 inexistente: " + noExiste + " (Esperado: null)");
+
+        if (insResA && insResB && insResC && !insDuplicado && encontradoB != null && noExiste == null && listaResidentes.getTamaño() == 3) {
+            System.out.println("   [OK] Inserción y búsqueda en ListaDobleResidentes superadas.");
+            pruebasPasadasF2++;
+        } else {
+            System.out.println("   [FALLO] Inserción o búsqueda en ListaDobleResidentes falló.");
+        }
+        System.out.println();
+
+        // -------------------------------------------------------------------------
+        // PRUEBA 2.2: Recorrido bidireccional (Ambos sentidos) en ListaDobleResidentes
+        // -------------------------------------------------------------------------
+        pruebasTotalesF2++;
+        System.out.println(">>> PRUEBA 2.2: Recorrido bidireccional en ListaDobleResidentes");
+        String recorrido = listaResidentes.recorrerAmbosSentidos();
+        System.out.print(recorrido);
+
+        if (listaResidentes.getCabeza().getDato().getId().equals("R-201")
+                && listaResidentes.getCola().getDato().getId().equals("R-203")
+                && listaResidentes.getCola().getAnterior().getDato().getId().equals("R-202")) {
+            System.out.println("   [OK] Recorrido bidireccional y punteros anterior/siguiente correctos.");
+            pruebasPasadasF2++;
+        } else {
+            System.out.println("   [FALLO] Error en enlaces dobles.");
+        }
+        System.out.println();
+
+        // -------------------------------------------------------------------------
+        // PRUEBA 2.3: Restricción estricta de máximo 3 vehículos (Rechazo del 4to)
+        // -------------------------------------------------------------------------
+        pruebasTotalesF2++;
+        System.out.println(">>> PRUEBA 2.3: Límite estricto de vehículos en ListaSimpleVehiculos (Rechazo del 4to)");
+        ListaSimpleVehiculos listaAutos = new ListaSimpleVehiculos();
+        Vehiculo auto1 = new Vehiculo("P-1111", "Mazda", "3", "Rojo", "Automóvil");
+        Vehiculo auto2 = new Vehiculo("P-2222", "Toyota", "Yaris", "Blanco", "Automóvil");
+        Vehiculo auto3 = new Vehiculo("P-3333", "Nissan", "Sentra", "Azul", "Automóvil");
+        Vehiculo auto4 = new Vehiculo("P-4444", "Hyundai", "Elantra", "Negro", "Automóvil");
+
+        boolean a1 = listaAutos.insertar(auto1);
+        boolean a2 = listaAutos.insertar(auto2);
+        boolean a3 = listaAutos.insertar(auto3);
+        boolean a4 = listaAutos.insertar(auto4); // Debe ser rechazado (límite 3)
+
+        System.out.println("   Auto 1 insertado: " + a1);
+        System.out.println("   Auto 2 insertado: " + a2);
+        System.out.println("   Auto 3 insertado: " + a3);
+        System.out.println("   Auto 4 insertado: " + a4 + " (Esperado: false)");
+        System.out.println("   Cantidad en lista: " + listaAutos.getTamaño() + "/3");
+
+        if (a1 && a2 && a3 && !a4 && listaAutos.getTamaño() == 3) {
+            System.out.println("   [OK] Restricción de capacidad máxima (3) cumplida estrictamente.");
+            pruebasPasadasF2++;
+        } else {
+            System.out.println("   [FALLO] Falló la restricción de capacidad máxima de vehículos.");
+        }
+        System.out.println();
+
+        // -------------------------------------------------------------------------
+        // PRUEBA 2.4: Regla de Oro - Bloqueo de eliminación si vehículo está ESTACIONADO
+        // -------------------------------------------------------------------------
+        pruebasTotalesF2++;
+        System.out.println(">>> PRUEBA 2.4: Bloqueo de eliminación de residente con vehículo ESTACIONADO");
+        Residente resConAuto = listaResidentes.buscarPorId("R-201");
+        Vehiculo vEstacionado = new Vehiculo("P-5555", "Honda", "CRV", "Plateado", "Pickup");
+        resConAuto.agregarVehiculo(vEstacionado);
+
+        // Pasamos el vehículo a ESTACIONADO
+        vEstacionado.entrarAColaEntrada();
+        vEstacionado.estacionar();
+        System.out.println("   Vehículo agregado a R-201 con estado: " + vEstacionado.getEstado());
+
+        // Intentamos eliminar al residente (DEBE DENEGARSE)
+        boolean eliminadoBloqueado = listaResidentes.eliminar("R-201");
+        System.out.println("   Intento de eliminar R-201 con auto ESTACIONADO: " + eliminadoBloqueado + " (Esperado: false)");
+
+        // Intentamos eliminar el auto directamente de la lista simple (DEBE DENEGARSE)
+        boolean autoEliminadoBloqueado = resConAuto.getListaVehiculos().eliminar("P-5555");
+        System.out.println("   Intento de eliminar auto P-5555 con estado ESTACIONADO: " + autoEliminadoBloqueado + " (Esperado: false)");
+
+        // Ahora sacamos el auto a FUERA
+        vEstacionado.entrarAColaSalida();
+        vEstacionado.salirDelResidencial();
+        System.out.println("   Vehículo salió a estado: " + vEstacionado.getEstado());
+
+        // Con el auto FUERA, ahora sí se debe permitir eliminar
+        boolean eliminadoExitoso = listaResidentes.eliminar("R-201");
+        System.out.println("   Eliminación de R-201 con autos FUERA: " + eliminadoExitoso + " (Esperado: true)");
+        System.out.println("   Tamaño de lista residentes: " + listaResidentes.getTamaño());
+
+        if (!eliminadoBloqueado && !autoEliminadoBloqueado && eliminadoExitoso && listaResidentes.buscarPorId("R-201") == null) {
+            System.out.println("   [OK] Bloqueo y descarte condicional de eliminación validado correctamente.");
+            pruebasPasadasF2++;
+        } else {
+            System.out.println("   [FALLO] La regla de oro en eliminación no se cumplió.");
+        }
+        System.out.println();
+
+        // -------------------------------------------------------------------------
+        // RESUMEN FINAL FASE 2
+        // -------------------------------------------------------------------------
+        System.out.println("======================================================================");
+        System.out.println("   RESULTADO DE INSPECCIÓN FASE 2: " + pruebasPasadasF2 + "/" + pruebasTotalesF2 + " PRUEBAS SUPERADAS");
+        if (pruebasPasadasF2 == pruebasTotalesF2) {
+            System.out.println("   ESTADO: [FASE 2 COMPLETADA CON ÉXITO]");
+        } else {
+            System.out.println("   ESTADO: [SE DETECTARON FALLOS EN FASE 2]");
         }
         System.out.println("======================================================================");
     }
