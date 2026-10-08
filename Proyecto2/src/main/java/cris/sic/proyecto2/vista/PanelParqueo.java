@@ -17,7 +17,6 @@ import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
-import javax.swing.JTabbedPane;
 import javax.swing.SwingUtilities;
 
 import cris.sic.proyecto2.estructuras.NodoCircular;
@@ -52,18 +51,18 @@ public class PanelParqueo extends JPanel implements GaritaListener {
     private JPanel panelCuadriculaGeneral;
 
     // Referencias a botones de celdas para actualización directa
-    private JButton[] botonesSocios;
-    private EspacioParqueo[] espaciosSocios;
+    private final JButton[] botonesSocios;
+    private final EspacioParqueo[] espaciosSocios;
 
-    private JButton[] botonesGeneral;
-    private EspacioParqueo[] espaciosGeneral;
+    private final JButton[] botonesGeneral;
+    private final EspacioParqueo[] espaciosGeneral;
 
     // Colores semánticos para celdas
-    private static final Color COLOR_LIBRE = new Color(34, 197, 94);          // Verde
-    private static final Color COLOR_SOCIO_OCUPADO = new Color(168, 85, 247); // Púrpura
-    private static final Color COLOR_GENERAL_OCUPADO = new Color(59, 130, 246);// Azul
-    private static final Color COLOR_VISITANTE_OCUPADO = new Color(245, 158, 11);// Ámbar
-    private static final Color COLOR_DESBORDE = new Color(236, 72, 153);       // Rosa/Fucsia (Socio en General)
+    private static final Color COLOR_LIBRE = new Color(34, 197, 94);           // Verde (#22C55E)
+    private static final Color COLOR_SOCIO_OCUPADO = new Color(168, 85, 247);  // Púrpura (#A855F7)
+    private static final Color COLOR_GENERAL_OCUPADO = new Color(59, 130, 246); // Azul (#3B82F6)
+    private static final Color COLOR_VISITANTE_OCUPADO = new Color(245, 158, 11); // Ámbar (#F59E0B)
+    private static final Color COLOR_DESBORDE = new Color(236, 72, 153);        // Rosa/Fucsia (#EC4899)
 
     public PanelParqueo(ControladorParqueo controladorParqueo, SimuladorParqueo simulador) {
         this.controladorParqueo = controladorParqueo;
@@ -82,49 +81,31 @@ public class PanelParqueo extends JPanel implements GaritaListener {
     }
 
     private void initComponents() {
-        // Encabezado con métricas y leyenda
+        // 1. Encabezado con métricas y leyenda
         add(crearCabeceraConMetricas(), BorderLayout.NORTH);
 
-        // Pestañas de visualización (Todas las áreas, Área Socios, Área General)
-        JTabbedPane tabbedPane = new JTabbedPane();
-        tabbedPane.setFont(TemaUI.FUENTE_BOLD);
-        tabbedPane.setBackground(TemaUI.FONDO_PANEL);
-        tabbedPane.setForeground(TemaUI.TEXTO_PRINCIPAL);
+        // 2. Contenedor principal con scroll que aloja las dos áreas (Socios y General)
+        JPanel panelContenedorAreas = new JPanel();
+        panelContenedorAreas.setLayout(new BoxLayout(panelContenedorAreas, BoxLayout.Y_AXIS));
+        panelContenedorAreas.setBackground(TemaUI.FONDO_APP);
 
-        // Pestaña 1: Vista General (Ambas Áreas)
-        JPanel panelVistaCompleta = new JPanel();
-        panelVistaCompleta.setLayout(new BoxLayout(panelVistaCompleta, BoxLayout.Y_AXIS));
-        panelVistaCompleta.setBackground(TemaUI.FONDO_APP);
+        // Sección 1: Socios (Filas A, B, C - 3x25 = 75 celdas)
+        JPanel seccionSocios = crearSeccionArea("⭐ Área de Socios (Filas A, B, C — 75 Espacios Exclusivos)", crearCuadriculaSocios());
+        
+        // Sección 2: General (Filas E, F, G, H, I — 5x15 = 75 celdas)
+        JPanel seccionGeneral = crearSeccionArea("🚗 Área General (Filas E, F, G, H, I — 75 Espacios Generales)", crearCuadriculaGeneral());
 
-        JPanel seccionSocios = crearSeccionArea("Área de Socios (Filas A, B, C - 75 Espacios)", crearCuadriculaSocios());
-        JPanel seccionGeneral = crearSeccionArea("Área General (Filas E, F, G, H, I - 75 Espacios)", crearCuadriculaGeneral());
+        panelContenedorAreas.add(seccionSocios);
+        panelContenedorAreas.add(Box.createRigidArea(new Dimension(0, 15)));
+        panelContenedorAreas.add(seccionGeneral);
 
-        panelVistaCompleta.add(seccionSocios);
-        panelVistaCompleta.add(Box.createRigidArea(new Dimension(0, 15)));
-        panelVistaCompleta.add(seccionGeneral);
+        JScrollPane scrollAreas = new JScrollPane(panelContenedorAreas);
+        scrollAreas.setBorder(BorderFactory.createEmptyBorder());
+        scrollAreas.getVerticalScrollBar().setUnitIncrement(18);
+        scrollAreas.getHorizontalScrollBar().setUnitIncrement(18);
+        scrollAreas.getViewport().setBackground(TemaUI.FONDO_APP);
 
-        JScrollPane scrollCompleto = new JScrollPane(panelVistaCompleta);
-        scrollCompleto.setBorder(BorderFactory.createEmptyBorder());
-        scrollCompleto.getVerticalScrollBar().setUnitIncrement(16);
-        scrollCompleto.getViewport().setBackground(TemaUI.FONDO_APP);
-
-        tabbedPane.addTab("🗺️ Vista Completa", scrollCompleto);
-
-        // Pestaña 2: Solo Socios
-        JScrollPane scrollSocios = new JScrollPane(crearSeccionArea("Área de Socios (Filas A, B, C)", panelCuadriculaSocios));
-        scrollSocios.setBorder(BorderFactory.createEmptyBorder());
-        scrollSocios.getVerticalScrollBar().setUnitIncrement(16);
-        scrollSocios.getViewport().setBackground(TemaUI.FONDO_APP);
-        tabbedPane.addTab("⭐ Área Socios (75)", scrollSocios);
-
-        // Pestaña 3: Solo General
-        JScrollPane scrollGeneral = new JScrollPane(crearSeccionArea("Área General (Filas E, F, G, H, I)", panelCuadriculaGeneral));
-        scrollGeneral.setBorder(BorderFactory.createEmptyBorder());
-        scrollGeneral.getVerticalScrollBar().setUnitIncrement(16);
-        scrollGeneral.getViewport().setBackground(TemaUI.FONDO_APP);
-        tabbedPane.addTab("🚗 Área General (75)", scrollGeneral);
-
-        add(tabbedPane, BorderLayout.CENTER);
+        add(scrollAreas, BorderLayout.CENTER);
     }
 
     private JPanel crearCabeceraConMetricas() {
@@ -138,13 +119,13 @@ public class PanelParqueo extends JPanel implements GaritaListener {
         // Título
         JPanel panelTitulo = new JPanel(new FlowLayout(FlowLayout.LEFT, 10, 0));
         panelTitulo.setBackground(TemaUI.FONDO_TARJETA);
-        JLabel lblTitulo = new JLabel("🅿️ Mapa en Vivo del Residencial");
+        JLabel lblTitulo = new JLabel("🅿️ Mapa en Vivo del Residencial (150 Celdas)");
         lblTitulo.setFont(TemaUI.FUENTE_TITULO);
         lblTitulo.setForeground(TemaUI.TEXTO_PRINCIPAL);
         panelTitulo.add(lblTitulo);
 
         // Leyenda Cromática
-        JPanel panelLeyenda = new JPanel(new FlowLayout(FlowLayout.RIGHT, 12, 0));
+        JPanel panelLeyenda = new JPanel(new FlowLayout(FlowLayout.RIGHT, 10, 0));
         panelLeyenda.setBackground(TemaUI.FONDO_TARJETA);
 
         panelLeyenda.add(crearItemLeyenda("Libre", COLOR_LIBRE));
@@ -155,7 +136,7 @@ public class PanelParqueo extends JPanel implements GaritaListener {
 
         // Botón Refrescar
         JButton btnRefrescar = TemaUI.crearBoton("🔄 Refrescar", TemaUI.PRIMARIO, Color.WHITE);
-        btnRefrescar.setPreferredSize(new Dimension(110, 30));
+        btnRefrescar.setPreferredSize(new Dimension(115, 30));
         btnRefrescar.addActionListener(e -> actualizarMatrizVisual());
         panelLeyenda.add(btnRefrescar);
 
@@ -238,7 +219,6 @@ public class PanelParqueo extends JPanel implements GaritaListener {
         panelCuadriculaSocios = new JPanel(new GridLayout(3, 25, 4, 4));
         panelCuadriculaSocios.setBackground(TemaUI.FONDO_PANEL);
 
-        // Recorrer la lista circular de socios para instanciar las 75 celdas
         NodoCircular actual = controladorParqueo.getAreaSocios().getCabeza();
         int idx = 0;
         while (idx < 75 && actual != null) {
@@ -292,7 +272,17 @@ public class PanelParqueo extends JPanel implements GaritaListener {
             protected void paintComponent(Graphics g) {
                 Graphics2D g2 = (Graphics2D) g.create();
                 g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
-                g2.setColor(getBackground());
+                Color bg = getBackground();
+                if (bg == null) {
+                    bg = COLOR_LIBRE;
+                }
+                if (getModel().isPressed()) {
+                    g2.setColor(bg.darker());
+                } else if (getModel().isRollover()) {
+                    g2.setColor(bg.brighter());
+                } else {
+                    g2.setColor(bg);
+                }
                 g2.fillRoundRect(0, 0, getWidth(), getHeight(), 6, 6);
                 g2.dispose();
                 super.paintComponent(g);
@@ -303,9 +293,23 @@ public class PanelParqueo extends JPanel implements GaritaListener {
         btn.setContentAreaFilled(false);
         btn.setBorderPainted(false);
         btn.setFocusPainted(false);
-        btn.setPreferredSize(new Dimension(42, 38));
+        btn.setPreferredSize(new Dimension(44, 38));
         btn.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
         return btn;
+    }
+
+    /**
+     * Alias para compatibilidad con la especificación visual.
+     */
+    public void actualizarMapa() {
+        actualizarMatrizVisual();
+    }
+
+    /**
+     * Alias para compatibilidad con la especificación visual.
+     */
+    public void pintarEspacios() {
+        actualizarMatrizVisual();
     }
 
     /**
@@ -336,10 +340,24 @@ public class PanelParqueo extends JPanel implements GaritaListener {
             int gen = controladorParqueo.getAreaGeneral().getOcupados();
             int tot = controladorParqueo.getTotalOcupados();
 
-            lblTotalSocios.setText("Socios: " + soc + " / 75 ocupados (" + (75 - soc) + " libres)");
-            lblTotalGeneral.setText("General: " + gen + " / 75 ocupados (" + (75 - gen) + " libres)");
-            lblTotalGlobal.setText("Ocupación Global: " + tot + " / 150 (" + (tot * 100 / 150) + "%)");
+            if (lblTotalSocios != null) {
+                lblTotalSocios.setText("Socios: " + soc + " / 75 ocupados (" + (75 - soc) + " libres)");
+            }
+            if (lblTotalGeneral != null) {
+                lblTotalGeneral.setText("General: " + gen + " / 75 ocupados (" + (75 - gen) + " libres)");
+            }
+            if (lblTotalGlobal != null) {
+                lblTotalGlobal.setText("Ocupación Global: " + tot + " / 150 (" + (tot * 100 / 150) + "%)");
+            }
 
+            if (panelCuadriculaSocios != null) {
+                panelCuadriculaSocios.revalidate();
+                panelCuadriculaSocios.repaint();
+            }
+            if (panelCuadriculaGeneral != null) {
+                panelCuadriculaGeneral.revalidate();
+                panelCuadriculaGeneral.repaint();
+            }
             revalidate();
             repaint();
         });
@@ -349,17 +367,16 @@ public class PanelParqueo extends JPanel implements GaritaListener {
         if (esp.estaLibre()) {
             btn.setBackground(COLOR_LIBRE);
             btn.setText(esp.getIdEspacio());
-            btn.setToolTipText("<html><b>Espacio " + esp.getIdEspacio() + "</b><br>Estado: LIBRE<br>Área: " + esp.getTipoEspacio() + "</html>");
+            btn.setToolTipText("<html><b>Espacio " + esp.getIdEspacio() + "</b><br>Estado: <font color='#22C55E'>LIBRE</font><br>Área: " + esp.getTipoEspacio() + "</html>");
         } else {
             Vehiculo v = esp.getVehiculoEstacionado();
             String placa = (v != null) ? v.getPlaca() : "OCUPADO";
             btn.setText("<html><center>" + esp.getIdEspacio() + "<br><font size='1'>" + (placa.length() > 6 ? placa.substring(0, 6) : placa) + "</font></center></html>");
 
-            // Determinar color cromático según el tipo de ocupante
             if (v != null) {
                 if (v.getPropietario() == null) {
                     btn.setBackground(COLOR_VISITANTE_OCUPADO);
-                } else if (v.getPropietario() != null) {
+                } else {
                     Residente res = v.getPropietario();
                     if (res.isEsSocio()) {
                         if (esp.getTipoEspacio() == TipoEspacio.GENERAL) {
@@ -370,13 +387,11 @@ public class PanelParqueo extends JPanel implements GaritaListener {
                     } else {
                         btn.setBackground(COLOR_GENERAL_OCUPADO);
                     }
-                } else {
-                    btn.setBackground(COLOR_GENERAL_OCUPADO);
                 }
 
                 String prop = (v.getPropietario() != null) ? v.getPropietario().getNombre() : "Visitante Temporal";
-                btn.setToolTipText("<html><b>Espacio " + esp.getIdEspacio() + "</b> [OCUPADO]<br>"
-                        + "Placa: " + v.getPlaca() + "<br>"
+                btn.setToolTipText("<html><b>Espacio " + esp.getIdEspacio() + "</b> [<font color='#EF4444'>OCUPADO</font>]<br>"
+                        + "Placa: <b>" + v.getPlaca() + "</b><br>"
                         + "Propietario: " + prop + "<br>"
                         + "Vehículo: " + v.getMarca() + " " + v.getModelo() + " (" + v.getColor() + ")<br>"
                         + "Tipo: " + v.getTipo() + "</html>");
@@ -461,6 +476,6 @@ public class PanelParqueo extends JPanel implements GaritaListener {
 
     @Override
     public void onEstadoCambiado(String idGarita, String estado) {
-        // No requiere actualización visual de celdas
+        // No requiere cambio de colores en celdas
     }
 }

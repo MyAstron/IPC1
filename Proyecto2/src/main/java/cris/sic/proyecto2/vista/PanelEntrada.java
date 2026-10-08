@@ -79,7 +79,6 @@ public class PanelEntrada extends JPanel implements GaritaListener {
         this.simulador = simulador;
         initComponents();
         actualizarCombosResidentes();
-        simulador.setListenerGlobal(this);
     }
 
     private void initComponents() {
@@ -264,26 +263,26 @@ public class PanelEntrada extends JPanel implements GaritaListener {
         // Garita 1
         JPanel pnlG1 = new JPanel(new GridLayout(2, 1));
         pnlG1.setBackground(TemaUI.FONDO_INPUT);
-        pnlG1.setBorder(BorderFactory.createEmptyBorder(6, 10, 6, 10));
+        pnlG1.setBorder(BorderFactory.createEmptyBorder(8, 12, 8, 12));
         JLabel lblG1Titulo = new JLabel("🏢 Garita de Entrada 1");
         lblG1Titulo.setFont(TemaUI.FUENTE_BOLD);
         lblG1Titulo.setForeground(TemaUI.PRIMARIO);
-        lblEstadoGarita1 = new JLabel("Estado: En espera");
-        lblEstadoGarita1.setFont(TemaUI.FUENTE_SMALL);
-        lblEstadoGarita1.setForeground(TemaUI.TEXTO_SECUNDARIO);
+        lblEstadoGarita1 = new JLabel("Estado: En espera (Cola vacía)");
+        lblEstadoGarita1.setFont(TemaUI.FUENTE_REGULAR);
+        lblEstadoGarita1.setForeground(TemaUI.TEXTO_PRINCIPAL);
         pnlG1.add(lblG1Titulo);
         pnlG1.add(lblEstadoGarita1);
 
         // Garita 2
         JPanel pnlG2 = new JPanel(new GridLayout(2, 1));
         pnlG2.setBackground(TemaUI.FONDO_INPUT);
-        pnlG2.setBorder(BorderFactory.createEmptyBorder(6, 10, 6, 10));
+        pnlG2.setBorder(BorderFactory.createEmptyBorder(8, 12, 8, 12));
         JLabel lblG2Titulo = new JLabel("🏢 Garita de Entrada 2");
         lblG2Titulo.setFont(TemaUI.FUENTE_BOLD);
         lblG2Titulo.setForeground(TemaUI.PRIMARIO);
-        lblEstadoGarita2 = new JLabel("Estado: En espera");
-        lblEstadoGarita2.setFont(TemaUI.FUENTE_SMALL);
-        lblEstadoGarita2.setForeground(TemaUI.TEXTO_SECUNDARIO);
+        lblEstadoGarita2 = new JLabel("Estado: En espera (Cola vacía)");
+        lblEstadoGarita2.setFont(TemaUI.FUENTE_REGULAR);
+        lblEstadoGarita2.setForeground(TemaUI.TEXTO_PRINCIPAL);
         pnlG2.add(lblG2Titulo);
         pnlG2.add(lblEstadoGarita2);
 
@@ -297,7 +296,7 @@ public class PanelEntrada extends JPanel implements GaritaListener {
         JPanel contenedor = TemaUI.crearTarjeta();
         contenedor.setLayout(new BorderLayout(5, 5));
 
-        JLabel lbl = TemaUI.crearEtiquetaTitulo("🚦 Cola de Espera en Garita de Entrada (FIFO)");
+        JLabel lbl = TemaUI.crearEtiquetaTitulo("🚦 Cola de Espera en Garitas de Entrada (FIFO)");
         contenedor.add(lbl, BorderLayout.NORTH);
 
         String[] columnas = {"Pos.", "Placa", "Tipo Usuario", "Vehículo / Color", "Destino / Residente"};
@@ -310,7 +309,7 @@ public class PanelEntrada extends JPanel implements GaritaListener {
 
         tablaColaEntrada = new JTable(modeloColaEntrada);
         tablaColaEntrada.setFont(TemaUI.FUENTE_REGULAR);
-        tablaColaEntrada.setRowHeight(24);
+        tablaColaEntrada.setRowHeight(26);
         tablaColaEntrada.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
         tablaColaEntrada.setBackground(TemaUI.FONDO_TARJETA);
         tablaColaEntrada.setForeground(TemaUI.TEXTO_PRINCIPAL);
@@ -346,7 +345,7 @@ public class PanelEntrada extends JPanel implements GaritaListener {
         actualizarComboVehiculosResidente();
     }
 
-    private void actualizarComboVehiculosResidente() {
+    public void actualizarComboVehiculosResidente() {
         cmbVehiculosResidente.removeAllItems();
         String itemSeleccionado = (String) cmbResidentes.getSelectedItem();
         if (itemSeleccionado == null) {
@@ -461,30 +460,45 @@ public class PanelEntrada extends JPanel implements GaritaListener {
         SwingUtilities.invokeLater(() -> {
             modeloColaEntrada.setRowCount(0);
             ColaFIFO cola = simulador.getColaEntrada();
-            NodoCola actual = cola.getPrimerNodo();
-            int pos = 1;
-            while (actual != null) {
-                Vehiculo v = actual.getDato();
-                if (v != null) {
-                    String tipoUsuario = (v.getPropietario() != null)
-                            ? (v.getPropietario().isEsSocio() ? "⭐ Residente Socio" : "🚗 Residente General")
-                            : "👥 Visitante";
-                    String infoVehiculo = v.getMarca() + " " + v.getModelo() + " (" + v.getColor() + ")";
-                    String destino = (v.getPropietario() != null)
-                            ? v.getPropietario().getNombre() + " (" + v.getPropietario().getCasaLote() + ")"
-                            : "Visita a Residente";
+            synchronized (cola) {
+                NodoCola actual = cola.getPrimerNodo();
+                int pos = 1;
+                while (actual != null) {
+                    Vehiculo v = actual.getDato();
+                    if (v != null) {
+                        String tipoUsuario = (v.getPropietario() != null)
+                                ? (v.getPropietario().isEsSocio() ? "⭐ Residente Socio" : "🚗 Residente General")
+                                : "👥 Visitante";
+                        String infoVehiculo = v.getMarca() + " " + v.getModelo() + " (" + v.getColor() + ")";
+                        String destino = (v.getPropietario() != null)
+                                ? v.getPropietario().getNombre() + " (" + v.getPropietario().getCasaLote() + ")"
+                                : "Visita a Residente";
 
-                    modeloColaEntrada.addRow(new Object[]{
-                        pos++,
-                        v.getPlaca(),
-                        tipoUsuario,
-                        infoVehiculo,
-                        destino
-                    });
+                        modeloColaEntrada.addRow(new Object[]{
+                            pos++,
+                            v.getPlaca(),
+                            tipoUsuario,
+                            infoVehiculo,
+                            destino
+                        });
+                    }
+                    actual = actual.getSiguiente();
                 }
-                actual = actual.getSiguiente();
             }
+            modeloColaEntrada.fireTableDataChanged();
         });
+    }
+
+    private boolean esGarita1(String idGarita) {
+        if (idGarita == null) return false;
+        String id = idGarita.toUpperCase();
+        return id.contains("1") || id.contains("GARITA-1") || id.contains("ENTRADA 1");
+    }
+
+    private boolean esGarita2(String idGarita) {
+        if (idGarita == null) return false;
+        String id = idGarita.toUpperCase();
+        return id.contains("2") || id.contains("GARITA-2") || id.contains("ENTRADA 2");
     }
 
     // =========================================================================
@@ -495,11 +509,13 @@ public class PanelEntrada extends JPanel implements GaritaListener {
     public void onVehiculoIngresado(String idGarita, Vehiculo vehiculo, EspacioParqueo espacioAsignado, Evento evento) {
         refrescarTablaColaEntrada();
         SwingUtilities.invokeLater(() -> {
-            String texto = "Atendiendo: " + vehiculo.getPlaca() + " -> " + espacioAsignado.getIdEspacio();
-            if ("GARITA-1".equalsIgnoreCase(idGarita)) {
+            String texto = "✅ Ingresó: " + vehiculo.getPlaca() + " ➔ " + espacioAsignado.getIdEspacio();
+            if (esGarita1(idGarita) && lblEstadoGarita1 != null) {
                 lblEstadoGarita1.setText(texto);
-            } else if ("GARITA-2".equalsIgnoreCase(idGarita)) {
+                lblEstadoGarita1.setForeground(TemaUI.EXITO);
+            } else if (esGarita2(idGarita) && lblEstadoGarita2 != null) {
                 lblEstadoGarita2.setText(texto);
+                lblEstadoGarita2.setForeground(TemaUI.EXITO);
             }
             actualizarComboVehiculosResidente();
         });
@@ -509,11 +525,13 @@ public class PanelEntrada extends JPanel implements GaritaListener {
     public void onVehiculoRechazado(String idGarita, Vehiculo vehiculo, Evento evento) {
         refrescarTablaColaEntrada();
         SwingUtilities.invokeLater(() -> {
-            String texto = "Rechazado: " + vehiculo.getPlaca() + " (Parqueo Lleno)";
-            if ("GARITA-1".equalsIgnoreCase(idGarita)) {
+            String texto = "❌ Rechazado: " + vehiculo.getPlaca() + " (Lleno)";
+            if (esGarita1(idGarita) && lblEstadoGarita1 != null) {
                 lblEstadoGarita1.setText(texto);
-            } else if ("GARITA-2".equalsIgnoreCase(idGarita)) {
+                lblEstadoGarita1.setForeground(TemaUI.PELIGRO);
+            } else if (esGarita2(idGarita) && lblEstadoGarita2 != null) {
                 lblEstadoGarita2.setText(texto);
+                lblEstadoGarita2.setForeground(TemaUI.PELIGRO);
             }
             actualizarComboVehiculosResidente();
         });
@@ -527,11 +545,17 @@ public class PanelEntrada extends JPanel implements GaritaListener {
 
     @Override
     public void onEstadoCambiado(String idGarita, String estado) {
+        refrescarTablaColaEntrada();
         SwingUtilities.invokeLater(() -> {
-            if ("GARITA-1".equalsIgnoreCase(idGarita)) {
-                lblEstadoGarita1.setText("Estado: " + estado);
-            } else if ("GARITA-2".equalsIgnoreCase(idGarita)) {
-                lblEstadoGarita2.setText("Estado: " + estado);
+            boolean atendiendo = estado != null && estado.contains("Atendiendo");
+            Color colorTexto = atendiendo ? TemaUI.ADVERTENCIA : TemaUI.TEXTO_PRINCIPAL;
+
+            if (esGarita1(idGarita) && lblEstadoGarita1 != null) {
+                lblEstadoGarita1.setText(estado);
+                lblEstadoGarita1.setForeground(colorTexto);
+            } else if (esGarita2(idGarita) && lblEstadoGarita2 != null) {
+                lblEstadoGarita2.setText(estado);
+                lblEstadoGarita2.setForeground(colorTexto);
             }
         });
     }

@@ -152,8 +152,8 @@ public class PanelSalida extends JPanel implements GaritaListener {
         lblTitulo.setFont(TemaUI.FUENTE_TITULO);
         lblTitulo.setForeground(TemaUI.PELIGRO);
 
-        lblEstadoGaritaSalida = new JLabel("Estado: En servicio");
-        lblEstadoGaritaSalida.setFont(TemaUI.FUENTE_BOLD);
+        lblEstadoGaritaSalida = new JLabel("Estado: En espera (Sin salidas pendientes)");
+        lblEstadoGaritaSalida.setFont(TemaUI.FUENTE_REGULAR);
         lblEstadoGaritaSalida.setForeground(TemaUI.TEXTO_PRINCIPAL);
 
         lblVehiculoSaliente = new JLabel("Último movimiento: Ninguno");
@@ -306,30 +306,34 @@ public class PanelSalida extends JPanel implements GaritaListener {
 
             // Área General
             recorrerAreaEstacionados(controladorParqueo.getAreaGeneral());
+
+            modeloEstacionados.fireTableDataChanged();
         });
     }
 
     private void recorrerAreaEstacionados(ListaCircularParqueo area) {
-        NodoCircular actual = area.getCabeza();
-        int cont = 0;
-        while (cont < area.getCapacidad() && actual != null) {
-            EspacioParqueo esp = actual.getDato();
-            if (esp != null && esp.estaOcupado() && esp.getVehiculoEstacionado() != null) {
-                Vehiculo v = esp.getVehiculoEstacionado();
-                String prop = (v.getPropietario() != null) ? v.getPropietario().getNombre() : "Visitante Temporal";
-                String auto = v.getMarca() + " " + v.getModelo() + " (" + v.getColor() + ")";
+        synchronized (area) {
+            NodoCircular actual = area.getCabeza();
+            int cont = 0;
+            while (cont < area.getCapacidad() && actual != null) {
+                EspacioParqueo esp = actual.getDato();
+                if (esp != null && esp.estaOcupado() && esp.getVehiculoEstacionado() != null) {
+                    Vehiculo v = esp.getVehiculoEstacionado();
+                    String prop = (v.getPropietario() != null) ? v.getPropietario().getNombre() : "Visitante Temporal";
+                    String auto = v.getMarca() + " " + v.getModelo() + " (" + v.getColor() + ")";
 
-                modeloEstacionados.addRow(new Object[]{
-                    esp.getIdEspacio(),
-                    esp.getTipoEspacio(),
-                    v.getPlaca(),
-                    prop,
-                    auto,
-                    v.getTipo()
-                });
+                    modeloEstacionados.addRow(new Object[]{
+                        esp.getIdEspacio(),
+                        esp.getTipoEspacio(),
+                        v.getPlaca(),
+                        prop,
+                        auto,
+                        v.getTipo()
+                    });
+                }
+                actual = actual.getSiguiente();
+                cont++;
             }
-            actual = actual.getSiguiente();
-            cont++;
         }
     }
 
@@ -337,25 +341,34 @@ public class PanelSalida extends JPanel implements GaritaListener {
         SwingUtilities.invokeLater(() -> {
             modeloColaSalida.setRowCount(0);
             ColaFIFO cola = simulador.getColaSalida();
-            NodoCola actual = cola.getPrimerNodo();
-            int pos = 1;
-            while (actual != null) {
-                Vehiculo v = actual.getDato();
-                if (v != null) {
-                    String prop = (v.getPropietario() != null) ? v.getPropietario().getNombre() : "Visitante";
-                    String auto = v.getMarca() + " " + v.getModelo();
+            synchronized (cola) {
+                NodoCola actual = cola.getPrimerNodo();
+                int pos = 1;
+                while (actual != null) {
+                    Vehiculo v = actual.getDato();
+                    if (v != null) {
+                        String prop = (v.getPropietario() != null) ? v.getPropietario().getNombre() : "Visitante";
+                        String auto = v.getMarca() + " " + v.getModelo();
 
-                    modeloColaSalida.addRow(new Object[]{
-                        pos++,
-                        v.getPlaca(),
-                        auto,
-                        prop,
-                        v.getEstado().getDescripcion()
-                    });
+                        modeloColaSalida.addRow(new Object[]{
+                            pos++,
+                            v.getPlaca(),
+                            auto,
+                            prop,
+                            v.getEstado().getDescripcion()
+                        });
+                    }
+                    actual = actual.getSiguiente();
                 }
-                actual = actual.getSiguiente();
             }
+            modeloColaSalida.fireTableDataChanged();
         });
+    }
+
+    private boolean esGaritaSalida(String idGarita) {
+        if (idGarita == null) return false;
+        String id = idGarita.toUpperCase();
+        return id.contains("SALIDA") || id.contains("3") || id.contains("GARITA-3");
     }
 
     // =========================================================================
@@ -376,15 +389,27 @@ public class PanelSalida extends JPanel implements GaritaListener {
     public void onVehiculoSalida(String idGarita, Vehiculo vehiculo, EspacioParqueo espacioLiberado, Evento evento) {
         refrescarTablas();
         SwingUtilities.invokeLater(() -> {
-            lblVehiculoSaliente.setText("Último egreso: " + vehiculo.getPlaca() + " (Espacio " + espacioLiberado.getIdEspacio() + ")");
+            if (lblVehiculoSaliente != null) {
+                lblVehiculoSaliente.setText("Último egreso: " + vehiculo.getPlaca() + " (Liberó " + (espacioLiberado != null ? espacioLiberado.getIdEspacio() : "espacio") + ")");
+            }
+            if (lblEstadoGaritaSalida != null) {
+                lblEstadoGaritaSalida.setText("✅ Egreso completado: " + vehiculo.getPlaca());
+                lblEstadoGaritaSalida.setForeground(TemaUI.EXITO);
+            }
         });
     }
 
     @Override
     public void onEstadoCambiado(String idGarita, String estado) {
-        if ("GARITA-3".equalsIgnoreCase(idGarita)) {
+        if (esGaritaSalida(idGarita)) {
+            refrescarTablaColaSalida();
             SwingUtilities.invokeLater(() -> {
-                lblEstadoGaritaSalida.setText("Estado: " + estado);
+                boolean atendiendo = estado != null && (estado.contains("Atendiendo") || estado.contains("Procesando"));
+                Color colorTexto = atendiendo ? TemaUI.ADVERTENCIA : TemaUI.TEXTO_PRINCIPAL;
+                if (lblEstadoGaritaSalida != null) {
+                    lblEstadoGaritaSalida.setText(estado);
+                    lblEstadoGaritaSalida.setForeground(colorTexto);
+                }
             });
         }
     }
