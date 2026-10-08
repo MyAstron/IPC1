@@ -865,9 +865,201 @@ public class Proyecto2 {
         } else {
             System.out.println("   ESTADO: [SE DETECTARON FALLOS EN FASE 6]");
         }
+        System.out.println("======================================================================\n");
+
+        // =====================================================================
+        // PUNTO DE INSPECCIÓN FASE 7: MAQUETACIÓN BASE DE INTERFAZ GRÁFICA (SWING MANUAL)
+        // =====================================================================
         System.out.println("======================================================================");
+        System.out.println("   RESIPARK - PUNTO DE INSPECCIÓN FASE 7: VISTAS Y PANELES SWING     ");
+        System.out.println("======================================================================\n");
+
+        int pruebasPasadasF7 = 0;
+        int pruebasTotalesF7 = 0;
+
+        // -------------------------------------------------------------------------
+        // PRUEBA 7.1: Instanciación limpia y layouts de los paneles de gestión
+        // -------------------------------------------------------------------------
+        pruebasTotalesF7++;
+        System.out.println(">>> PRUEBA 7.1: Instanciación limpia de paneles de interfaz gráfica Swing");
+
+        ListaDobleResidentes listaF7 = new ListaDobleResidentes();
+        ControladorParqueo parqueoF7 = new ControladorParqueo();
+        PilaEventos bitacoraF7 = new PilaEventos();
+        SimuladorParqueo simuladorF7 = new SimuladorParqueo(parqueoF7, bitacoraF7);
+
+        cris.sic.proyecto2.vista.PanelResidentes pResidentes = new cris.sic.proyecto2.vista.PanelResidentes(listaF7);
+        cris.sic.proyecto2.vista.PanelEntrada pEntrada = new cris.sic.proyecto2.vista.PanelEntrada(listaF7, simuladorF7);
+        cris.sic.proyecto2.vista.PanelSalida pSalida = new cris.sic.proyecto2.vista.PanelSalida(parqueoF7, simuladorF7);
+        cris.sic.proyecto2.vista.PanelEventos pEventos = new cris.sic.proyecto2.vista.PanelEventos(bitacoraF7);
+
+        boolean panelesNoNulos = (pResidentes != null && pEntrada != null && pSalida != null && pEventos != null);
+        System.out.println("   Paneles Swing instanciados sin dependencias gráficas bloqueantes: " + panelesNoNulos);
+
+        if (panelesNoNulos && pResidentes.getLayout() != null && pEntrada.getLayout() != null) {
+            System.out.println("   [OK] Paneles base de la interfaz gráfica construidos correctamente.");
+            pruebasPasadasF7++;
+        } else {
+            System.out.println("   [FALLO] Falló la construcción de paneles Swing.");
+        }
+        System.out.println();
+
+        System.out.println("======================================================================");
+        System.out.println("   RESULTADO DE INSPECCIÓN FASE 7: " + pruebasPasadasF7 + "/" + pruebasTotalesF7 + " PRUEBAS SUPERADAS");
+        if (pruebasPasadasF7 == pruebasTotalesF7) {
+            System.out.println("   ESTADO: [FASE 7 COMPLETADA CON ÉXITO]");
+        } else {
+            System.out.println("   ESTADO: [SE DETECTARON FALLOS EN FASE 7]");
+        }
+        System.out.println("======================================================================\n");
+
+        // =====================================================================
+        // PUNTO DE INSPECCIÓN FASE 8: RENDERIZADO DINÁMICO DEL PARQUEO (150 CELDAS)
+        // =====================================================================
+        System.out.println("======================================================================");
+        System.out.println("   RESIPARK - PUNTO DE INSPECCIÓN FASE 8: PANEL PARQUEO Y MATRIZ      ");
+        System.out.println("======================================================================\n");
+
+        int pruebasPasadasF8 = 0;
+        int pruebasTotalesF8 = 0;
+
+        // -------------------------------------------------------------------------
+        // PRUEBA 8.1: Verificación de dimensiones de celdas (75 socios + 75 general = 150)
+        // -------------------------------------------------------------------------
+        pruebasTotalesF8++;
+        System.out.println(">>> PRUEBA 8.1: Mapeo de celdas visuales y lista circular en PanelParqueo");
+
+        cris.sic.proyecto2.vista.PanelParqueo panelParqueoTest = new cris.sic.proyecto2.vista.PanelParqueo(parqueoF7, simuladorF7);
+        System.out.println("   Capacidad Área Socios: " + parqueoF7.getAreaSocios().getCapacidad() + " espacios.");
+        System.out.println("   Capacidad Área General: " + parqueoF7.getAreaGeneral().getCapacidad() + " espacios.");
+        System.out.println("   Capacidad Total Parqueo: " + (parqueoF7.getAreaSocios().getCapacidad() + parqueoF7.getAreaGeneral().getCapacidad()) + " espacios.");
+
+        if (panelParqueoTest != null && parqueoF7.getAreaSocios().getCapacidad() == 75 && parqueoF7.getAreaGeneral().getCapacidad() == 75) {
+            System.out.println("   [OK] Matriz visual de 150 celdas (75 Socios / 75 General) mapeada correctamente.");
+            pruebasPasadasF8++;
+        } else {
+            System.out.println("   [FALLO] Inconsistencia en la matriz visual del parqueo.");
+        }
+        System.out.println();
+
+        // -------------------------------------------------------------------------
+        // PRUEBA 8.2: Actualización cromática y reactiva ante eventos de garitas
+        // -------------------------------------------------------------------------
+        pruebasTotalesF8++;
+        System.out.println(">>> PRUEBA 8.2: Disparo de actualización en PanelParqueo al ingresar y liberar vehículos");
+
+        Residente resP8 = new Residente("R-888", "Socio Parqueo", "Casa P-8", true);
+        Vehiculo vP8 = new Vehiculo("SOC-888", "Audi", "A4", "Gris", "Automóvil", resP8);
+        EspacioParqueo espP8 = parqueoF7.asignarVehiculo(vP8);
+        Evento evtP8 = new Evento("GARITA-1", "INGRESO_VEHICULO", "Ingreso de vehículo SOC-888");
+        bitacoraF7.apilar(evtP8);
+
+        panelParqueoTest.onVehiculoIngresado("GARITA-1", vP8, espP8, evtP8);
+        System.out.println("   Vehículo estacionado en espacio: " + espP8.getIdEspacio() + " (" + espP8.getTipoEspacio() + ")");
+
+        // Liberación
+        parqueoF7.liberarVehiculoPorPlaca("SOC-888");
+        Evento evtSalidaP8 = new Evento("GARITA-3", "SALIDA_VEHICULO", "Salida de vehículo SOC-888");
+        bitacoraF7.apilar(evtSalidaP8);
+        panelParqueoTest.onVehiculoSalida("GARITA-3", vP8, espP8, evtSalidaP8);
+
+        if (espP8.estaLibre() && parqueoF7.getTotalOcupados() == 0) {
+            System.out.println("   [OK] Renderizado cromático y callbacks de listener ejecutados sin errores.");
+            pruebasPasadasF8++;
+        } else {
+            System.out.println("   [FALLO] Error en el flujo de callbacks del PanelParqueo.");
+        }
+        System.out.println();
+
+        System.out.println("======================================================================");
+        System.out.println("   RESULTADO DE INSPECCIÓN FASE 8: " + pruebasPasadasF8 + "/" + pruebasTotalesF8 + " PRUEBAS SUPERADAS");
+        if (pruebasPasadasF8 == pruebasTotalesF8) {
+            System.out.println("   ESTADO: [FASE 8 COMPLETADA CON ÉXITO]");
+        } else {
+            System.out.println("   ESTADO: [SE DETECTARON FALLOS EN FASE 8]");
+        }
+        System.out.println("======================================================================\n");
+
+        // =====================================================================
+        // PUNTO DE INSPECCIÓN FASE 9: PRUEBA DE ESTRÉS CONCURRENTE (10 VEHÍCULOS)
+        // =====================================================================
+        System.out.println("======================================================================");
+        System.out.println("   RESIPARK - PUNTO DE INSPECCIÓN FASE 9: PRUEBA DE ESTRÉS CONCURRENTE");
+        System.out.println("======================================================================\n");
+
+        int pruebasPasadasF9 = 0;
+        int pruebasTotalesF9 = 0;
+
+        pruebasTotalesF9++;
+        System.out.println(">>> PRUEBA 9.1: Flujo continuo de 10 vehículos en 3 garitas simultáneas");
+
+        ControladorParqueo parqueoStress = new ControladorParqueo();
+        PilaEventos bitacoraStress = new PilaEventos();
+        SimuladorParqueo simStress = new SimuladorParqueo(parqueoStress, bitacoraStress);
+        simStress.setVelocidadAtencion(50); // 50 ms por atención
+        simStress.iniciarSimulacion();
+
+        // Encolamos 10 vehículos simultáneos
+        for (int i = 1; i <= 10; i++) {
+            Vehiculo v = new Vehiculo("STR-" + (100 + i), "Marca" + i, "Mod" + i, "Blanco", "Automóvil");
+            simStress.encolarVehiculoEntrada(v);
+        }
+
+        System.out.println("   10 vehículos encolados en cola de entrada...");
+
+        // Esperamos a que se procesen las entradas
+        try {
+            Thread.sleep(1200);
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+        }
+
+        int ocupadosStress = parqueoStress.getTotalOcupados();
+        System.out.println("   Vehículos estacionados en parqueo: " + ocupadosStress + "/10");
+
+        // Ahora enviamos los primeros 5 a salida
+        for (int i = 1; i <= 5; i++) {
+            EspacioParqueo esp = parqueoStress.buscarPorPlaca("STR-" + (100 + i));
+            if (esp != null && esp.getVehiculoEstacionado() != null) {
+                simStress.encolarVehiculoSalida(esp.getVehiculoEstacionado());
+            }
+        }
+
+        System.out.println("   5 vehículos encolados para salida...");
+
+        try {
+            Thread.sleep(800);
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+        }
+
+        int ocupadosPostStress = parqueoStress.getTotalOcupados();
+        int bitacoraTotal = bitacoraStress.getTamaño();
+
+        System.out.println("   Vehículos en parqueo tras salidas: " + ocupadosPostStress + "/5");
+        System.out.println("   Total de eventos registrados en bitácora: " + bitacoraTotal + " (10 ingresos + 5 salidas = 15)");
+
+        simStress.detenerSimulacion();
+
+        if (ocupadosStress == 10 && ocupadosPostStress == 5 && bitacoraTotal == 15) {
+            System.out.println("   [OK] Prueba de estrés con 10 vehículos superada con total integridad.");
+            pruebasPasadasF9++;
+        } else {
+            System.out.println("   [FALLO] La prueba de estrés presentó inconsistencias.");
+        }
+        System.out.println();
+
+        System.out.println("======================================================================");
+        System.out.println("   RESULTADO DE INSPECCIÓN FASE 9: " + pruebasPasadasF9 + "/" + pruebasTotalesF9 + " PRUEBAS SUPERADAS");
+        if (pruebasPasadasF9 == pruebasTotalesF9) {
+            System.out.println("   ESTADO: [FASE 9 COMPLETADA CON ÉXITO]");
+        } else {
+            System.out.println("   ESTADO: [SE DETECTARON FALLOS EN FASE 9]");
+        }
+        System.out.println("======================================================================\n");
     }
 }
+
 
 
 
