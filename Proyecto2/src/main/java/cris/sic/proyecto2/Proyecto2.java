@@ -1,22 +1,30 @@
-    package cris.sic.proyecto2;
+package cris.sic.proyecto2;
 
+import cris.sic.proyecto2.estructuras.ColaFIFO;
+import cris.sic.proyecto2.estructuras.ListaCircularParqueo;
 import cris.sic.proyecto2.estructuras.ListaDobleResidentes;
 import cris.sic.proyecto2.estructuras.ListaSimpleVehiculos;
+import cris.sic.proyecto2.estructuras.NodoCircular;
+import cris.sic.proyecto2.estructuras.PilaEventos;
+import cris.sic.proyecto2.modelo.ControladorParqueo;
+import cris.sic.proyecto2.modelo.EspacioParqueo;
+import cris.sic.proyecto2.modelo.EstadoEspacio;
 import cris.sic.proyecto2.modelo.EstadoVehiculo;
+import cris.sic.proyecto2.modelo.Evento;
 import cris.sic.proyecto2.modelo.Residente;
+import cris.sic.proyecto2.modelo.TipoEspacio;
 import cris.sic.proyecto2.modelo.Vehiculo;
 import cris.sic.proyecto2.modelo.Visitante;
 import cris.sic.proyecto2.util.ValidadorTexto;
 
 /**
- * Punto de entrada principal y suite de inspección para la Fase 1 del Proyecto 2 (ResiPark).
+ * Punto de entrada principal y suite de inspección para el Proyecto 2 (ResiPark).
  * 
- * Verifica:
- * 1. Instanciación correcta de entidades del modelo (Vehiculo, Residente, Visitante).
- * 2. Ciclo de vida y mutación de estados de vehículos (FUERA -> EN_COLA_ENTRADA -> ESTACIONADO -> EN_COLA_SALIDA -> FUERA).
- * 3. Restricción estricta de máximo 3 vehículos por residente.
- * 4. Regla de oro: Bloqueo de cambio de condición de socio cuando existen vehículos activos en el parqueo.
- * 5. Cero uso de colecciones de java.util o arreglos T[] en datos de negocio.
+ * Verifica fases del planificador con rigor y cero uso de colecciones java.util:
+ * - Fase 1: Modelo y reglas de negocio.
+ * - Fase 2: Listas lineales (simples y dobles).
+ * - Fase 3: Colas FIFO y Pila LIFO de eventos.
+ * - Fase 4: Parqueo y listas circulares (asignación y desborde).
  * 
  * @author cris_sic
  */
@@ -336,6 +344,267 @@ public class Proyecto2 {
         } else {
             System.out.println("   ESTADO: [SE DETECTARON FALLOS EN FASE 2]");
         }
+        System.out.println("======================================================================\n");
+
+        // =====================================================================
+        // PUNTO DE INSPECCIÓN FASE 3: ESTRUCTURAS DE FLUJO Y EVENTOS (COLAS Y PILA)
+        // =====================================================================
+        System.out.println("======================================================================");
+        System.out.println("   RESIPARK - PUNTO DE INSPECCIÓN FASE 3: COLAS FIFO Y PILA LIFO       ");
+        System.out.println("======================================================================\n");
+
+        int pruebasPasadasF3 = 0;
+        int pruebasTotalesF3 = 0;
+
+        // -------------------------------------------------------------------------
+        // PRUEBA 3.1: Encolado y Desencolado FIFO en ColaFIFO
+        // -------------------------------------------------------------------------
+        pruebasTotalesF3++;
+        System.out.println(">>> PRUEBA 3.1: Orden estricto FIFO de llegada y salida en ColaFIFO");
+        ColaFIFO colaEntrada = new ColaFIFO();
+        Vehiculo vCola1 = new Vehiculo("P-C001", "Mazda", "2", "Rojo", "Automóvil");
+        Vehiculo vCola2 = new Vehiculo("P-C002", "Honda", "Civic", "Azul", "Automóvil");
+        Vehiculo vCola3 = new Vehiculo("P-C003", "Toyota", "Hilux", "Blanco", "Pickup");
+
+        boolean enc1 = colaEntrada.encolar(vCola1);
+        boolean enc2 = colaEntrada.encolar(vCola2);
+        boolean enc3 = colaEntrada.encolar(vCola3);
+
+        System.out.println("   Encolados 3 vehículos: " + (enc1 && enc2 && enc3));
+        System.out.println("   Tamaño de la cola: " + colaEntrada.getTamaño());
+        System.out.println("   Vehículo al frente (peek): " + colaEntrada.obtenerFrente().getPlaca());
+        System.out.println("   ¿Contiene placa P-C002?: " + colaEntrada.contienePlaca("P-C002"));
+        System.out.println("   ¿Contiene placa P-INEXISTENTE?: " + colaEntrada.contienePlaca("P-INEXISTENTE"));
+
+        // Desencolamos y verificamos orden exacto 1 -> 2 -> 3
+        Vehiculo sale1 = colaEntrada.desencolar();
+        Vehiculo sale2 = colaEntrada.desencolar();
+        Vehiculo sale3 = colaEntrada.desencolar();
+        Vehiculo saleVacio = colaEntrada.desencolar();
+
+        System.out.println("   1er desencolado: " + (sale1 != null ? sale1.getPlaca() : "null") + " (Esperado: P-C001)");
+        System.out.println("   2do desencolado: " + (sale2 != null ? sale2.getPlaca() : "null") + " (Esperado: P-C002)");
+        System.out.println("   3er desencolado: " + (sale3 != null ? sale3.getPlaca() : "null") + " (Esperado: P-C003)");
+        System.out.println("   4to desencolado con cola vacía: " + saleVacio + " (Esperado: null)");
+        System.out.println("   ¿Está vacía al final?: " + colaEntrada.estaVacia());
+
+        if (enc1 && enc2 && enc3 && sale1 == vCola1 && sale2 == vCola2 && sale3 == vCola3
+                && saleVacio == null && colaEntrada.estaVacia()) {
+            System.out.println("   [OK] Cola FIFO opera con disciplina de colas estricta.");
+            pruebasPasadasF3++;
+        } else {
+            System.out.println("   [FALLO] El orden FIFO de la cola no se cumplió.");
+        }
+        System.out.println();
+
+        // -------------------------------------------------------------------------
+        // PRUEBA 3.2: Apilado, Desapilado y Recorrido LIFO No Destructivo en PilaEventos
+        // -------------------------------------------------------------------------
+        pruebasTotalesF3++;
+        System.out.println(">>> PRUEBA 3.2: Apilado, Desapilado y Recorrido LIFO en PilaEventos");
+        PilaEventos bitacora = new PilaEventos();
+
+        Evento ev1 = new Evento("2026-10-07 10:00:00", "INGRESO", "Vehículo P-C001 ingresó a Garita 1", "Garita de Entrada 1");
+        Evento ev2 = new Evento("2026-10-07 10:05:00", "ASIGNACION", "Asignado espacio A-1 a P-C001", "Parqueo Socios");
+        Evento ev3 = new Evento("2026-10-07 10:10:00", "SALIDA", "Vehículo P-C001 liberó espacio A-1", "Garita de Salida");
+
+        bitacora.apilar(ev1);
+        bitacora.apilar(ev2);
+        bitacora.apilar(ev3);
+
+        System.out.println("   Eventos apilados: 3");
+        System.out.println("   Tamaño de la pila: " + bitacora.getTamaño());
+        System.out.println("   Tope actual (peek): " + bitacora.verTope().getTipoEvento() + " (Esperado: SALIDA)");
+
+        // Verificamos el recorrido no destructivo (Debe mostrar 3 -> 2 -> 1)
+        System.out.println("   --- RECORRIDO NO DESTRUCTIVO DE BITÁCORA ---");
+        String textoRecorrido = bitacora.recorrer();
+        System.out.println(textoRecorrido);
+
+        int tamanoPostRecorrido = bitacora.getTamaño();
+        System.out.println("   Tamaño después del recorrido (debe conservarse): " + tamanoPostRecorrido);
+
+        // Desapilamos para confirmar orden LIFO estricto
+        Evento evSale1 = bitacora.desapilar();
+        Evento evSale2 = bitacora.desapilar();
+        Evento evSale3 = bitacora.desapilar();
+        Evento evSaleVacio = bitacora.desapilar();
+
+        System.out.println("   1er desapilado: " + (evSale1 != null ? evSale1.getTipoEvento() : "null") + " (Esperado: SALIDA)");
+        System.out.println("   2do desapilado: " + (evSale2 != null ? evSale2.getTipoEvento() : "null") + " (Esperado: ASIGNACION)");
+        System.out.println("   3er desapilado: " + (evSale3 != null ? evSale3.getTipoEvento() : "null") + " (Esperado: INGRESO)");
+        System.out.println("   4to desapilado con pila vacía: " + evSaleVacio + " (Esperado: null)");
+        System.out.println("   ¿Está vacía al final?: " + bitacora.estaVacia());
+
+        if (tamanoPostRecorrido == 3 && evSale1 == ev3 && evSale2 == ev2 && evSale3 == ev1
+                && evSaleVacio == null && bitacora.estaVacia()) {
+            System.out.println("   [OK] Pila LIFO de eventos opera correctamente con recorrido no destructivo.");
+            pruebasPasadasF3++;
+        } else {
+            System.out.println("   [FALLO] La pila LIFO de eventos falló.");
+        }
+        System.out.println();
+
+        // -------------------------------------------------------------------------
+        // RESUMEN FINAL FASE 3
+        // -------------------------------------------------------------------------
+        System.out.println("======================================================================");
+        System.out.println("   RESULTADO DE INSPECCIÓN FASE 3: " + pruebasPasadasF3 + "/" + pruebasTotalesF3 + " PRUEBAS SUPERADAS");
+        if (pruebasPasadasF3 == pruebasTotalesF3) {
+            System.out.println("   ESTADO: [FASE 3 COMPLETADA CON ÉXITO]");
+        } else {
+            System.out.println("   ESTADO: [SE DETECTARON FALLOS EN FASE 3]");
+        }
+        System.out.println("======================================================================\n");
+
+        // =====================================================================
+        // PUNTO DE INSPECCIÓN FASE 4: PARQUEO Y LISTAS CIRCULARES (ASIGNACIÓN Y DESBORDE)
+        // =====================================================================
+        System.out.println("======================================================================");
+        System.out.println("   RESIPARK - PUNTO DE INSPECCIÓN FASE 4: LISTAS CIRCULARES Y DESBORDE ");
+        System.out.println("======================================================================\n");
+
+        int pruebasPasadasF4 = 0;
+        int pruebasTotalesF4 = 0;
+
+        // -------------------------------------------------------------------------
+        // PRUEBA 4.1: Topología y dimensiones del Parqueo (75 Socios + 75 General = 150)
+        // -------------------------------------------------------------------------
+        pruebasTotalesF4++;
+        System.out.println(">>> PRUEBA 4.1: Estructura y topología circular del parqueo");
+        ControladorParqueo parqueo = new ControladorParqueo();
+        int capSocios = parqueo.getAreaSocios().getCapacidad();
+        int capGeneral = parqueo.getAreaGeneral().getCapacidad();
+        int capTotal = parqueo.getTotalCapacidad();
+
+        System.out.println("   Capacidad Área Socios (Filas A, B, C): " + capSocios + " (Esperado: 75)");
+        System.out.println("   Capacidad Área General (Filas E, F, G, H, I): " + capGeneral + " (Esperado: 75, sin fila D)");
+        System.out.println("   Capacidad Total: " + capTotal + " (Esperado: 150)");
+
+        // Verificar el cierre circular (nodo 75 apunta a nodo 1)
+        NodoCircular cabezaSocios = parqueo.getAreaSocios().getCabeza();
+        NodoCircular actual = cabezaSocios;
+        for (int i = 0; i < 75; i++) {
+            actual = actual.getSiguiente();
+        }
+        boolean circularidadValida = (actual == cabezaSocios);
+        System.out.println("   ¿La lista de Socios es un anillo circular cerrado?: " + circularidadValida);
+
+        if (capSocios == 75 && capGeneral == 75 && capTotal == 150 && circularidadValida) {
+            System.out.println("   [OK] Topología de 150 espacios y listas circulares construida correctamente.");
+            pruebasPasadasF4++;
+        } else {
+            System.out.println("   [FALLO] La topología del parqueo no cumple las dimensiones.");
+        }
+        System.out.println();
+
+        // -------------------------------------------------------------------------
+        // PRUEBA 4.2: Asignación masiva y Desborde de Socios hacia Área General (Espacio 76)
+        // -------------------------------------------------------------------------
+        pruebasTotalesF4++;
+        System.out.println(">>> PRUEBA 4.2: Asignación masiva de 75 socios y desborde del 76° a Área General");
+        Residente socioGenerico = new Residente("R-SOCIO-MASIVO", "Socio Masivo", "Lote VIP", true);
+
+        // Llenamos los 75 espacios de socios
+        boolean todosAsignadosSocios = true;
+        for (int i = 1; i <= 75; i++) {
+            Vehiculo autoSocio = new Vehiculo("SOC-" + i, "Toyota", "Corolla", "Blanco", "Automóvil");
+            autoSocio.setPropietario(socioGenerico);
+            EspacioParqueo espacio = parqueo.asignarVehiculo(autoSocio);
+            if (espacio == null || espacio.getTipoEspacio() != TipoEspacio.SOCIO) {
+                todosAsignadosSocios = false;
+                break;
+            }
+        }
+
+        System.out.println("   75 espacios de socios llenados exitosamente: " + todosAsignadosSocios);
+        System.out.println("   Ocupados Área Socios: " + parqueo.getAreaSocios().getOcupados() + "/75");
+        System.out.println("   ¿Área Socios llena?: " + parqueo.getAreaSocios().estaLlena());
+
+        // Ahora insertamos el socio 76 (debe desbordar hacia Área General, asignando ej. E1)
+        Vehiculo autoSocio76 = new Vehiculo("SOC-76", "Audi", "A4", "Negro", "Automóvil");
+        autoSocio76.setPropietario(socioGenerico);
+        EspacioParqueo espacioDesborde = parqueo.asignarVehiculo(autoSocio76);
+
+        System.out.println("   Asignación del Socio 76: " + (espacioDesborde != null ? espacioDesborde.getIdEspacio() : "RECHAZADO"));
+        System.out.println("   Tipo de área del espacio asignado: " + (espacioDesborde != null ? espacioDesborde.getTipoEspacio() : "null"));
+        System.out.println("   Estado del vehículo 76: " + autoSocio76.getEstado());
+
+        if (todosAsignadosSocios && parqueo.getAreaSocios().estaLlena()
+                && espacioDesborde != null && espacioDesborde.getTipoEspacio() == TipoEspacio.GENERAL
+                && autoSocio76.getEstado() == EstadoVehiculo.ESTACIONADO) {
+            System.out.println("   [OK] Regla de desborde automática de Área Socios a Área General validada con éxito.");
+            pruebasPasadasF4++;
+        } else {
+            System.out.println("   [FALLO] La regla de desborde de socios no se comportó según lo esperado.");
+        }
+        System.out.println();
+
+        // -------------------------------------------------------------------------
+        // PRUEBA 4.3: Residentes No Socios y Visitantes (Solo acceden a Área General)
+        // -------------------------------------------------------------------------
+        pruebasTotalesF4++;
+        System.out.println(">>> PRUEBA 4.3: Restricción de acceso para No Socios y Visitantes (Solo General)");
+        Residente noSocio = new Residente("R-NOSOCIO", "Juan Pérez", "Casa 12", false);
+        Vehiculo autoNoSocio = new Vehiculo("NOS-001", "Nissan", "Versa", "Gris", "Automóvil");
+        autoNoSocio.setPropietario(noSocio);
+
+        Visitante visitantePrueba = new Visitante("Pedro Gómez", "VIS-001", "R-NOSOCIO", "Hyundai", "Accent", "Rojo", "Automóvil");
+        Vehiculo autoVisitante = visitantePrueba.getVehiculo();
+
+        EspacioParqueo espNoSocio = parqueo.asignarVehiculo(autoNoSocio);
+        EspacioParqueo espVisitante = parqueo.asignarVehiculo(autoVisitante);
+
+        System.out.println("   Espacio para No Socio: " + (espNoSocio != null ? espNoSocio.getIdEspacio() + " (" + espNoSocio.getTipoEspacio() + ")" : "null"));
+        System.out.println("   Espacio para Visitante: " + (espVisitante != null ? espVisitante.getIdEspacio() + " (" + espVisitante.getTipoEspacio() + ")" : "null"));
+
+        if (espNoSocio != null && espNoSocio.getTipoEspacio() == TipoEspacio.GENERAL
+                && espVisitante != null && espVisitante.getTipoEspacio() == TipoEspacio.GENERAL) {
+            System.out.println("   [OK] No socios y visitantes asignados exclusivamente en Área General.");
+            pruebasPasadasF4++;
+        } else {
+            System.out.println("   [FALLO] No socios o visitantes ingresaron indebidamente al área de socios.");
+        }
+        System.out.println();
+
+        // -------------------------------------------------------------------------
+        // PRUEBA 4.4: Liberación de espacios y reasignación circular continua
+        // -------------------------------------------------------------------------
+        pruebasTotalesF4++;
+        System.out.println(">>> PRUEBA 4.4: Liberación de espacio por placa y reasignación circular");
+        // Liberamos el espacio A1 (donde estaba SOC-1)
+        EspacioParqueo espLiberado = parqueo.liberarVehiculoPorPlaca("SOC-1");
+        boolean liberacionExitosa = (espLiberado != null && espLiberado.estaLibre());
+        System.out.println("   Espacio liberado para SOC-1: " + (espLiberado != null ? espLiberado.getIdEspacio() + " (Estado=" + espLiberado.getEstado() + ")" : "null"));
+        System.out.println("   Ocupados en Socios tras liberación: " + parqueo.getAreaSocios().getOcupados() + "/75");
+
+        // Asignamos un nuevo socio, el puntero circular debe seguir avanzando y reutilizar el espacio
+        Vehiculo autoNuevoSocio = new Vehiculo("SOC-NUEVO", "BMW", "Serie 3", "Azul", "Automóvil");
+        autoNuevoSocio.setPropietario(socioGenerico);
+        EspacioParqueo espReasignado = parqueo.asignarVehiculo(autoNuevoSocio);
+        System.out.println("   Nuevo vehículo socio asignado a: " + (espReasignado != null ? espReasignado.getIdEspacio() : "null"));
+        System.out.println("   Ocupados en Socios tras reasignación: " + parqueo.getAreaSocios().getOcupados() + "/75");
+
+        if (liberacionExitosa && espReasignado != null && espReasignado.estaOcupado() && parqueo.getAreaSocios().getOcupados() == 75) {
+            System.out.println("   [OK] Liberación y reasignación circular continua operando sin inconsistencias.");
+            pruebasPasadasF4++;
+        } else {
+            System.out.println("   [FALLO] Falló la liberación o reasignación circular.");
+        }
+        System.out.println();
+
+        // -------------------------------------------------------------------------
+        // RESUMEN FINAL FASE 4
+        // -------------------------------------------------------------------------
+        System.out.println("======================================================================");
+        System.out.println("   RESULTADO DE INSPECCIÓN FASE 4: " + pruebasPasadasF4 + "/" + pruebasTotalesF4 + " PRUEBAS SUPERADAS");
+        if (pruebasPasadasF4 == pruebasTotalesF4) {
+            System.out.println("   ESTADO: [FASE 4 COMPLETADA CON ÉXITO]");
+        } else {
+            System.out.println("   ESTADO: [SE DETECTARON FALLOS EN FASE 4]");
+        }
         System.out.println("======================================================================");
     }
 }
+
+
