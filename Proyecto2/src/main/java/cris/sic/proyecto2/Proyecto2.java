@@ -6,6 +6,10 @@ import cris.sic.proyecto2.estructuras.ListaDobleResidentes;
 import cris.sic.proyecto2.estructuras.ListaSimpleVehiculos;
 import cris.sic.proyecto2.estructuras.NodoCircular;
 import cris.sic.proyecto2.estructuras.PilaEventos;
+import cris.sic.proyecto2.hilos.GaritaEntrada;
+import cris.sic.proyecto2.hilos.GaritaListener;
+import cris.sic.proyecto2.hilos.GaritaSalida;
+import cris.sic.proyecto2.hilos.SimuladorParqueo;
 import cris.sic.proyecto2.modelo.ControladorParqueo;
 import cris.sic.proyecto2.modelo.EspacioParqueo;
 import cris.sic.proyecto2.modelo.EstadoEspacio;
@@ -28,6 +32,7 @@ import cris.sic.proyecto2.util.ValidadorTexto;
  * - Fase 3: Colas FIFO y Pila LIFO de eventos.
  * - Fase 4: Parqueo y listas circulares (asignación y desborde).
  * - Fase 5: Persistencia en disco (java.io.* y cifrado XOR).
+ * - Fase 6: Lógica concurrente de garitas (hilos y sincronización).
  * 
  * @author cris_sic
  */
@@ -734,6 +739,131 @@ public class Proyecto2 {
             System.out.println("   ESTADO: [FASE 5 COMPLETADA CON ÉXITO]");
         } else {
             System.out.println("   ESTADO: [SE DETECTARON FALLOS EN FASE 5]");
+        }
+        System.out.println("======================================================================\n");
+
+        // =====================================================================
+        // PUNTO DE INSPECCIÓN FASE 6: LÓGICA CONCURRENTE DE GARITAS (HILOS Y SINCRONIZACIÓN)
+        // =====================================================================
+        System.out.println("======================================================================");
+        System.out.println("   RESIPARK - PUNTO DE INSPECCIÓN FASE 6: HILOS, WAIT/NOTIFY Y GARITAS ");
+        System.out.println("======================================================================\n");
+
+        int pruebasPasadasF6 = 0;
+        int pruebasTotalesF6 = 0;
+
+        // -------------------------------------------------------------------------
+        // PRUEBA 6.1: Simulación multihilo concurrente con 2 Garitas de Entrada
+        // -------------------------------------------------------------------------
+        pruebasTotalesF6++;
+        System.out.println(">>> PRUEBA 6.1: Concurrencia de 2 Garitas de Entrada sin condición de carrera");
+
+        ControladorParqueo parqueoHilos = new ControladorParqueo();
+        PilaEventos bitacoraHilos = new PilaEventos();
+        SimuladorParqueo simulador = new SimuladorParqueo(parqueoHilos, bitacoraHilos);
+
+        // Configuramos retardo corto para la prueba automatizada
+        simulador.setVelocidadAtencion(100); // 100 ms por atención
+        simulador.iniciarSimulacion();
+
+        // Encolamos 5 vehículos simultáneamente
+        Vehiculo h1 = new Vehiculo("CON-001", "Toyota", "Yaris", "Rojo", "Automóvil");
+        Vehiculo h2 = new Vehiculo("CON-002", "Honda", "Civic", "Azul", "Automóvil");
+        Vehiculo h3 = new Vehiculo("CON-003", "Mazda", "3", "Blanco", "Automóvil");
+        Vehiculo h4 = new Vehiculo("CON-004", "Nissan", "Sentra", "Negro", "Automóvil");
+        Vehiculo h5 = new Vehiculo("CON-005", "Ford", "Ranger", "Gris", "Pickup");
+
+        simulador.encolarVehiculoEntrada(h1);
+        simulador.encolarVehiculoEntrada(h2);
+        simulador.encolarVehiculoEntrada(h3);
+        simulador.encolarVehiculoEntrada(h4);
+        simulador.encolarVehiculoEntrada(h5);
+
+        System.out.println("   5 vehículos encolados simultáneamente...");
+
+        // Esperamos a que ambas garitas atiendan los 5 vehículos
+        try {
+            Thread.sleep(800); // Tiempo suficiente para 5 atenciones a 100ms repartidas en 2 hilos
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+        }
+
+        int ocupadosConcurrencia = parqueoHilos.getTotalOcupados();
+        int colaEntradaRestante = simulador.getColaEntrada().getTamaño();
+        int eventosIngreso = bitacoraHilos.getTamaño();
+
+        System.out.println("   Vehículos en parqueo: " + ocupadosConcurrencia + "/5");
+        System.out.println("   Vehículos restantes en cola: " + colaEntradaRestante);
+        System.out.println("   Eventos registrados en bitácora: " + eventosIngreso);
+
+        boolean todosEstacionados = (h1.getEstado() == EstadoVehiculo.ESTACIONADO
+                && h2.getEstado() == EstadoVehiculo.ESTACIONADO
+                && h3.getEstado() == EstadoVehiculo.ESTACIONADO
+                && h4.getEstado() == EstadoVehiculo.ESTACIONADO
+                && h5.getEstado() == EstadoVehiculo.ESTACIONADO);
+
+        if (ocupadosConcurrencia == 5 && colaEntradaRestante == 0 && eventosIngreso == 5 && todosEstacionados) {
+            System.out.println("   [OK] Concurrencia de garitas de entrada superada sin condición de carrera.");
+            pruebasPasadasF6++;
+        } else {
+            System.out.println("   [FALLO] La atención concurrente de entrada presentó inconsistencias.");
+        }
+        System.out.println();
+
+        // -------------------------------------------------------------------------
+        // PRUEBA 6.2: Simulación concurrente de Garita de Salida y desocupación
+        // -------------------------------------------------------------------------
+        pruebasTotalesF6++;
+        System.out.println(">>> PRUEBA 6.2: Concurrencia de Garita de Salida y liberación sincronizada");
+
+        // Encolamos 2 vehículos para salir
+        simulador.encolarVehiculoSalida(h1);
+        simulador.encolarVehiculoSalida(h2);
+
+        System.out.println("   2 vehículos enviados a Cola de Salida...");
+
+        try {
+            Thread.sleep(400); // Tiempo para 2 atenciones a 100ms
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+        }
+
+        int ocupadosPostSalida = parqueoHilos.getTotalOcupados();
+        int colaSalidaRestante = simulador.getColaSalida().getTamaño();
+        int eventosTotales = bitacoraHilos.getTamaño();
+
+        System.out.println("   Vehículos en parqueo tras salidas: " + ocupadosPostSalida + "/3");
+        System.out.println("   Vehículos restantes en cola de salida: " + colaSalidaRestante);
+        System.out.println("   Estado de h1 (saliente): " + h1.getEstado());
+        System.out.println("   Estado de h2 (saliente): " + h2.getEstado());
+        System.out.println("   Total eventos acumulados: " + eventosTotales + " (5 ingresos + 2 salidas = 7)");
+
+        boolean salidasCorrectas = (h1.getEstado() == EstadoVehiculo.FUERA
+                && h2.getEstado() == EstadoVehiculo.FUERA
+                && ocupadosPostSalida == 3
+                && colaSalidaRestante == 0
+                && eventosTotales == 7);
+
+        // Detenemos la simulación con seguridad
+        simulador.detenerSimulacion();
+
+        if (salidasCorrectas) {
+            System.out.println("   [OK] Garita de salida operó concurrentemente liberando espacios en parqueo.");
+            pruebasPasadasF6++;
+        } else {
+            System.out.println("   [FALLO] Falló la concurrencia en la garita de salida.");
+        }
+        System.out.println();
+
+        // -------------------------------------------------------------------------
+        // RESUMEN FINAL FASE 6
+        // -------------------------------------------------------------------------
+        System.out.println("======================================================================");
+        System.out.println("   RESULTADO DE INSPECCIÓN FASE 6: " + pruebasPasadasF6 + "/" + pruebasTotalesF6 + " PRUEBAS SUPERADAS");
+        if (pruebasPasadasF6 == pruebasTotalesF6) {
+            System.out.println("   ESTADO: [FASE 6 COMPLETADA CON ÉXITO]");
+        } else {
+            System.out.println("   ESTADO: [SE DETECTARON FALLOS EN FASE 6]");
         }
         System.out.println("======================================================================");
     }
