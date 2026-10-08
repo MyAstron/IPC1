@@ -824,6 +824,64 @@ public class PruebasBackend {
         System.out.println();
 
         // -------------------------------------------------------------------------
+        // PRUEBA 5.5: Persistencia y Reconstrucción Cronológica de Bitácora (Pila LIFO)
+        // -------------------------------------------------------------------------
+        pruebasTotalesF5++;
+        System.out.println(">>> PRUEBA 5.5: Persistencia y reconstrucción cronológica de bitácora (Pila LIFO)");
+
+        String rutaTestBitacora = "src/datos/test_bitacora.txt";
+        PilaEventos pilaOriginal = new PilaEventos();
+
+        Evento evBit1 = new Evento("2026-10-08 10:00:00", "INGRESO", "Vehículo P101ABC ingresó a Garita 1", "Garita 1");
+        Evento evBit2 = new Evento("2026-10-08 10:05:00", "ASIGNACION", "Vehículo P101ABC asignado al espacio A1", "Parqueo");
+        Evento evBit3 = new Evento("2026-10-08 10:10:00", "SALIDA", "Vehículo P101ABC liberó espacio A1", "Garita Salida");
+
+        pilaOriginal.apilar(evBit1);
+        pilaOriginal.apilar(evBit2);
+        pilaOriginal.apilar(evBit3);
+
+        boolean guardadoBitOk = false;
+        try {
+            int evGuardados = GestorArchivos.guardarBitacora(pilaOriginal, rutaTestBitacora);
+            guardadoBitOk = (evGuardados == 3);
+        } catch (Exception e) {
+            guardadoBitOk = false;
+        }
+        System.out.println("   Guardado de 3 eventos en disco: " + guardadoBitOk);
+
+        // Reconstrucción desde archivo
+        PilaEventos pilaRecuperada = new PilaEventos();
+        int evCargados = 0;
+        try {
+            evCargados = GestorArchivos.cargarBitacora(pilaRecuperada, rutaTestBitacora);
+        } catch (Exception e) {
+            evCargados = 0;
+        }
+        System.out.println("   Eventos cargados en nueva pila: " + evCargados + "/3");
+
+        Evento pop1 = pilaRecuperada.desapilar(); // Debe ser ev3 (más reciente)
+        Evento pop2 = pilaRecuperada.desapilar(); // Debe ser ev2
+        Evento pop3 = pilaRecuperada.desapilar(); // Debe ser ev1 (más antiguo)
+
+        boolean ordenOk = (pop1 != null && pop1.getTipoEvento().equals("SALIDA")
+                && pop2 != null && pop2.getTipoEvento().equals("ASIGNACION")
+                && pop3 != null && pop3.getTipoEvento().equals("INGRESO")
+                && pilaRecuperada.estaVacia());
+
+        System.out.println("   ¿Orden LIFO cronológico perfecto preservado?: " + ordenOk);
+
+        // Limpieza de archivo temporal
+        new java.io.File(rutaTestBitacora).delete();
+
+        if (guardadoBitOk && evCargados == 3 && ordenOk) {
+            System.out.println("   [OK] Persistencia y reconstrucción cronológica de bitácora verificadas.");
+            pruebasPasadasF5++;
+        } else {
+            System.out.println("   [FALLO] Error en la persistencia u orden de la bitácora.");
+        }
+        System.out.println();
+
+        // -------------------------------------------------------------------------
         // RESUMEN FINAL FASE 5
         // -------------------------------------------------------------------------
         System.out.println("======================================================================");

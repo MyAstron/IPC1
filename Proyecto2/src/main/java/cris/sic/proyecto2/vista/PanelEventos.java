@@ -122,6 +122,7 @@ public class PanelEventos extends JPanel implements GaritaListener {
 
         if (confirm == JOptionPane.YES_OPTION) {
             pilaEventos.vaciar();
+            cris.sic.proyecto2.persistencia.GestorArchivos.guardarBitacora(pilaEventos);
             refrescarTablaEventos();
         }
     }

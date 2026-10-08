@@ -11,10 +11,13 @@ import cris.sic.proyecto2.estructuras.ListaCircularParqueo;
 import cris.sic.proyecto2.estructuras.ListaDobleResidentes;
 import cris.sic.proyecto2.estructuras.NodoCircular;
 import cris.sic.proyecto2.estructuras.NodoDoble;
+import cris.sic.proyecto2.estructuras.NodoPila;
 import cris.sic.proyecto2.estructuras.NodoSimple;
+import cris.sic.proyecto2.estructuras.PilaEventos;
 import cris.sic.proyecto2.modelo.ControladorParqueo;
 import cris.sic.proyecto2.modelo.EspacioParqueo;
 import cris.sic.proyecto2.modelo.EstadoVehiculo;
+import cris.sic.proyecto2.modelo.Evento;
 import cris.sic.proyecto2.modelo.Residente;
 import cris.sic.proyecto2.modelo.Vehiculo;
 import cris.sic.proyecto2.util.ValidadorTexto;
@@ -26,7 +29,7 @@ import cris.sic.proyecto2.util.ValidadorTexto;
  * - Uso exclusivo de librerías del paquete java.io.* (BufferedReader, BufferedWriter, FileReader, FileWriter, File).
  * - Cero colecciones del Java Collections Framework (sin ArrayList, HashMap, etc.).
  * - Cero uso de arreglos nativos T[] para almacenamiento persistente.
- * - Formato delimitado por pipe '|' para residentes.txt, vehiculos.txt, parqueo_socios.txt y parqueo_general.txt.
+ * - Formato delimitado por pipe '|' para residentes.txt, vehiculos.txt, parqueo_socios.txt, parqueo_general.txt y bitacora.txt.
  * - Filtro de integridad: Omisión silenciosa de líneas corruptas, referencias huérfanas o excesos de capacidad.
  * 
  * @author cris_sic
@@ -37,6 +40,7 @@ public class GestorArchivos {
     public static final String RUTA_POR_DEFECTO_VEHICULOS = "src/datos/vehiculos.txt";
     public static final String RUTA_POR_DEFECTO_PARQUEO_SOCIOS = "src/datos/parqueo_socios.txt";
     public static final String RUTA_POR_DEFECTO_PARQUEO_GENERAL = "src/datos/parqueo_general.txt";
+    public static final String RUTA_POR_DEFECTO_BITACORA = "src/datos/bitacora.txt";
 
     /**
      * Resuelve dinámicamente la ruta del archivo residentes.txt en src/datos/.
@@ -100,6 +104,22 @@ public class GestorArchivos {
             return "Proyecto2/src/datos/parqueo_general.txt";
         }
         return RUTA_POR_DEFECTO_PARQUEO_GENERAL;
+    }
+
+    /**
+     * Resuelve dinámicamente la ruta del archivo bitacora.txt en src/datos/.
+     */
+    public static String getRutaBitacora() {
+        if (new File("src/datos/bitacora.txt").exists()) {
+            return "src/datos/bitacora.txt";
+        }
+        if (new File("Proyecto2/src/datos/bitacora.txt").exists()) {
+            return "Proyecto2/src/datos/bitacora.txt";
+        }
+        if (new File("Proyecto2").isDirectory()) {
+            return "Proyecto2/src/datos/bitacora.txt";
+        }
+        return RUTA_POR_DEFECTO_BITACORA;
     }
 
     // =========================================================================
@@ -197,9 +217,6 @@ public class GestorArchivos {
 
     /**
      * Guarda el estado de una lista circular de parqueo en disco.
-     * Estructura:
-     * Línea meta: #ULTIMO_ASIGNADO|ID_ESPACIO
-     * Líneas de celdas: ID_ESPACIO|ESTADO|PLACA_VEHICULO (ej. A1|OCUPADO|P102XYZ o A2|LIBRE|NULL)
      *
      * @param area        Lista circular de parqueo (Socios o General)
      * @param rutaArchivo Ruta de archivo destino
@@ -283,16 +300,90 @@ public class GestorArchivos {
     }
 
     /**
-     * Guarda residentes, vehículos y el estado de las dos listas circulares del parqueo.
+     * Guarda la bitácora histórica de eventos (Pila LIFO) en disco en orden cronológico.
+     * Utiliza un recorrido recursivo desde la base hacia el tope para almacenar los más antiguos primero.
+     *
+     * @param pila        Pila de eventos en memoria
+     * @param rutaArchivo Ruta del archivo bitacora.txt
+     * @return Cantidad de eventos guardados
+     * @throws IOException Si ocurre un error de E/S
+     */
+    public static int guardarBitacora(PilaEventos pila, String rutaArchivo) throws IOException {
+        if (pila == null || pila.estaVacia()) {
+            asegurarArchivoVacio(rutaArchivo);
+            return 0;
+        }
+
+        asegurarDirectorios(rutaArchivo);
+        int guardados = 0;
+
+        try (BufferedWriter bw = new BufferedWriter(new FileWriter(rutaArchivo, false))) {
+            synchronized (pila) {
+                escribirEventosRecursivo(bw, pila.getPrimerNodo());
+                guardados = pila.getTamaño();
+            }
+        }
+
+        return guardados;
+    }
+
+    private static void escribirEventosRecursivo(BufferedWriter bw, NodoPila nodo) throws IOException {
+        if (nodo == null) {
+            return;
+        }
+        // Primero descender hacia la base (los eventos más antiguos)
+        escribirEventosRecursivo(bw, nodo.getSiguiente());
+
+        // Al retornar de la recursión, escribir el evento actual
+        Evento ev = nodo.getDato();
+        if (ev != null) {
+            String fechaHora = sanitizarPipe(ev.getFechaHora());
+            String tipo = sanitizarPipe(ev.getTipoEvento());
+            String garita = sanitizarPipe(ev.getGaritaInvolucrada());
+            String desc = sanitizarPipe(ev.getDescripcion());
+
+            String linea = fechaHora + "|" + tipo + "|" + garita + "|" + desc;
+            bw.write(linea);
+            bw.newLine();
+        }
+    }
+
+    /**
+     * Guarda la bitácora en la ruta por defecto (src/datos/bitacora.txt).
+     */
+    public static boolean guardarBitacora(PilaEventos pila) {
+        try {
+            guardarBitacora(pila, getRutaBitacora());
+            return true;
+        } catch (IOException e) {
+            System.err.println("[ERROR PERSISTENCIA] Fallo al guardar bitácora en disco: " + e.getMessage());
+            return false;
+        }
+    }
+
+    /**
+     * Guarda residentes, vehículos, estado del parqueo y la bitácora histórica en disco.
      *
      * @param listaResidentes    Lista doble de residentes en memoria
      * @param controladorParqueo Controlador del parqueo en memoria
+     * @param pilaEventos        Bitácora de eventos en memoria
      * @return true si toda la persistencia fue exitosa
      */
-    public static boolean guardarTodo(ListaDobleResidentes listaResidentes, ControladorParqueo controladorParqueo) {
+    public static boolean guardarTodo(ListaDobleResidentes listaResidentes, ControladorParqueo controladorParqueo, PilaEventos pilaEventos) {
         boolean okRes = guardarTodo(listaResidentes, getRutaResidentes(), getRutaVehiculos());
         boolean okParq = (controladorParqueo != null) && guardarParqueo(controladorParqueo);
-        return okRes && okParq;
+        boolean okBit = true;
+        if (pilaEventos != null) {
+            okBit = guardarBitacora(pilaEventos);
+        }
+        return okRes && okParq && okBit;
+    }
+
+    /**
+     * Guarda residentes, vehículos y estado del parqueo.
+     */
+    public static boolean guardarTodo(ListaDobleResidentes listaResidentes, ControladorParqueo controladorParqueo) {
+        return guardarTodo(listaResidentes, controladorParqueo, null);
     }
 
     /**
@@ -330,7 +421,6 @@ public class GestorArchivos {
 
     /**
      * Lee el archivo de residentes y construye una nueva ListaDobleResidentes.
-     * Ignora líneas corruptas, vacías o con identificadores duplicados.
      *
      * @param rutaArchivo Ruta del archivo de residentes
      * @return ListaDobleResidentes reconstruida
@@ -351,7 +441,6 @@ public class GestorArchivos {
                     continue; // Omitir comentarios o líneas en blanco
                 }
 
-                // Parseo manual por delimitador pipe '|'
                 String[] partes = descomponerLineaPipe(linea);
                 if (partes == null || partes.length < 4) {
                     continue; // Línea corrupta
@@ -369,7 +458,6 @@ public class GestorArchivos {
                 boolean esSocio = socioStr.equalsIgnoreCase("S") || socioStr.equalsIgnoreCase("SI")
                         || socioStr.equalsIgnoreCase("SÍ") || socioStr.equalsIgnoreCase("TRUE");
 
-                // Validar duplicidad
                 if (lista.buscarPorId(id) != null) {
                     continue; // Ya existe este residente
                 }
@@ -384,10 +472,6 @@ public class GestorArchivos {
 
     /**
      * Lee el archivo de vehículos y los asocia a sus respectivos propietarios en la ListaDobleResidentes.
-     * Reglas de integridad:
-     * - Omite vehículos cuyo residente no exista en la lista.
-     * - Omite vehículos si el residente ya tiene 3 vehículos (capacidad máxima).
-     * - Omite vehículos con placas repetidas en todo el sistema.
      *
      * @param listaResidentes Lista doble de residentes previamente cargada
      * @param rutaArchivo     Ruta del archivo de vehículos
@@ -430,7 +514,6 @@ public class GestorArchivos {
                     tipo = partes[4].trim();
                     idResidente = partes[5].trim();
                 } else {
-                    // Formato estándar 5 campos: PLACA|MARCA|MODELO|COLOR|ID_RESIDENTE
                     idResidente = partes[4].trim();
                 }
 
@@ -438,23 +521,19 @@ public class GestorArchivos {
                     continue;
                 }
 
-                // Verificar si la placa ya existe en algún residente del sistema
                 if (existePlacaEnSistema(listaResidentes, placa)) {
                     continue;
                 }
 
-                // Buscar al propietario en la lista doble
                 Residente propietario = listaResidentes.buscarPorId(idResidente);
                 if (propietario == null) {
-                    continue; // Residente no existe (referencia huérfana)
+                    continue;
                 }
 
-                // Validar límite estricto de máximo 3 vehículos por residente
                 if (propietario.getCantidadVehiculos() >= 3) {
-                    continue; // Residente ya completó su cuota máxima de 3
+                    continue;
                 }
 
-                // Normalizar tipo de vehículo si es necesario
                 if (!ValidadorTexto.esTipoVehiculoValido(tipo)) {
                     tipo = "Automóvil";
                 }
@@ -510,12 +589,12 @@ public class GestorArchivos {
                 }
 
                 if (linea.startsWith("#")) {
-                    continue; // Comentarios generales
+                    continue;
                 }
 
                 String[] partes = descomponerLineaPipe(linea);
                 if (partes == null || partes.length < 3) {
-                    continue; // Formato inválido
+                    continue;
                 }
 
                 String idEspacio = partes[0].trim();
@@ -523,10 +602,8 @@ public class GestorArchivos {
                 String placa = partes[2].trim();
 
                 if (estado.equalsIgnoreCase("OCUPADO") && !placa.equalsIgnoreCase("NULL") && !placa.isEmpty()) {
-                    // Buscar vehículo existente en lista de residentes
                     Vehiculo vehiculo = buscarVehiculoPorPlaca(listaResidentes, placa);
 
-                    // Si no pertenece a residentes registrados, se reconstruye como visitante
                     if (vehiculo == null) {
                         vehiculo = new Vehiculo(placa, "Visitante", "Temporal", "Color", "Automóvil", null);
                     }
@@ -584,17 +661,87 @@ public class GestorArchivos {
     }
 
     /**
-     * Carga y reconstruye todo el estado (residentes, vehículos y parqueo) a partir de las rutas por defecto.
+     * Carga y reconstruye la bitácora histórica de eventos (Pila LIFO) desde disco.
+     *
+     * @param pila        Pila de eventos a poblar
+     * @param rutaArchivo Ruta del archivo bitacora.txt
+     * @return Cantidad de eventos restaurados
+     * @throws IOException Si ocurre un error al leer el archivo
+     */
+    public static int cargarBitacora(PilaEventos pila, String rutaArchivo) throws IOException {
+        if (pila == null) {
+            return 0;
+        }
+
+        File archivo = new File(rutaArchivo);
+        if (!archivo.exists() || !archivo.isFile()) {
+            return 0;
+        }
+
+        int cargados = 0;
+
+        try (BufferedReader br = new BufferedReader(new FileReader(archivo))) {
+            String linea;
+            while ((linea = br.readLine()) != null) {
+                linea = linea.trim();
+                if (linea.isEmpty() || linea.startsWith("#")) {
+                    continue;
+                }
+
+                String[] partes = descomponerLineaPipe(linea);
+                if (partes == null || partes.length < 4) {
+                    continue;
+                }
+
+                String fechaHora = partes[0].trim();
+                String tipo = partes[1].trim();
+                String garita = partes[2].trim();
+                String desc = partes[3].trim();
+
+                Evento ev = new Evento(fechaHora, tipo, desc, garita);
+                pila.apilar(ev);
+                cargados++;
+            }
+        }
+
+        return cargados;
+    }
+
+    /**
+     * Carga la bitácora histórica desde la ruta por defecto (src/datos/bitacora.txt).
+     */
+    public static int cargarBitacora(PilaEventos pila) {
+        try {
+            return cargarBitacora(pila, getRutaBitacora());
+        } catch (IOException e) {
+            System.err.println("[ERROR PERSISTENCIA] Fallo al cargar bitácora desde disco: " + e.getMessage());
+            return 0;
+        }
+    }
+
+    /**
+     * Carga y reconstruye todo el estado (residentes, vehículos, parqueo y bitácora) a partir de las rutas por defecto.
      *
      * @param controladorParqueo Controlador de parqueo a poblar
+     * @param pilaEventos        Pila de bitácora a poblar
      * @return ListaDobleResidentes completamente poblada
      */
-    public static ListaDobleResidentes cargarTodo(ControladorParqueo controladorParqueo) {
+    public static ListaDobleResidentes cargarTodo(ControladorParqueo controladorParqueo, PilaEventos pilaEventos) {
         ListaDobleResidentes lista = cargarTodo(getRutaResidentes(), getRutaVehiculos());
         if (controladorParqueo != null) {
             cargarParqueo(controladorParqueo, lista);
         }
+        if (pilaEventos != null) {
+            cargarBitacora(pilaEventos);
+        }
         return lista;
+    }
+
+    /**
+     * Carga y reconstruye todo el estado (residentes, vehículos y parqueo).
+     */
+    public static ListaDobleResidentes cargarTodo(ControladorParqueo controladorParqueo) {
+        return cargarTodo(controladorParqueo, null);
     }
 
     /**

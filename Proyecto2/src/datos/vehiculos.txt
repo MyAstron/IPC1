@@ -1,6 +1,8 @@
 P101ABC|Toyota|Corolla|Gris|Automóvil|R-101
 P102XYZ|Honda|CR-V|Azul|Automóvil|R-101
 P201DEF|Mazda|3|Rojo|Automóvil|R-102
+M123ASD|asd|123|asd|Automóvil|R-102
+Q1S2D3F|asd|asd|asd|Pickup|R-102
 P301GHI|Nissan|Frontier|Negro|Pickup|R-103
 P401JKL|Hyundai|Tucson|Blanco|Automóvil|R-104
 P501MNO|Yamaha|MT-07|Azul|Motocicleta|R-105

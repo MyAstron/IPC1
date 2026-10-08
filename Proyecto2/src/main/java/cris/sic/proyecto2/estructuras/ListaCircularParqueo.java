@@ -89,43 +89,35 @@ public class ListaCircularParqueo {
     }
 
     /**
-     * Asigna un espacio libre al vehículo mediante búsqueda circular a partir del nodo
-     * siguiente al último asignado, dando un máximo de una vuelta completa.
+     * Asigna un espacio libre al vehículo evaluando secuencialmente desde el PRIMER nodo
+     * de la lista (cabeza: A1 en Socios, E1 en General) para ocupar siempre el primer espacio disponible.
      *
      * @param vehiculo Vehículo que solicita estacionarse
      * @return EspacioParqueo asignado, o null si el área está completamente llena
      */
     public synchronized EspacioParqueo asignarEspacio(Vehiculo vehiculo) {
-        if (vehiculo == null || estaLlena()) {
+        if (vehiculo == null || estaLlena() || cabeza == null) {
             return null;
         }
 
-        NodoCircular inicioBusqueda;
-        if (ultimoAsignado == null) {
-            inicioBusqueda = cabeza;
-        } else {
-            inicioBusqueda = ultimoAsignado.getSiguiente();
-        }
-
-        NodoCircular actual = inicioBusqueda;
+        // Búsqueda secuencial obligatoria desde el PRIMER nodo de la lista (cabeza)
+        NodoCircular actual = cabeza;
         int pasos = 0;
 
-        while (pasos < capacidad) {
-            if (actual != null && actual.getDato() != null && actual.getDato().estaLibre()) {
-                // Espacio libre encontrado
+        while (pasos < capacidad && actual != null) {
+            if (actual.getDato() != null && actual.getDato().estaLibre()) {
+                // Primer espacio libre encontrado desde el inicio
                 EspacioParqueo espacio = actual.getDato();
                 espacio.ocupar(vehiculo);
                 ultimoAsignado = actual;
                 ocupados++;
                 return espacio;
             }
-            if (actual != null) {
-                actual = actual.getSiguiente();
-            }
+            actual = actual.getSiguiente();
             pasos++;
         }
 
-        // No se encontró espacio disponible tras una vuelta completa
+        // No se encontró espacio disponible tras recorrer toda el área
         return null;
     }
 
