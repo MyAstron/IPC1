@@ -3,3 +3,4 @@ R-102|Ana Lucía Morales|Casa B-05|S
 R-103|Roberto Gómez Bolaños|Casa C-08|N
 R-104|Sofía Valentina Reyes|Casa E-02|S
 R-105|Fernando José Castillo|Casa F-11|N
+R-106|Crisotpher|B-406|S

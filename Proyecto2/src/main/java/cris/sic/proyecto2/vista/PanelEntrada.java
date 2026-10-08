@@ -415,8 +415,10 @@ public class PanelEntrada extends JPanel implements GaritaListener {
             return;
         }
 
-        if (!ValidadorTexto.esPlacaValida(placa)) {
-            JOptionPane.showMessageDialog(this, "Placa inválida (3-10 caracteres, sin '|').", "Validación", JOptionPane.WARNING_MESSAGE);
+        String errorPlaca = ValidadorTexto.obtenerErrorPlaca(placa, tipo);
+        if (errorPlaca != null) {
+            JOptionPane.showMessageDialog(this, errorPlaca, "Formato de Placa Inválido", JOptionPane.WARNING_MESSAGE);
+            txtPlacaVisitante.requestFocus();
             return;
         }
 

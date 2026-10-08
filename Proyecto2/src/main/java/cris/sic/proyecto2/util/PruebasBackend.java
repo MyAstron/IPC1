@@ -206,6 +206,39 @@ public class PruebasBackend {
         }
         System.out.println();
 
+        // -------------------------------------------------------------------------
+        // PRUEBA 7: Validación Estricta de Placas de 7 Caracteres y Reglas P/M
+        // -------------------------------------------------------------------------
+        pruebasTotales++;
+        System.out.println(">>> PRUEBA 7: Validación estricta de placas (7 caracteres, P/M, dígitos 2-4, letras 5-7)");
+        boolean vAutoOk = ValidadorTexto.esPlacaValida("P123ABC", "Automóvil");
+        boolean vMotoOk = ValidadorTexto.esPlacaValida("M555XYZ", "Motocicleta");
+        boolean vPickupOk = ValidadorTexto.esPlacaValida("P789TRK", "Pickup");
+
+        // Casos inválidos
+        boolean invMotoConP = ValidadorTexto.esPlacaValida("P123ABC", "Motocicleta"); // Debe fallar
+        boolean invAutoConM = ValidadorTexto.esPlacaValida("M123ABC", "Automóvil");    // Debe fallar
+        boolean invLongitud = ValidadorTexto.esPlacaValida("P123AB", "Automóvil");     // 6 chars
+        boolean invDigitos = ValidadorTexto.esPlacaValida("P1A3ABC", "Automóvil");      // 'A' en dígitos
+        boolean invLetras = ValidadorTexto.esPlacaValida("P123AB1", "Automóvil");       // '1' en letras
+
+        System.out.println("   Placa válida Auto 'P123ABC': " + vAutoOk);
+        System.out.println("   Placa válida Moto 'M555XYZ': " + vMotoOk);
+        System.out.println("   Placa válida Pickup 'P789TRK': " + vPickupOk);
+        System.out.println("   Rechazo Moto con 'P': " + !invMotoConP);
+        System.out.println("   Rechazo Auto con 'M': " + !invAutoConM);
+        System.out.println("   Rechazo Longitud != 7: " + !invLongitud);
+        System.out.println("   Rechazo Carácter no dígito: " + !invDigitos);
+        System.out.println("   Rechazo Carácter no letra: " + !invLetras);
+
+        if (vAutoOk && vMotoOk && vPickupOk && !invMotoConP && !invAutoConM && !invLongitud && !invDigitos && !invLetras) {
+            System.out.println("   [OK] Todas las reglas de validación estricta de placas aprobadas.");
+            pruebasPasadas++;
+        } else {
+            System.out.println("   [FALLO] La validación estricta de placas no capturó adecuadamente los casos.");
+        }
+        System.out.println();
+
         System.out.println("======================================================================");
         System.out.println("   RESULTADO DE INSPECCIÓN FASE 1: " + pruebasPasadas + "/" + pruebasTotales + " PRUEBAS SUPERADAS");
         if (pruebasPasadas == pruebasTotales) {

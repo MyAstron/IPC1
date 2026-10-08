@@ -4,3 +4,6 @@ P201DEF|Mazda|3|Rojo|Automóvil|R-102
 P301GHI|Nissan|Frontier|Negro|Pickup|R-103
 P401JKL|Hyundai|Tucson|Blanco|Automóvil|R-104
 P501MNO|Yamaha|MT-07|Azul|Motocicleta|R-105
+P333FYK|Toyota|2011|Amarillo|Automóvil|R-106
+P999AAA|Toyota|2026|Gris|Pickup|R-106
+M190PQZ|Honda|2023|Negro|Motocicleta|R-106
