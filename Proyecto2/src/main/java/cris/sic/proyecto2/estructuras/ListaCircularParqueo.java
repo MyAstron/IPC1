@@ -279,6 +279,51 @@ public class ListaCircularParqueo {
         return ultimoAsignado;
     }
 
+    public synchronized void setUltimoAsignadoPorId(String idEspacio) {
+        if (idEspacio == null || idEspacio.trim().isEmpty() || idEspacio.equalsIgnoreCase("NULL")) {
+            this.ultimoAsignado = null;
+            return;
+        }
+        NodoCircular actual = cabeza;
+        int pasos = 0;
+        while (pasos < capacidad && actual != null) {
+            if (actual.getDato() != null && actual.getDato().getIdEspacio().equalsIgnoreCase(idEspacio.trim())) {
+                this.ultimoAsignado = actual;
+                return;
+            }
+            actual = actual.getSiguiente();
+            pasos++;
+        }
+    }
+
+    public synchronized void recalcularOcupados() {
+        int count = 0;
+        NodoCircular actual = cabeza;
+        int pasos = 0;
+        while (pasos < capacidad && actual != null) {
+            if (actual.getDato() != null && actual.getDato().estaOcupado()) {
+                count++;
+            }
+            actual = actual.getSiguiente();
+            pasos++;
+        }
+        this.ocupados = count;
+    }
+
+    public synchronized void vaciar() {
+        NodoCircular actual = cabeza;
+        int pasos = 0;
+        while (pasos < capacidad && actual != null) {
+            if (actual.getDato() != null) {
+                actual.getDato().liberar();
+            }
+            actual = actual.getSiguiente();
+            pasos++;
+        }
+        this.ocupados = 0;
+        this.ultimoAsignado = null;
+    }
+
     /**
      * Genera un reporte en texto con el estado de todos los espacios del área en orden secuencial.
      *

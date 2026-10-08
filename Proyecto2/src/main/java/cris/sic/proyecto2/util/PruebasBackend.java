@@ -737,6 +737,60 @@ public class PruebasBackend {
         System.out.println();
 
         // -------------------------------------------------------------------------
+        // PRUEBA 5.4: Persistencia y Reconstrucción del Parqueo (Listas Circulares)
+        // -------------------------------------------------------------------------
+        pruebasTotalesF5++;
+        System.out.println(">>> PRUEBA 5.4: Persistencia y reconstrucción del estado de parqueo (Socios y General)");
+
+        String rutaTestSocios = "src/datos/test_parqueo_socios.txt";
+        String rutaTestGeneral = "src/datos/test_parqueo_general.txt";
+
+        ControladorParqueo parqueoOriginal = new ControladorParqueo();
+        ListaDobleResidentes resOriginales = new ListaDobleResidentes();
+        Residente rTest = new Residente("R-PARQ1", "Ana Gomez", "Casa Z-1", true);
+        Vehiculo vTest1 = new Vehiculo("SOC-99A", "Audi", "A4", "Plata", "Automóvil");
+        Vehiculo vTest2 = new Vehiculo("SOC-99B", "Mazda", "3", "Rojo", "Automóvil");
+        rTest.agregarVehiculo(vTest1);
+        rTest.agregarVehiculo(vTest2);
+        resOriginales.insertar(rTest);
+
+        // Estacionar vehículos
+        EspacioParqueo espAsig1 = parqueoOriginal.asignarVehiculo(vTest1);
+        EspacioParqueo espAsig2 = parqueoOriginal.asignarVehiculo(vTest2);
+
+        // Guardar parqueo a disco
+        boolean guardadoParqueoOk = GestorArchivos.guardarParqueo(parqueoOriginal, rutaTestSocios, rutaTestGeneral);
+        System.out.println("   Guardado de parqueo en disco: " + guardadoParqueoOk);
+        System.out.println("   Espacios ocupados antes de reiniciar: " + parqueoOriginal.getTotalOcupados() + "/150");
+
+        // Nuevo controlador vacío
+        ControladorParqueo parqueoRecuperado = new ControladorParqueo();
+        int vehiculosRestaurados = GestorArchivos.cargarParqueo(parqueoRecuperado, resOriginales, rutaTestSocios, rutaTestGeneral);
+        System.out.println("   Vehículos de parqueo restaurados: " + vehiculosRestaurados + "/2");
+        System.out.println("   Ocupados en Socios recuperados: " + parqueoRecuperado.getAreaSocios().getOcupados() + "/75");
+
+        EspacioParqueo espRecup1 = parqueoRecuperado.buscarPorPlaca("SOC-99A");
+        EspacioParqueo espRecup2 = parqueoRecuperado.buscarPorPlaca("SOC-99B");
+
+        boolean estadoOk = (espRecup1 != null && espRecup1.getIdEspacio().equals(espAsig1.getIdEspacio())
+                && espRecup2 != null && espRecup2.getIdEspacio().equals(espAsig2.getIdEspacio())
+                && vTest1.getEstado() == EstadoVehiculo.ESTACIONADO);
+
+        System.out.println("   ¿Espacios e identificadores coinciden?: " + estadoOk);
+
+        // Limpieza de archivos temporales
+        new java.io.File(rutaTestSocios).delete();
+        new java.io.File(rutaTestGeneral).delete();
+
+        if (guardadoParqueoOk && vehiculosRestaurados == 2 && estadoOk) {
+            System.out.println("   [OK] Persistencia y restauración de listas circulares de parqueo completada.");
+            pruebasPasadasF5++;
+        } else {
+            System.out.println("   [FALLO] Error al restaurar el estado del parqueo desde disco.");
+        }
+        System.out.println();
+
+        // -------------------------------------------------------------------------
         // RESUMEN FINAL FASE 5
         // -------------------------------------------------------------------------
         System.out.println("======================================================================");

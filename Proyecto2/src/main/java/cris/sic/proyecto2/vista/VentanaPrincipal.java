@@ -65,9 +65,9 @@ public class VentanaPrincipal extends JFrame implements GaritaListener {
     private JButton btnNavEventos;
 
     public VentanaPrincipal() {
-        // Carga automática de datos desde disco con java.io.*
-        this.listaResidentes = GestorArchivos.cargarTodo();
+        // Carga automática de datos y estado de parqueo desde disco con java.io.*
         this.controladorParqueo = new ControladorParqueo();
+        this.listaResidentes = GestorArchivos.cargarTodo(this.controladorParqueo);
         this.pilaEventos = new PilaEventos();
         this.simulador = new SimuladorParqueo(this.controladorParqueo, this.pilaEventos);
 
@@ -233,9 +233,9 @@ public class VentanaPrincipal extends JFrame implements GaritaListener {
         JButton btnGuardarDisco = TemaUI.crearBoton("💾 Guardar Disco", TemaUI.FONDO_TARJETA, TemaUI.TEXTO_PRINCIPAL);
         btnGuardarDisco.setMaximumSize(new Dimension(190, 36));
         btnGuardarDisco.addActionListener(e -> {
-            boolean ok = GestorArchivos.guardarTodo(listaResidentes);
+            boolean ok = GestorArchivos.guardarTodo(listaResidentes, controladorParqueo);
             if (ok) {
-                JOptionPane.showMessageDialog(this, "Datos guardados en disco exitosamente.", "Persistencia", JOptionPane.INFORMATION_MESSAGE);
+                JOptionPane.showMessageDialog(this, "Datos y estado del parqueo guardados en disco exitosamente.", "Persistencia", JOptionPane.INFORMATION_MESSAGE);
             } else {
                 JOptionPane.showMessageDialog(this, "Error al guardar en disco.", "Error", JOptionPane.ERROR_MESSAGE);
             }
@@ -306,8 +306,8 @@ public class VentanaPrincipal extends JFrame implements GaritaListener {
             // Detener hilos con seguridad
             simulador.detenerSimulacion();
 
-            // Guardar automáticamente en disco con java.io.*
-            GestorArchivos.guardarTodo(listaResidentes);
+            // Guardar automáticamente en disco con java.io.* (incluyendo parqueo)
+            GestorArchivos.guardarTodo(listaResidentes, controladorParqueo);
 
             dispose();
             System.exit(0);

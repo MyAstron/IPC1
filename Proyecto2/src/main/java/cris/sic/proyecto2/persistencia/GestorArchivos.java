@@ -7,10 +7,13 @@ import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
 
+import cris.sic.proyecto2.estructuras.ListaCircularParqueo;
 import cris.sic.proyecto2.estructuras.ListaDobleResidentes;
-import cris.sic.proyecto2.estructuras.ListaSimpleVehiculos;
+import cris.sic.proyecto2.estructuras.NodoCircular;
 import cris.sic.proyecto2.estructuras.NodoDoble;
 import cris.sic.proyecto2.estructuras.NodoSimple;
+import cris.sic.proyecto2.modelo.ControladorParqueo;
+import cris.sic.proyecto2.modelo.EspacioParqueo;
 import cris.sic.proyecto2.modelo.EstadoVehiculo;
 import cris.sic.proyecto2.modelo.Residente;
 import cris.sic.proyecto2.modelo.Vehiculo;
@@ -23,7 +26,7 @@ import cris.sic.proyecto2.util.ValidadorTexto;
  * - Uso exclusivo de librerías del paquete java.io.* (BufferedReader, BufferedWriter, FileReader, FileWriter, File).
  * - Cero colecciones del Java Collections Framework (sin ArrayList, HashMap, etc.).
  * - Cero uso de arreglos nativos T[] para almacenamiento persistente.
- * - Formato delimitado por pipe '|' para residentes.txt y vehiculos.txt.
+ * - Formato delimitado por pipe '|' para residentes.txt, vehiculos.txt, parqueo_socios.txt y parqueo_general.txt.
  * - Filtro de integridad: Omisión silenciosa de líneas corruptas, referencias huérfanas o excesos de capacidad.
  * 
  * @author cris_sic
@@ -32,6 +35,8 @@ public class GestorArchivos {
 
     public static final String RUTA_POR_DEFECTO_RESIDENTES = "src/datos/residentes.txt";
     public static final String RUTA_POR_DEFECTO_VEHICULOS = "src/datos/vehiculos.txt";
+    public static final String RUTA_POR_DEFECTO_PARQUEO_SOCIOS = "src/datos/parqueo_socios.txt";
+    public static final String RUTA_POR_DEFECTO_PARQUEO_GENERAL = "src/datos/parqueo_general.txt";
 
     /**
      * Resuelve dinámicamente la ruta del archivo residentes.txt en src/datos/.
@@ -63,6 +68,38 @@ public class GestorArchivos {
             return "Proyecto2/src/datos/vehiculos.txt";
         }
         return RUTA_POR_DEFECTO_VEHICULOS;
+    }
+
+    /**
+     * Resuelve dinámicamente la ruta del archivo parqueo_socios.txt en src/datos/.
+     */
+    public static String getRutaParqueoSocios() {
+        if (new File("src/datos/parqueo_socios.txt").exists()) {
+            return "src/datos/parqueo_socios.txt";
+        }
+        if (new File("Proyecto2/src/datos/parqueo_socios.txt").exists()) {
+            return "Proyecto2/src/datos/parqueo_socios.txt";
+        }
+        if (new File("Proyecto2").isDirectory()) {
+            return "Proyecto2/src/datos/parqueo_socios.txt";
+        }
+        return RUTA_POR_DEFECTO_PARQUEO_SOCIOS;
+    }
+
+    /**
+     * Resuelve dinámicamente la ruta del archivo parqueo_general.txt en src/datos/.
+     */
+    public static String getRutaParqueoGeneral() {
+        if (new File("src/datos/parqueo_general.txt").exists()) {
+            return "src/datos/parqueo_general.txt";
+        }
+        if (new File("Proyecto2/src/datos/parqueo_general.txt").exists()) {
+            return "Proyecto2/src/datos/parqueo_general.txt";
+        }
+        if (new File("Proyecto2").isDirectory()) {
+            return "Proyecto2/src/datos/parqueo_general.txt";
+        }
+        return RUTA_POR_DEFECTO_PARQUEO_GENERAL;
     }
 
     // =========================================================================
@@ -111,7 +148,7 @@ public class GestorArchivos {
 
     /**
      * Guarda la totalidad de los vehículos asociados a cada residente en formato pipe.
-     * Estructura: PLACA|MARCA|MODELO|COLOR|ID_RESIDENTE (o PLACA|MARCA|MODELO|COLOR|TIPO|ID_RESIDENTE)
+     * Estructura: PLACA|MARCA|MODELO|COLOR|TIPO|ID_RESIDENTE
      *
      * @param listaResidentes Lista doble de residentes con sus listas de vehículos
      * @param rutaArchivo     Ruta del archivo de destino
@@ -156,6 +193,106 @@ public class GestorArchivos {
         }
 
         return guardados;
+    }
+
+    /**
+     * Guarda el estado de una lista circular de parqueo en disco.
+     * Estructura:
+     * Línea meta: #ULTIMO_ASIGNADO|ID_ESPACIO
+     * Líneas de celdas: ID_ESPACIO|ESTADO|PLACA_VEHICULO (ej. A1|OCUPADO|P102XYZ o A2|LIBRE|NULL)
+     *
+     * @param area        Lista circular de parqueo (Socios o General)
+     * @param rutaArchivo Ruta de archivo destino
+     * @return Cantidad de espacios guardados
+     * @throws IOException Si ocurre un error de E/S
+     */
+    public static int guardarParqueoArea(ListaCircularParqueo area, String rutaArchivo) throws IOException {
+        if (area == null || area.getCabeza() == null) {
+            asegurarArchivoVacio(rutaArchivo);
+            return 0;
+        }
+
+        asegurarDirectorios(rutaArchivo);
+        int guardados = 0;
+
+        try (BufferedWriter bw = new BufferedWriter(new FileWriter(rutaArchivo, false))) {
+            synchronized (area) {
+                // 1. Guardar referencia al último asignado
+                String idUltimo = "NULL";
+                if (area.getUltimoAsignado() != null && area.getUltimoAsignado().getDato() != null) {
+                    idUltimo = area.getUltimoAsignado().getDato().getIdEspacio();
+                }
+                bw.write("#ULTIMO_ASIGNADO|" + idUltimo);
+                bw.newLine();
+
+                // 2. Guardar los 75 espacios secuencialmente
+                NodoCircular actual = area.getCabeza();
+                int cont = 0;
+                while (cont < area.getCapacidad() && actual != null) {
+                    EspacioParqueo esp = actual.getDato();
+                    if (esp != null) {
+                        String id = esp.getIdEspacio();
+                        String estado = esp.estaOcupado() ? "OCUPADO" : "LIBRE";
+                        String placa = "NULL";
+
+                        if (esp.estaOcupado() && esp.getVehiculoEstacionado() != null) {
+                            placa = esp.getVehiculoEstacionado().getPlaca();
+                        }
+
+                        String linea = id + "|" + estado + "|" + placa;
+                        bw.write(linea);
+                        bw.newLine();
+                        guardados++;
+                    }
+                    actual = actual.getSiguiente();
+                    cont++;
+                }
+            }
+        }
+
+        return guardados;
+    }
+
+    /**
+     * Guarda ambas áreas del parqueo (Socios y General) en sus archivos correspondientes.
+     *
+     * @param controladorParqueo Controlador central del parqueo
+     * @param rutaSocios         Ruta archivo parqueo_socios.txt
+     * @param rutaGeneral        Ruta archivo parqueo_general.txt
+     * @return true si ambas áreas se guardaron con éxito
+     */
+    public static boolean guardarParqueo(ControladorParqueo controladorParqueo, String rutaSocios, String rutaGeneral) {
+        if (controladorParqueo == null) {
+            return false;
+        }
+        try {
+            guardarParqueoArea(controladorParqueo.getAreaSocios(), rutaSocios);
+            guardarParqueoArea(controladorParqueo.getAreaGeneral(), rutaGeneral);
+            return true;
+        } catch (IOException e) {
+            System.err.println("[ERROR PERSISTENCIA] Fallo al guardar parqueo en disco: " + e.getMessage());
+            return false;
+        }
+    }
+
+    /**
+     * Guarda el parqueo en las rutas por defecto (src/datos/).
+     */
+    public static boolean guardarParqueo(ControladorParqueo controladorParqueo) {
+        return guardarParqueo(controladorParqueo, getRutaParqueoSocios(), getRutaParqueoGeneral());
+    }
+
+    /**
+     * Guarda residentes, vehículos y el estado de las dos listas circulares del parqueo.
+     *
+     * @param listaResidentes    Lista doble de residentes en memoria
+     * @param controladorParqueo Controlador del parqueo en memoria
+     * @return true si toda la persistencia fue exitosa
+     */
+    public static boolean guardarTodo(ListaDobleResidentes listaResidentes, ControladorParqueo controladorParqueo) {
+        boolean okRes = guardarTodo(listaResidentes, getRutaResidentes(), getRutaVehiculos());
+        boolean okParq = (controladorParqueo != null) && guardarParqueo(controladorParqueo);
+        return okRes && okParq;
     }
 
     /**
@@ -335,6 +472,132 @@ public class GestorArchivos {
     }
 
     /**
+     * Carga el estado de un área de parqueo desde archivo, restaurando espacios ocupados y puntero circular.
+     *
+     * @param area            Lista circular de parqueo a poblar
+     * @param listaResidentes Lista doble de residentes para vincular instancias de Vehiculo
+     * @param rutaArchivo     Ruta del archivo de parqueo
+     * @return Cantidad de vehículos restaurados en el parqueo
+     * @throws IOException Si ocurre un error al leer el archivo
+     */
+    public static int cargarParqueoArea(ListaCircularParqueo area, ListaDobleResidentes listaResidentes, String rutaArchivo) throws IOException {
+        if (area == null) {
+            return 0;
+        }
+
+        File archivo = new File(rutaArchivo);
+        if (!archivo.exists() || !archivo.isFile()) {
+            return 0;
+        }
+
+        int restaurados = 0;
+        String ultimoAsignadoId = null;
+
+        try (BufferedReader br = new BufferedReader(new FileReader(archivo))) {
+            String linea;
+            while ((linea = br.readLine()) != null) {
+                linea = linea.trim();
+                if (linea.isEmpty()) {
+                    continue;
+                }
+
+                if (linea.startsWith("#ULTIMO_ASIGNADO")) {
+                    String[] partesMeta = descomponerLineaPipe(linea);
+                    if (partesMeta.length >= 2) {
+                        ultimoAsignadoId = partesMeta[1].trim();
+                    }
+                    continue;
+                }
+
+                if (linea.startsWith("#")) {
+                    continue; // Comentarios generales
+                }
+
+                String[] partes = descomponerLineaPipe(linea);
+                if (partes == null || partes.length < 3) {
+                    continue; // Formato inválido
+                }
+
+                String idEspacio = partes[0].trim();
+                String estado = partes[1].trim();
+                String placa = partes[2].trim();
+
+                if (estado.equalsIgnoreCase("OCUPADO") && !placa.equalsIgnoreCase("NULL") && !placa.isEmpty()) {
+                    // Buscar vehículo existente en lista de residentes
+                    Vehiculo vehiculo = buscarVehiculoPorPlaca(listaResidentes, placa);
+
+                    // Si no pertenece a residentes registrados, se reconstruye como visitante
+                    if (vehiculo == null) {
+                        vehiculo = new Vehiculo(placa, "Visitante", "Temporal", "Color", "Automóvil", null);
+                    }
+
+                    vehiculo.setEstado(EstadoVehiculo.ESTACIONADO);
+
+                    EspacioParqueo espacio = area.buscarPorId(idEspacio);
+                    if (espacio != null) {
+                        espacio.ocupar(vehiculo);
+                        restaurados++;
+                    }
+                }
+            }
+        }
+
+        synchronized (area) {
+            if (ultimoAsignadoId != null && !ultimoAsignadoId.equalsIgnoreCase("NULL")) {
+                area.setUltimoAsignadoPorId(ultimoAsignadoId);
+            }
+            area.recalcularOcupados();
+        }
+
+        return restaurados;
+    }
+
+    /**
+     * Carga y reconstruye ambas áreas del parqueo desde disco.
+     *
+     * @param controladorParqueo Controlador del parqueo
+     * @param listaResidentes    Lista doble de residentes
+     * @param rutaSocios         Ruta archivo parqueo_socios.txt
+     * @param rutaGeneral        Ruta archivo parqueo_general.txt
+     * @return Total de vehículos restaurados en el parqueo
+     */
+    public static int cargarParqueo(ControladorParqueo controladorParqueo, ListaDobleResidentes listaResidentes, String rutaSocios, String rutaGeneral) {
+        if (controladorParqueo == null) {
+            return 0;
+        }
+        int total = 0;
+        try {
+            total += cargarParqueoArea(controladorParqueo.getAreaSocios(), listaResidentes, rutaSocios);
+            total += cargarParqueoArea(controladorParqueo.getAreaGeneral(), listaResidentes, rutaGeneral);
+            controladorParqueo.recalcularOcupados();
+        } catch (IOException e) {
+            System.err.println("[ERROR PERSISTENCIA] Fallo al cargar parqueo desde disco: " + e.getMessage());
+        }
+        return total;
+    }
+
+    /**
+     * Carga el parqueo desde las rutas por defecto (src/datos/).
+     */
+    public static int cargarParqueo(ControladorParqueo controladorParqueo, ListaDobleResidentes listaResidentes) {
+        return cargarParqueo(controladorParqueo, listaResidentes, getRutaParqueoSocios(), getRutaParqueoGeneral());
+    }
+
+    /**
+     * Carga y reconstruye todo el estado (residentes, vehículos y parqueo) a partir de las rutas por defecto.
+     *
+     * @param controladorParqueo Controlador de parqueo a poblar
+     * @return ListaDobleResidentes completamente poblada
+     */
+    public static ListaDobleResidentes cargarTodo(ControladorParqueo controladorParqueo) {
+        ListaDobleResidentes lista = cargarTodo(getRutaResidentes(), getRutaVehiculos());
+        if (controladorParqueo != null) {
+            cargarParqueo(controladorParqueo, lista);
+        }
+        return lista;
+    }
+
+    /**
      * Carga y reconstruye todo el estado de residentes y vehículos a partir de las rutas por defecto (src/datos/).
      *
      * @return ListaDobleResidentes completamente poblada
@@ -366,6 +629,31 @@ public class GestorArchivos {
     // =========================================================================
 
     /**
+     * Busca una instancia de Vehiculo en toda la lista de residentes a partir de su placa.
+     *
+     * @param listaResidentes Lista de residentes
+     * @param placa           Placa a buscar
+     * @return Instancia de Vehiculo, o null si no se encuentra
+     */
+    public static Vehiculo buscarVehiculoPorPlaca(ListaDobleResidentes listaResidentes, String placa) {
+        if (listaResidentes == null || placa == null) {
+            return null;
+        }
+        NodoDoble actualRes = listaResidentes.getCabeza();
+        while (actualRes != null) {
+            Residente r = actualRes.getDato();
+            if (r != null && r.getListaVehiculos() != null) {
+                Vehiculo v = r.getListaVehiculos().buscarPorPlaca(placa);
+                if (v != null) {
+                    return v;
+                }
+            }
+            actualRes = actualRes.getSiguiente();
+        }
+        return null;
+    }
+
+    /**
      * Descompone una línea en segmentos delimitados por el carácter pipe '|'.
      * Maneja casos sin depender de librerías externas.
      *
@@ -377,7 +665,6 @@ public class GestorArchivos {
             return new String[0];
         }
 
-        // Conteo manual de delimitadores
         int count = 1;
         for (int i = 0; i < linea.length(); i++) {
             if (linea.charAt(i) == '|') {

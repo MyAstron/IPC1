@@ -137,6 +137,16 @@ public class ControladorParqueo {
         return areaSocios.getOcupados() + areaGeneral.getOcupados();
     }
 
+    public synchronized void vaciarParqueo() {
+        areaSocios.vaciar();
+        areaGeneral.vaciar();
+    }
+
+    public synchronized void recalcularOcupados() {
+        areaSocios.recalcularOcupados();
+        areaGeneral.recalcularOcupados();
+    }
+
     public synchronized int getTotalDisponibles() {
         return areaSocios.getDisponibles() + areaGeneral.getDisponibles();
     }
