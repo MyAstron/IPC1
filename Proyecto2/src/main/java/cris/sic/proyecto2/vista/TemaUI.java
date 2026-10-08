@@ -60,18 +60,23 @@ public class TemaUI {
             protected void paintComponent(Graphics g) {
                 Graphics2D g2 = (Graphics2D) g.create();
                 g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+                Color bg = getBackground();
+                if (bg == null) {
+                    bg = colorFondo;
+                }
                 if (getModel().isPressed()) {
-                    g2.setColor(colorFondo.darker());
+                    g2.setColor(bg.darker());
                 } else if (getModel().isRollover()) {
-                    g2.setColor(colorFondo.brighter());
+                    g2.setColor(bg.brighter());
                 } else {
-                    g2.setColor(colorFondo);
+                    g2.setColor(bg);
                 }
                 g2.fillRoundRect(0, 0, getWidth(), getHeight(), 8, 8);
                 g2.dispose();
                 super.paintComponent(g);
             }
         };
+        boton.setBackground(colorFondo);
         boton.setFont(FUENTE_BOLD);
         boton.setForeground(colorTexto);
         boton.setContentAreaFilled(false);

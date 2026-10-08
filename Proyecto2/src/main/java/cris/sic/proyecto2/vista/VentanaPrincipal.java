@@ -248,16 +248,40 @@ public class VentanaPrincipal extends JFrame implements GaritaListener {
     private void mostrarPanel(String nombreCard, JButton botonActivo) {
         cardLayout.show(panelContenedorCards, nombreCard);
 
+        // Color semántico personalizado según el panel activo
+        Color colorActivo;
+        switch (nombreCard) {
+            case "RESIDENTES":
+                colorActivo = TemaUI.PRIMARIO;       // Azul vibrante
+                break;
+            case "PARQUEO":
+                colorActivo = TemaUI.PURPURA;        // Púrpura VIP
+                break;
+            case "ENTRADA":
+                colorActivo = TemaUI.EXITO;          // Verde esmeralda
+                break;
+            case "SALIDA":
+                colorActivo = TemaUI.PELIGRO;        // Rojo carmesí
+                break;
+            case "EVENTOS":
+                colorActivo = TemaUI.ADVERTENCIA;    // Ámbar dorado
+                break;
+            default:
+                colorActivo = TemaUI.PRIMARIO;
+                break;
+        }
+
         // Estilo activo para botones
         JButton[] botones = {btnNavResidentes, btnNavParqueo, btnNavEntrada, btnNavSalida, btnNavEventos};
         for (JButton b : botones) {
             if (b == botonActivo) {
-                b.setBackground(TemaUI.PRIMARIO);
+                b.setBackground(colorActivo);
                 b.setForeground(Color.WHITE);
             } else {
                 b.setBackground(TemaUI.FONDO_INPUT);
                 b.setForeground(TemaUI.TEXTO_PRINCIPAL);
             }
+            b.repaint();
         }
     }
 
