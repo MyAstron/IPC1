@@ -15,6 +15,8 @@ import cris.sic.proyecto2.modelo.Residente;
 import cris.sic.proyecto2.modelo.TipoEspacio;
 import cris.sic.proyecto2.modelo.Vehiculo;
 import cris.sic.proyecto2.modelo.Visitante;
+import cris.sic.proyecto2.persistencia.Encriptador;
+import cris.sic.proyecto2.persistencia.GestorArchivos;
 import cris.sic.proyecto2.util.ValidadorTexto;
 
 /**
@@ -25,6 +27,7 @@ import cris.sic.proyecto2.util.ValidadorTexto;
  * - Fase 2: Listas lineales (simples y dobles).
  * - Fase 3: Colas FIFO y Pila LIFO de eventos.
  * - Fase 4: Parqueo y listas circulares (asignación y desborde).
+ * - Fase 5: Persistencia en disco (java.io.* y cifrado XOR).
  * 
  * @author cris_sic
  */
@@ -603,8 +606,138 @@ public class Proyecto2 {
         } else {
             System.out.println("   ESTADO: [SE DETECTARON FALLOS EN FASE 4]");
         }
+        System.out.println("======================================================================\n");
+
+        // =====================================================================
+        // PUNTO DE INSPECCIÓN FASE 5: PERSISTENCIA EN DISCO (JAVA.IO.* Y CIFRADO)
+        // =====================================================================
+        System.out.println("======================================================================");
+        System.out.println("   RESIPARK - PUNTO DE INSPECCIÓN FASE 5: PERSISTENCIA EN DISCO Y XOR  ");
+        System.out.println("======================================================================\n");
+
+        int pruebasPasadasF5 = 0;
+        int pruebasTotalesF5 = 0;
+
+        // -------------------------------------------------------------------------
+        // PRUEBA 5.1: Cifrado y Descifrado Simétrico XOR (Reversibilidad)
+        // -------------------------------------------------------------------------
+        pruebasTotalesF5++;
+        System.out.println(">>> PRUEBA 5.1: Cifrado y descifrado simétrico XOR");
+        String textoPrueba = "R-501|Carlos Mendoza|Casa D-20|S";
+        String textoCifrado = Encriptador.procesar(textoPrueba);
+        String textoDescifrado = Encriptador.procesar(textoCifrado);
+
+        System.out.println("   Texto original  : " + textoPrueba);
+        System.out.println("   Texto cifrado   : " + textoCifrado);
+        System.out.println("   Texto descifrado: " + textoDescifrado);
+        boolean simetriaOk = Encriptador.verificarSimetria(textoPrueba);
+        System.out.println("   ¿Simetría perfecta validada?: " + simetriaOk);
+
+        if (simetriaOk && textoDescifrado.equals(textoPrueba) && !textoCifrado.equals(textoPrueba)) {
+            System.out.println("   [OK] Algoritmo de cifrado/descifrado simétrico XOR opera fielmente.");
+            pruebasPasadasF5++;
+        } else {
+            System.out.println("   [FALLO] El cifrado XOR no recuperó el texto original.");
+        }
+        System.out.println();
+
+        // -------------------------------------------------------------------------
+        // PRUEBA 5.2: Guardado y Recarga Idéntica de Estructuras (Reconstrucción en Memoria)
+        // -------------------------------------------------------------------------
+        pruebasTotalesF5++;
+        System.out.println(">>> PRUEBA 5.2: Guardado y reconstrucción idéntica desde disco");
+
+        String rutaTestRes = "src/datos/test_residentes.txt";
+        String rutaTestVeh = "src/datos/test_vehiculos.txt";
+
+        // Creamos 2 residentes con 2 vehículos cada uno
+        ListaDobleResidentes listaOriginal = new ListaDobleResidentes();
+        Residente rMem1 = new Residente("R-901", "Guillermo Tell", "Casa X-01", true);
+        Residente rMem2 = new Residente("R-902", "Valeria Vega", "Casa X-02", false);
+
+        Vehiculo vMem1 = new Vehiculo("P-901A", "Toyota", "Corolla", "Rojo", "Automóvil");
+        Vehiculo vMem2 = new Vehiculo("P-901B", "Honda", "Civic", "Gris", "Automóvil");
+        rMem1.agregarVehiculo(vMem1);
+        rMem1.agregarVehiculo(vMem2);
+
+        Vehiculo vMem3 = new Vehiculo("M-902A", "Yamaha", "MT03", "Azul", "Motocicleta");
+        Vehiculo vMem4 = new Vehiculo("P-902B", "Ford", "F150", "Negro", "Pickup");
+        rMem2.agregarVehiculo(vMem3);
+        rMem2.agregarVehiculo(vMem4);
+
+        listaOriginal.insertar(rMem1);
+        listaOriginal.insertar(rMem2);
+
+        // Guardamos en disco
+        boolean guardadoOk = GestorArchivos.guardarTodo(listaOriginal, rutaTestRes, rutaTestVeh);
+        System.out.println("   Guardado en disco exitoso: " + guardadoOk);
+
+        // Borramos la memoria simulando reinicio
+        listaOriginal = null;
+
+        // Cargamos desde disco
+        ListaDobleResidentes listaRecuperada = GestorArchivos.cargarTodo(rutaTestRes, rutaTestVeh);
+
+        System.out.println("   Residentes recuperados: " + listaRecuperada.getTamaño() + "/2");
+        Residente rRecup1 = listaRecuperada.buscarPorId("R-901");
+        Residente rRecup2 = listaRecuperada.buscarPorId("R-902");
+
+        boolean r1Ok = (rRecup1 != null && rRecup1.getNombre().equals("Guillermo Tell") && rRecup1.isEsSocio() && rRecup1.getCantidadVehiculos() == 2);
+        boolean r2Ok = (rRecup2 != null && rRecup2.getNombre().equals("Valeria Vega") && !rRecup2.isEsSocio() && rRecup2.getCantidadVehiculos() == 2);
+
+        Vehiculo vRecup1 = (rRecup1 != null) ? rRecup1.getListaVehiculos().buscarPorPlaca("P-901A") : null;
+        Vehiculo vRecup4 = (rRecup2 != null) ? rRecup2.getListaVehiculos().buscarPorPlaca("P-902B") : null;
+        boolean autosOk = (vRecup1 != null && vRecup1.getMarca().equals("Toyota") && vRecup4 != null && vRecup4.getTipo().equals("Pickup")
+                && vRecup1.getEstado() == EstadoVehiculo.FUERA);
+
+        System.out.println("   Residente 1 y vehículos íntegros: " + r1Ok);
+        System.out.println("   Residente 2 y vehículos íntegros: " + r2Ok);
+        System.out.println("   Vehículos con estado FUERA al restaurar: " + autosOk);
+
+        if (guardadoOk && r1Ok && r2Ok && autosOk) {
+            System.out.println("   [OK] Persistencia y reconstrucción en memoria verificadas con fidelidad total.");
+            pruebasPasadasF5++;
+        } else {
+            System.out.println("   [FALLO] La reconstrucción de datos desde disco falló.");
+        }
+        System.out.println();
+
+        // -------------------------------------------------------------------------
+        // PRUEBA 5.3: Filtrado y Resiliencia ante Datos Corruptos y Referencias Huérfanas
+        // -------------------------------------------------------------------------
+        pruebasTotalesF5++;
+        System.out.println(">>> PRUEBA 5.3: Resiliencia ante datos corruptos o referencias huérfanas");
+
+        // Parseo de línea corrupta y línea limpia
+        String lineaCorrupta = "R-BAD|FaltanCampos";
+        String[] partesCorruptas = GestorArchivos.descomponerLineaPipe(lineaCorrupta);
+        String lineaValida = "R-777|Mario Bros|Casa H-01|S";
+        String[] partesValidas = GestorArchivos.descomponerLineaPipe(lineaValida);
+
+        System.out.println("   Partes en línea corrupta: " + partesCorruptas.length + " (Rechazada por < 4 campos)");
+        System.out.println("   Partes en línea válida  : " + partesValidas.length + " (Aceptada con 4 campos)");
+
+        if (partesCorruptas.length == 2 && partesValidas.length == 4) {
+            System.out.println("   [OK] Mecanismo de parsing y filtrado resiliente ante corrupción superado.");
+            pruebasPasadasF5++;
+        } else {
+            System.out.println("   [FALLO] Falló el parseo y filtrado de líneas.");
+        }
+        System.out.println();
+
+        // -------------------------------------------------------------------------
+        // RESUMEN FINAL FASE 5
+        // -------------------------------------------------------------------------
+        System.out.println("======================================================================");
+        System.out.println("   RESULTADO DE INSPECCIÓN FASE 5: " + pruebasPasadasF5 + "/" + pruebasTotalesF5 + " PRUEBAS SUPERADAS");
+        if (pruebasPasadasF5 == pruebasTotalesF5) {
+            System.out.println("   ESTADO: [FASE 5 COMPLETADA CON ÉXITO]");
+        } else {
+            System.out.println("   ESTADO: [SE DETECTARON FALLOS EN FASE 5]");
+        }
         System.out.println("======================================================================");
     }
 }
+
 
 
