@@ -40,7 +40,7 @@ import cris.sic.proyecto2.util.ValidadorTexto;
 
 /**
  * Panel para la gestión de ingresos, control de Garita 1 y Garita 2,
- * y visualización en tiempo real de la Cola de Entrada (FIFO).
+ * y visualización en tiempo real de la Cola de Entrada (FIFO) con limpieza y guía visual de botones.
  * 
  * @author cris_sic
  */
@@ -52,6 +52,8 @@ public class PanelEntrada extends JPanel implements GaritaListener {
     // Componentes ingreso residente
     private JComboBox<String> cmbResidentes;
     private JComboBox<String> cmbVehiculosResidente;
+    private JButton btnEnviarColaResidente;
+    private JButton btnLimpiarResidenteEntrada;
 
     // Componentes ingreso visitante
     private JTextField txtNombreVisitante;
@@ -61,12 +63,12 @@ public class PanelEntrada extends JPanel implements GaritaListener {
     private JTextField txtModeloVis;
     private JTextField txtColorVis;
     private JComboBox<String> cmbTipoVis;
+    private JButton btnEnviarVis;
+    private JButton btnLimpiarVisitante;
 
     // Visores de Garitas
     private JLabel lblEstadoGarita1;
-    private JLabel lblVehiculoGarita1;
     private JLabel lblEstadoGarita2;
-    private JLabel lblVehiculoGarita2;
 
     // Tabla Cola de Entrada
     private JTable tablaColaEntrada;
@@ -139,14 +141,31 @@ public class PanelEntrada extends JPanel implements GaritaListener {
         cmbVehiculosResidente.setFont(TemaUI.FUENTE_REGULAR);
         cmbVehiculosResidente.setBackground(TemaUI.FONDO_INPUT);
         cmbVehiculosResidente.setForeground(TemaUI.TEXTO_PRINCIPAL);
+        cmbVehiculosResidente.addActionListener(e -> {
+            boolean hayVehiculo = (cmbVehiculosResidente.getItemCount() > 0 && cmbVehiculosResidente.getSelectedItem() != null);
+            if (btnEnviarColaResidente != null) {
+                btnEnviarColaResidente.setEnabled(hayVehiculo);
+            }
+        });
         tarjeta.add(cmbVehiculosResidente, gbc);
+
+        // Botonera Residente
+        JPanel panelBotonesRes = new JPanel(new FlowLayout(FlowLayout.CENTER, 8, 4));
+        panelBotonesRes.setBackground(TemaUI.FONDO_TARJETA);
+
+        btnEnviarColaResidente = TemaUI.crearBoton("🚗 Enviar a Cola", TemaUI.EXITO, Color.WHITE);
+        btnLimpiarResidenteEntrada = TemaUI.crearBoton("🧹 Limpiar", TemaUI.FONDO_INPUT, TemaUI.TEXTO_PRINCIPAL);
+
+        btnEnviarColaResidente.addActionListener(e -> accionEnviarVehiculoResidente());
+        btnLimpiarResidenteEntrada.addActionListener(e -> limpiarFormularioEntradaResidente());
+
+        panelBotonesRes.add(btnEnviarColaResidente);
+        panelBotonesRes.add(btnLimpiarResidenteEntrada);
 
         gbc.gridx = 0;
         gbc.gridy = 2;
         gbc.gridwidth = 2;
-        JButton btnEnviarCola = TemaUI.crearBoton("🚗 Enviar a Cola de Entrada", TemaUI.EXITO, Color.WHITE);
-        btnEnviarCola.addActionListener(e -> accionEnviarVehiculoResidente());
-        tarjeta.add(btnEnviarCola, gbc);
+        tarjeta.add(panelBotonesRes, gbc);
 
         return tarjeta;
     }
@@ -217,12 +236,23 @@ public class PanelEntrada extends JPanel implements GaritaListener {
         cmbTipoVis.setForeground(TemaUI.TEXTO_PRINCIPAL);
         tarjeta.add(cmbTipoVis, gbc);
 
+        // Botonera Visitante
+        JPanel panelBotonesVis = new JPanel(new FlowLayout(FlowLayout.CENTER, 8, 4));
+        panelBotonesVis.setBackground(TemaUI.FONDO_TARJETA);
+
+        btnEnviarVis = TemaUI.crearBoton("👥 Enviar Visitante a Cola", TemaUI.PRIMARIO, Color.WHITE);
+        btnLimpiarVisitante = TemaUI.crearBoton("🧹 Limpiar", TemaUI.FONDO_INPUT, TemaUI.TEXTO_PRINCIPAL);
+
+        btnEnviarVis.addActionListener(e -> accionEnviarVehiculoVisitante());
+        btnLimpiarVisitante.addActionListener(e -> limpiarFormularioVisitante());
+
+        panelBotonesVis.add(btnEnviarVis);
+        panelBotonesVis.add(btnLimpiarVisitante);
+
         gbc.gridx = 0;
         gbc.gridy = 7;
         gbc.gridwidth = 2;
-        JButton btnEnviarVis = TemaUI.crearBoton("👥 Enviar Visitante a Cola", TemaUI.PRIMARIO, Color.WHITE);
-        btnEnviarVis.addActionListener(e -> accionEnviarVehiculoVisitante());
-        tarjeta.add(btnEnviarVis, gbc);
+        tarjeta.add(panelBotonesVis, gbc);
 
         return tarjeta;
     }
@@ -250,7 +280,7 @@ public class PanelEntrada extends JPanel implements GaritaListener {
         pnlG2.setBorder(BorderFactory.createEmptyBorder(6, 10, 6, 10));
         JLabel lblG2Titulo = new JLabel("🏢 Garita de Entrada 2");
         lblG2Titulo.setFont(TemaUI.FUENTE_BOLD);
-        lblG2Titulo.setForeground(TemaUI.PURPURA);
+        lblG2Titulo.setForeground(TemaUI.PRIMARIO);
         lblEstadoGarita2 = new JLabel("Estado: En espera");
         lblEstadoGarita2.setFont(TemaUI.FUENTE_SMALL);
         lblEstadoGarita2.setForeground(TemaUI.TEXTO_SECUNDARIO);
@@ -265,26 +295,22 @@ public class PanelEntrada extends JPanel implements GaritaListener {
 
     private JPanel crearContenedorColaEntrada() {
         JPanel contenedor = TemaUI.crearTarjeta();
-        contenedor.setLayout(new BorderLayout(8, 8));
+        contenedor.setLayout(new BorderLayout(5, 5));
 
-        JPanel header = new JPanel(new BorderLayout());
-        header.setBackground(TemaUI.FONDO_TARJETA);
-        JLabel lbl = TemaUI.crearEtiquetaTitulo("⏳ Cola de Entrada en Vivo (Estructura FIFO)");
-        header.add(lbl, BorderLayout.WEST);
+        JLabel lbl = TemaUI.crearEtiquetaTitulo("🚦 Cola de Espera en Garita de Entrada (FIFO)");
+        contenedor.add(lbl, BorderLayout.NORTH);
 
-        contenedor.add(header, BorderLayout.NORTH);
-
-        String[] columnas = {"Posición", "Placa", "Propietario / Tipo", "Marca / Modelo", "Color", "Condición"};
+        String[] columnas = {"Pos.", "Placa", "Tipo Usuario", "Vehículo / Color", "Destino / Residente"};
         modeloColaEntrada = new DefaultTableModel(columnas, 0) {
             @Override
-            public boolean isCellEditable(int row, int col) {
+            public boolean isCellEditable(int row, int column) {
                 return false;
             }
         };
 
         tablaColaEntrada = new JTable(modeloColaEntrada);
         tablaColaEntrada.setFont(TemaUI.FUENTE_REGULAR);
-        tablaColaEntrada.setRowHeight(26);
+        tablaColaEntrada.setRowHeight(24);
         tablaColaEntrada.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
         tablaColaEntrada.setBackground(TemaUI.FONDO_TARJETA);
         tablaColaEntrada.setForeground(TemaUI.TEXTO_PRINCIPAL);
@@ -299,83 +325,8 @@ public class PanelEntrada extends JPanel implements GaritaListener {
     }
 
     // =========================================================================
-    // ACCIONES DE NEGOCIO Y SINCRONIZACIÓN
+    // ACCIONES
     // =========================================================================
-
-    private void accionEnviarVehiculoResidente() {
-        if (cmbResidentes.getSelectedIndex() < 0 || cmbVehiculosResidente.getSelectedIndex() < 0) {
-            JOptionPane.showMessageDialog(this, "Seleccione un residente y un vehículo disponible.", "Atención", JOptionPane.WARNING_MESSAGE);
-            return;
-        }
-
-        String idRes = ((String) cmbResidentes.getSelectedItem()).split(" - ")[0];
-        Residente r = listaResidentes.buscarPorId(idRes);
-        if (r == null) {
-            return;
-        }
-
-        String itemVeh = (String) cmbVehiculosResidente.getSelectedItem();
-        String placa = itemVeh.split(" ")[0];
-        Vehiculo v = r.getListaVehiculos().buscarPorPlaca(placa);
-
-        if (v == null) {
-            return;
-        }
-
-        if (v.getEstado() != EstadoVehiculo.FUERA) {
-            JOptionPane.showMessageDialog(this, "El vehículo no está en estado FUERA. Estado actual: " + v.getEstado(), "Aviso", JOptionPane.WARNING_MESSAGE);
-            return;
-        }
-
-        boolean encolado = simulador.encolarVehiculoEntrada(v);
-        if (encolado) {
-            actualizarComboVehiculosResidente();
-            refrescarTablaColaEntrada();
-        } else {
-            JOptionPane.showMessageDialog(this, "No se pudo encolar el vehículo.", "Error", JOptionPane.ERROR_MESSAGE);
-        }
-    }
-
-    private void accionEnviarVehiculoVisitante() {
-        String nombre = txtNombreVisitante.getText().trim();
-        String placa = txtPlacaVisitante.getText().trim();
-        String marca = txtMarcaVis.getText().trim();
-        String modelo = txtModeloVis.getText().trim();
-        String color = txtColorVis.getText().trim();
-        String tipo = (String) cmbTipoVis.getSelectedItem();
-
-        if (nombre.isEmpty() || !ValidadorTexto.esPlacaValida(placa) || marca.isEmpty() || modelo.isEmpty() || color.isEmpty()) {
-            JOptionPane.showMessageDialog(this, "Complete todos los campos del visitante con formato válido.", "Validación", JOptionPane.WARNING_MESSAGE);
-            return;
-        }
-
-        if (cmbResidenteVisita.getSelectedIndex() < 0) {
-            JOptionPane.showMessageDialog(this, "Debe seleccionar el residente al que visita.", "Validación", JOptionPane.WARNING_MESSAGE);
-            return;
-        }
-
-        String idResVis = ((String) cmbResidenteVisita.getSelectedItem()).split(" - ")[0];
-
-        // Validar que la placa no esté en la cola ni en el parqueo actualmente
-        if (simulador.getColaEntrada().contienePlaca(placa)
-                || simulador.getControladorParqueo().buscarPorPlaca(placa) != null) {
-            JOptionPane.showMessageDialog(this, "Esta placa ya se encuentra dentro o en cola de atención.", "Placa en Uso", JOptionPane.WARNING_MESSAGE);
-            return;
-        }
-
-        Visitante vis = new Visitante(nombre, placa, idResVis, marca, modelo, color, tipo);
-        Vehiculo autoVis = vis.getVehiculo();
-
-        boolean encolado = simulador.encolarVehiculoEntrada(autoVis);
-        if (encolado) {
-            txtNombreVisitante.setText("");
-            txtPlacaVisitante.setText("");
-            txtMarcaVis.setText("");
-            txtModeloVis.setText("");
-            txtColorVis.setText("");
-            refrescarTablaColaEntrada();
-        }
-    }
 
     public void actualizarCombosResidentes() {
         cmbResidentes.removeAllItems();
@@ -385,7 +336,7 @@ public class PanelEntrada extends JPanel implements GaritaListener {
         while (actual != null) {
             Residente r = actual.getDato();
             if (r != null) {
-                String item = r.getId() + " - " + r.getNombre() + (r.isEsSocio() ? " (Socio)" : "");
+                String item = r.getId() + " - " + r.getNombre() + " (" + (r.isEsSocio() ? "Socio" : "General") + ")";
                 cmbResidentes.addItem(item);
                 cmbResidenteVisita.addItem(item);
             }
@@ -397,91 +348,190 @@ public class PanelEntrada extends JPanel implements GaritaListener {
 
     private void actualizarComboVehiculosResidente() {
         cmbVehiculosResidente.removeAllItems();
-        if (cmbResidentes.getSelectedIndex() >= 0) {
-            String idRes = ((String) cmbResidentes.getSelectedItem()).split(" - ")[0];
-            Residente r = listaResidentes.buscarPorId(idRes);
-            if (r != null && r.getListaVehiculos() != null) {
-                NodoSimple actual = r.getListaVehiculos().getCabeza();
-                while (actual != null) {
-                    Vehiculo v = actual.getDato();
-                    if (v != null && v.getEstado() == EstadoVehiculo.FUERA) {
-                        cmbVehiculosResidente.addItem(v.getPlaca() + " (" + v.getMarca() + " " + v.getModelo() + ")");
-                    }
-                    actual = actual.getSiguiente();
+        String itemSeleccionado = (String) cmbResidentes.getSelectedItem();
+        if (itemSeleccionado == null) {
+            if (btnEnviarColaResidente != null) {
+                btnEnviarColaResidente.setEnabled(false);
+            }
+            return;
+        }
+
+        String idResidente = itemSeleccionado.split(" - ")[0].trim();
+        Residente r = listaResidentes.buscarPorId(idResidente);
+        if (r != null && r.getListaVehiculos() != null) {
+            NodoSimple actual = r.getListaVehiculos().getCabeza();
+            while (actual != null) {
+                Vehiculo v = actual.getDato();
+                // Solo mostrar vehículos en estado FUERA
+                if (v != null && v.getEstado() == EstadoVehiculo.FUERA) {
+                    cmbVehiculosResidente.addItem(v.getPlaca() + " (" + v.getMarca() + " " + v.getModelo() + " - " + v.getColor() + ")");
                 }
+                actual = actual.getSiguiente();
             }
         }
+
+        boolean tieneVehiculosDisponibles = (cmbVehiculosResidente.getItemCount() > 0);
+        if (btnEnviarColaResidente != null) {
+            btnEnviarColaResidente.setEnabled(tieneVehiculosDisponibles);
+            if (!tieneVehiculosDisponibles) {
+                btnEnviarColaResidente.setToolTipText("El residente no tiene vehículos fuera del residencial.");
+            } else {
+                btnEnviarColaResidente.setToolTipText("Enviar vehículo seleccionado a la cola de entrada");
+            }
+        }
+    }
+
+    private void accionEnviarVehiculoResidente() {
+        String itemVehiculo = (String) cmbVehiculosResidente.getSelectedItem();
+        if (itemVehiculo == null) {
+            JOptionPane.showMessageDialog(this, "No hay vehículos en estado FUERA disponibles para este residente.", "Aviso", JOptionPane.WARNING_MESSAGE);
+            return;
+        }
+
+        String placa = itemVehiculo.split(" ")[0].trim();
+        String itemRes = (String) cmbResidentes.getSelectedItem();
+        String idRes = itemRes.split(" - ")[0].trim();
+        Residente r = listaResidentes.buscarPorId(idRes);
+
+        if (r != null && r.getListaVehiculos() != null) {
+            Vehiculo v = r.getListaVehiculos().buscarPorPlaca(placa);
+            if (v != null) {
+                simulador.encolarVehiculoEntrada(v);
+                actualizarComboVehiculosResidente();
+                refrescarTablaColaEntrada();
+            }
+        }
+    }
+
+    private void accionEnviarVehiculoVisitante() {
+        String nombre = txtNombreVisitante.getText().trim();
+        String placa = txtPlacaVisitante.getText().trim().toUpperCase();
+        String marca = txtMarcaVis.getText().trim();
+        String modelo = txtModeloVis.getText().trim();
+        String color = txtColorVis.getText().trim();
+        String tipo = (String) cmbTipoVis.getSelectedItem();
+
+        if (nombre.isEmpty() || placa.isEmpty() || marca.isEmpty() || modelo.isEmpty() || color.isEmpty()) {
+            JOptionPane.showMessageDialog(this, "Complete todos los datos del visitante.", "Validación", JOptionPane.WARNING_MESSAGE);
+            return;
+        }
+
+        if (!ValidadorTexto.esPlacaValida(placa)) {
+            JOptionPane.showMessageDialog(this, "Placa inválida (3-10 caracteres, sin '|').", "Validación", JOptionPane.WARNING_MESSAGE);
+            return;
+        }
+
+        String itemResVisita = (String) cmbResidenteVisita.getSelectedItem();
+        if (itemResVisita == null) {
+            JOptionPane.showMessageDialog(this, "Seleccione un residente a visitar.", "Validación", JOptionPane.WARNING_MESSAGE);
+            return;
+        }
+        String idResVisita = itemResVisita.split(" - ")[0].trim();
+
+        Visitante visitante = new Visitante(nombre, placa, idResVisita, marca, modelo, color, tipo);
+        simulador.encolarVehiculoEntrada(visitante.getVehiculo());
+
+        limpiarFormularioVisitante();
+        refrescarTablaColaEntrada();
+    }
+
+    public void limpiarFormularioEntradaResidente() {
+        if (cmbResidentes != null && cmbResidentes.getItemCount() > 0) {
+            cmbResidentes.setSelectedIndex(0);
+        }
+        actualizarComboVehiculosResidente();
+    }
+
+    public void limpiarFormularioVisitante() {
+        txtNombreVisitante.setText("");
+        txtPlacaVisitante.setText("");
+        txtMarcaVis.setText("");
+        txtModeloVis.setText("");
+        txtColorVis.setText("");
+        if (cmbResidenteVisita != null && cmbResidenteVisita.getItemCount() > 0) {
+            cmbResidenteVisita.setSelectedIndex(0);
+        }
+        if (cmbTipoVis != null && cmbTipoVis.getItemCount() > 0) {
+            cmbTipoVis.setSelectedIndex(0);
+        }
+        txtNombreVisitante.requestFocus();
     }
 
     public void refrescarTablaColaEntrada() {
         SwingUtilities.invokeLater(() -> {
             modeloColaEntrada.setRowCount(0);
             ColaFIFO cola = simulador.getColaEntrada();
-            synchronized (cola) {
-                NodoCola actual = cola.getPrimerNodo();
-                int pos = 1;
-                while (actual != null) {
-                    Vehiculo v = actual.getDato();
-                    if (v != null) {
-                        String prop = (v.getPropietario() != null) ? v.getPropietario().getNombre() : "Visitante Temporal";
-                        String condicion = (v.getPropietario() != null && v.getPropietario().isEsSocio()) ? "Socio VIP" : "General";
-                        modeloColaEntrada.addRow(new Object[]{
-                            "#" + pos++,
-                            v.getPlaca(),
-                            prop,
-                            v.getMarca() + " " + v.getModelo(),
-                            v.getColor(),
-                            condicion
-                        });
-                    }
-                    actual = actual.getSiguiente();
+            NodoCola actual = cola.getPrimerNodo();
+            int pos = 1;
+            while (actual != null) {
+                Vehiculo v = actual.getDato();
+                if (v != null) {
+                    String tipoUsuario = (v.getPropietario() != null)
+                            ? (v.getPropietario().isEsSocio() ? "⭐ Residente Socio" : "🚗 Residente General")
+                            : "👥 Visitante";
+                    String infoVehiculo = v.getMarca() + " " + v.getModelo() + " (" + v.getColor() + ")";
+                    String destino = (v.getPropietario() != null)
+                            ? v.getPropietario().getNombre() + " (" + v.getPropietario().getCasaLote() + ")"
+                            : "Visita a Residente";
+
+                    modeloColaEntrada.addRow(new Object[]{
+                        pos++,
+                        v.getPlaca(),
+                        tipoUsuario,
+                        infoVehiculo,
+                        destino
+                    });
                 }
+                actual = actual.getSiguiente();
             }
         });
     }
 
     // =========================================================================
-    // CALLBACKS DE GARITALISTENER (SwingUtilities.invokeLater)
+    // CALLBACKS DE GARITALISTENER
     // =========================================================================
 
     @Override
     public void onVehiculoIngresado(String idGarita, Vehiculo vehiculo, EspacioParqueo espacioAsignado, Evento evento) {
+        refrescarTablaColaEntrada();
         SwingUtilities.invokeLater(() -> {
-            refrescarTablaColaEntrada();
-            actualizarComboVehiculosResidente();
-            if (idGarita.contains("1")) {
-                lblEstadoGarita1.setText("Atendido: " + vehiculo.getPlaca() + " -> Espacio " + espacioAsignado.getIdEspacio());
-            } else {
-                lblEstadoGarita2.setText("Atendido: " + vehiculo.getPlaca() + " -> Espacio " + espacioAsignado.getIdEspacio());
+            String texto = "Atendiendo: " + vehiculo.getPlaca() + " -> " + espacioAsignado.getIdEspacio();
+            if ("GARITA-1".equalsIgnoreCase(idGarita)) {
+                lblEstadoGarita1.setText(texto);
+            } else if ("GARITA-2".equalsIgnoreCase(idGarita)) {
+                lblEstadoGarita2.setText(texto);
             }
+            actualizarComboVehiculosResidente();
         });
     }
 
     @Override
     public void onVehiculoRechazado(String idGarita, Vehiculo vehiculo, Evento evento) {
+        refrescarTablaColaEntrada();
         SwingUtilities.invokeLater(() -> {
-            refrescarTablaColaEntrada();
-            actualizarComboVehiculosResidente();
-            if (idGarita.contains("1")) {
-                lblEstadoGarita1.setText("RECHAZADO: " + vehiculo.getPlaca() + " (Sin espacio)");
-            } else {
-                lblEstadoGarita2.setText("RECHAZADO: " + vehiculo.getPlaca() + " (Sin espacio)");
+            String texto = "Rechazado: " + vehiculo.getPlaca() + " (Parqueo Lleno)";
+            if ("GARITA-1".equalsIgnoreCase(idGarita)) {
+                lblEstadoGarita1.setText(texto);
+            } else if ("GARITA-2".equalsIgnoreCase(idGarita)) {
+                lblEstadoGarita2.setText(texto);
             }
+            actualizarComboVehiculosResidente();
         });
     }
 
     @Override
     public void onVehiculoSalida(String idGarita, Vehiculo vehiculo, EspacioParqueo espacioLiberado, Evento evento) {
+        // Al salir un vehículo, puede quedar en estado FUERA y habilitarse en el combo
         SwingUtilities.invokeLater(this::actualizarComboVehiculosResidente);
     }
 
     @Override
     public void onEstadoCambiado(String idGarita, String estado) {
         SwingUtilities.invokeLater(() -> {
-            if (idGarita.contains("1")) {
-                lblEstadoGarita1.setText(estado);
-            } else if (idGarita.contains("2")) {
-                lblEstadoGarita2.setText(estado);
+            if ("GARITA-1".equalsIgnoreCase(idGarita)) {
+                lblEstadoGarita1.setText("Estado: " + estado);
+            } else if ("GARITA-2".equalsIgnoreCase(idGarita)) {
+                lblEstadoGarita2.setText("Estado: " + estado);
             }
         });
     }

@@ -34,7 +34,8 @@ import cris.sic.proyecto2.util.ValidadorTexto;
 
 /**
  * Panel de gestión y administración de Residentes y sus Vehículos asociados.
- * Implementa operaciones de inserción, actualización, eliminación y asignación con validaciones visuales.
+ * Implementa operaciones de inserción, actualización, eliminación y asignación con
+ * control inteligente de botones habilitados/deshabilitados (enable/disable) y limpieza guiada.
  * 
  * @author cris_sic
  */
@@ -48,6 +49,12 @@ public class PanelResidentes extends JPanel {
     private JTextField txtCasaLote;
     private JCheckBox chkEsSocio;
 
+    // Botones Residente
+    private JButton btnRegistrarResidente;
+    private JButton btnActualizarResidente;
+    private JButton btnEliminarResidente;
+    private JButton btnLimpiarResidente;
+
     // Campos formulario Vehículo
     private JTextField txtPlaca;
     private JTextField txtMarca;
@@ -55,20 +62,28 @@ public class PanelResidentes extends JPanel {
     private JTextField txtColor;
     private JComboBox<String> cmbTipoVehiculo;
 
+    // Botones Vehículo
+    private JButton btnAgregarVehiculo;
+    private JButton btnEliminarVehiculo;
+    private JButton btnLimpiarVehiculo;
+
     // Tablas
     private JTable tablaResidentes;
     private DefaultTableModel modeloTablaResidentes;
     private JTable tablaVehiculos;
     private DefaultTableModel modeloTablaVehiculos;
 
-    // Residente seleccionado actualmente
+    // Entidades seleccionadas
     private Residente residenteSeleccionado;
+    private Vehiculo vehiculoSeleccionado;
 
     public PanelResidentes(ListaDobleResidentes listaResidentes) {
         this.listaResidentes = (listaResidentes != null) ? listaResidentes : new ListaDobleResidentes();
         this.residenteSeleccionado = null;
+        this.vehiculoSeleccionado = null;
         initComponents();
         refrescarTablaResidentes();
+        actualizarEstadosGuiados();
     }
 
     private void initComponents() {
@@ -152,20 +167,20 @@ public class PanelResidentes extends JPanel {
         JPanel panelBotones = new JPanel(new FlowLayout(FlowLayout.CENTER, 6, 6));
         panelBotones.setBackground(TemaUI.FONDO_TARJETA);
 
-        JButton btnGuardar = TemaUI.crearBoton("Registrar", TemaUI.EXITO, Color.WHITE);
-        JButton btnActualizar = TemaUI.crearBoton("Actualizar", TemaUI.PRIMARIO, Color.WHITE);
-        JButton btnEliminar = TemaUI.crearBoton("Eliminar", TemaUI.PELIGRO, Color.WHITE);
-        JButton btnLimpiar = TemaUI.crearBoton("Limpiar", TemaUI.FONDO_INPUT, TemaUI.TEXTO_PRINCIPAL);
+        btnRegistrarResidente = TemaUI.crearBoton("Registrar", TemaUI.EXITO, Color.WHITE);
+        btnActualizarResidente = TemaUI.crearBoton("Actualizar", TemaUI.PRIMARIO, Color.WHITE);
+        btnEliminarResidente = TemaUI.crearBoton("Eliminar", TemaUI.PELIGRO, Color.WHITE);
+        btnLimpiarResidente = TemaUI.crearBoton("🧹 Limpiar", TemaUI.FONDO_INPUT, TemaUI.TEXTO_PRINCIPAL);
 
-        btnGuardar.addActionListener(e -> accionRegistrarResidente());
-        btnActualizar.addActionListener(e -> accionActualizarResidente());
-        btnEliminar.addActionListener(e -> accionEliminarResidente());
-        btnLimpiar.addActionListener(e -> limpiarFormularioResidente());
+        btnRegistrarResidente.addActionListener(e -> accionRegistrarResidente());
+        btnActualizarResidente.addActionListener(e -> accionActualizarResidente());
+        btnEliminarResidente.addActionListener(e -> accionEliminarResidente());
+        btnLimpiarResidente.addActionListener(e -> limpiarFormularioResidente());
 
-        panelBotones.add(btnGuardar);
-        panelBotones.add(btnActualizar);
-        panelBotones.add(btnEliminar);
-        panelBotones.add(btnLimpiar);
+        panelBotones.add(btnRegistrarResidente);
+        panelBotones.add(btnActualizarResidente);
+        panelBotones.add(btnEliminarResidente);
+        panelBotones.add(btnLimpiarResidente);
 
         gbc.gridy = 5;
         tarjeta.add(panelBotones, gbc);
@@ -235,14 +250,17 @@ public class PanelResidentes extends JPanel {
         JPanel panelBotonesVeh = new JPanel(new FlowLayout(FlowLayout.CENTER, 6, 6));
         panelBotonesVeh.setBackground(TemaUI.FONDO_TARJETA);
 
-        JButton btnAgregarVeh = TemaUI.crearBoton("Agregar Auto", TemaUI.EXITO, Color.WHITE);
-        JButton btnEliminarVeh = TemaUI.crearBoton("Eliminar Auto", TemaUI.PELIGRO, Color.WHITE);
+        btnAgregarVehiculo = TemaUI.crearBoton("+ Agregar Auto", TemaUI.EXITO, Color.WHITE);
+        btnEliminarVehiculo = TemaUI.crearBoton("Eliminar Auto", TemaUI.PELIGRO, Color.WHITE);
+        btnLimpiarVehiculo = TemaUI.crearBoton("🧹 Limpiar", TemaUI.FONDO_INPUT, TemaUI.TEXTO_PRINCIPAL);
 
-        btnAgregarVeh.addActionListener(e -> accionAgregarVehiculo());
-        btnEliminarVeh.addActionListener(e -> accionEliminarVehiculo());
+        btnAgregarVehiculo.addActionListener(e -> accionAgregarVehiculo());
+        btnEliminarVehiculo.addActionListener(e -> accionEliminarVehiculo());
+        btnLimpiarVehiculo.addActionListener(e -> limpiarFormularioVehiculo());
 
-        panelBotonesVeh.add(btnAgregarVeh);
-        panelBotonesVeh.add(btnEliminarVeh);
+        panelBotonesVeh.add(btnAgregarVehiculo);
+        panelBotonesVeh.add(btnEliminarVehiculo);
+        panelBotonesVeh.add(btnLimpiarVehiculo);
 
         gbc.gridx = 0;
         gbc.gridy = 6;
@@ -317,6 +335,17 @@ public class PanelResidentes extends JPanel {
         tablaVehiculos.setForeground(TemaUI.TEXTO_PRINCIPAL);
         tablaVehiculos.setGridColor(TemaUI.BORDE_SUAVE);
 
+        tablaVehiculos.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mouseClicked(MouseEvent e) {
+                int fila = tablaVehiculos.getSelectedRow();
+                if (fila >= 0 && residenteSeleccionado != null && residenteSeleccionado.getListaVehiculos() != null) {
+                    String placa = (String) modeloTablaVehiculos.getValueAt(fila, 0);
+                    seleccionarVehiculo(placa);
+                }
+            }
+        });
+
         JScrollPane scroll = new JScrollPane(tablaVehiculos);
         scroll.getViewport().setBackground(TemaUI.FONDO_TARJETA);
         scroll.setBorder(BorderFactory.createLineBorder(TemaUI.BORDE_SUAVE));
@@ -375,6 +404,11 @@ public class PanelResidentes extends JPanel {
             return;
         }
 
+        if (ValidadorTexto.contienePipe(nombre) || ValidadorTexto.contienePipe(casa)) {
+            JOptionPane.showMessageDialog(this, "No se permite el carácter delimitador '|'.", "Validación", JOptionPane.WARNING_MESSAGE);
+            return;
+        }
+
         // Regla de Oro: Cambio de socio solo permitido si todos los autos están FUERA
         if (nuevoEstadoSocio != residenteSeleccionado.isEsSocio()) {
             boolean cambioSocioExitoso = residenteSeleccionado.cambiarEstadoSocio(nuevoEstadoSocio);
@@ -392,6 +426,7 @@ public class PanelResidentes extends JPanel {
 
         JOptionPane.showMessageDialog(this, "Datos del residente actualizados con éxito.", "Éxito", JOptionPane.INFORMATION_MESSAGE);
         refrescarTablaResidentes();
+        actualizarEstadosGuiados();
     }
 
     private void accionEliminarResidente() {
@@ -451,6 +486,11 @@ public class PanelResidentes extends JPanel {
             return;
         }
 
+        if (ValidadorTexto.contienePipe(marca) || ValidadorTexto.contienePipe(modelo) || ValidadorTexto.contienePipe(color)) {
+            JOptionPane.showMessageDialog(this, "No se permite el carácter delimitador '|'.", "Validación", JOptionPane.WARNING_MESSAGE);
+            return;
+        }
+
         // Validar unicidad de placa en el sistema
         if (existePlacaEnSistema(placa)) {
             JOptionPane.showMessageDialog(this, "La placa ingresada ya pertenece a otro vehículo en el sistema.", "Placa Duplicada", JOptionPane.WARNING_MESSAGE);
@@ -463,6 +503,7 @@ public class PanelResidentes extends JPanel {
             limpiarFormularioVehiculo();
             refrescarTablaResidentes();
             refrescarTablaVehiculos();
+            actualizarEstadosGuiados();
         } else {
             JOptionPane.showMessageDialog(this, "No se pudo agregar el vehículo.", "Error", JOptionPane.ERROR_MESSAGE);
         }
@@ -474,26 +515,31 @@ public class PanelResidentes extends JPanel {
             return;
         }
 
-        int fila = tablaVehiculos.getSelectedRow();
-        if (fila < 0) {
+        if (vehiculoSeleccionado == null) {
             JOptionPane.showMessageDialog(this, "Seleccione un vehículo de la tabla para eliminar.", "Atención", JOptionPane.WARNING_MESSAGE);
             return;
         }
 
-        String placa = (String) modeloTablaVehiculos.getValueAt(fila, 0);
-        Vehiculo v = residenteSeleccionado.getListaVehiculos().buscarPorPlaca(placa);
-
-        if (v != null && v.getEstado() != EstadoVehiculo.FUERA) {
+        String placa = vehiculoSeleccionado.getPlaca();
+        if (vehiculoSeleccionado.getEstado() != EstadoVehiculo.FUERA) {
             JOptionPane.showMessageDialog(this,
-                    "REGLA DE ORO: No se puede eliminar el vehículo porque su estado actual es '" + v.getEstado() + "'. Debe estar FUERA.",
+                    "REGLA DE ORO: No se puede eliminar el vehículo porque su estado actual es '" + vehiculoSeleccionado.getEstado() + "'. Debe estar FUERA.",
                     "Eliminación Bloqueada", JOptionPane.WARNING_MESSAGE);
             return;
         }
 
-        if (residenteSeleccionado.getListaVehiculos().eliminar(placa)) {
-            JOptionPane.showMessageDialog(this, "Vehículo eliminado con éxito.", "Éxito", JOptionPane.INFORMATION_MESSAGE);
-            refrescarTablaResidentes();
-            refrescarTablaVehiculos();
+        int confirm = JOptionPane.showConfirmDialog(this,
+                "¿Está seguro de desvincular y eliminar el vehículo " + placa + "?",
+                "Confirmar Eliminación", JOptionPane.YES_NO_OPTION);
+
+        if (confirm == JOptionPane.YES_OPTION) {
+            if (residenteSeleccionado.getListaVehiculos().eliminar(placa)) {
+                JOptionPane.showMessageDialog(this, "Vehículo eliminado con éxito.", "Éxito", JOptionPane.INFORMATION_MESSAGE);
+                limpiarFormularioVehiculo();
+                refrescarTablaResidentes();
+                refrescarTablaVehiculos();
+                actualizarEstadosGuiados();
+            }
         }
     }
 
@@ -505,28 +551,91 @@ public class PanelResidentes extends JPanel {
             txtNombreResidente.setText(residenteSeleccionado.getNombre());
             txtCasaLote.setText(residenteSeleccionado.getCasaLote());
             chkEsSocio.setSelected(residenteSeleccionado.isEsSocio());
+            limpiarFormularioVehiculo();
             refrescarTablaVehiculos();
+            actualizarEstadosGuiados();
         }
     }
 
-    private void limpiarFormularioResidente() {
+    private void seleccionarVehiculo(String placa) {
+        if (residenteSeleccionado != null && residenteSeleccionado.getListaVehiculos() != null) {
+            vehiculoSeleccionado = residenteSeleccionado.getListaVehiculos().buscarPorPlaca(placa);
+            if (vehiculoSeleccionado != null) {
+                txtPlaca.setText(vehiculoSeleccionado.getPlaca());
+                txtPlaca.setEditable(false);
+                txtMarca.setText(vehiculoSeleccionado.getMarca());
+                txtModelo.setText(vehiculoSeleccionado.getModelo());
+                txtColor.setText(vehiculoSeleccionado.getColor());
+                cmbTipoVehiculo.setSelectedItem(vehiculoSeleccionado.getTipo());
+                actualizarEstadosGuiados();
+            }
+        }
+    }
+
+    public void limpiarFormularioResidente() {
         residenteSeleccionado = null;
+        vehiculoSeleccionado = null;
         txtIdResidente.setText("");
         txtIdResidente.setEditable(true);
         txtNombreResidente.setText("");
         txtCasaLote.setText("");
         chkEsSocio.setSelected(false);
+        if (tablaResidentes != null) {
+            tablaResidentes.clearSelection();
+        }
         limpiarFormularioVehiculo();
         refrescarTablaVehiculos();
+        actualizarEstadosGuiados();
     }
 
-    private void limpiarFormularioVehiculo() {
+    public void limpiarFormularioVehiculo() {
+        vehiculoSeleccionado = null;
         txtPlaca.setText("");
+        txtPlaca.setEditable(true);
         txtMarca.setText("");
         txtModelo.setText("");
         txtColor.setText("");
         if (cmbTipoVehiculo != null && cmbTipoVehiculo.getItemCount() > 0) {
             cmbTipoVehiculo.setSelectedIndex(0);
+        }
+        if (tablaVehiculos != null) {
+            tablaVehiculos.clearSelection();
+        }
+        actualizarEstadosGuiados();
+    }
+
+    /**
+     * Sincroniza el estado de habilitación/deshabilitación (enable/disable) de cada botón
+     * para guiar al usuario de forma intuitiva según el contexto actual.
+     */
+    private void actualizarEstadosGuiados() {
+        boolean hayResidenteSeleccionado = (residenteSeleccionado != null);
+        boolean hayVehiculoSeleccionado = (vehiculoSeleccionado != null);
+
+        // Control botones Residente
+        btnRegistrarResidente.setEnabled(!hayResidenteSeleccionado);
+        btnActualizarResidente.setEnabled(hayResidenteSeleccionado);
+        btnEliminarResidente.setEnabled(hayResidenteSeleccionado);
+        btnLimpiarResidente.setEnabled(true);
+
+        // Control botones Vehículo
+        if (hayResidenteSeleccionado) {
+            int cantidadAutos = residenteSeleccionado.getCantidadVehiculos();
+            boolean puedeAgregar = (cantidadAutos < 3) && !hayVehiculoSeleccionado;
+            btnAgregarVehiculo.setEnabled(puedeAgregar);
+            btnEliminarVehiculo.setEnabled(hayVehiculoSeleccionado);
+            btnLimpiarVehiculo.setEnabled(true);
+
+            if (cantidadAutos >= 3) {
+                btnAgregarVehiculo.setToolTipText("Límite alcanzado: Este residente ya tiene 3 vehículos.");
+            } else {
+                btnAgregarVehiculo.setToolTipText("Agregar un nuevo vehículo a " + residenteSeleccionado.getNombre());
+            }
+        } else {
+            btnAgregarVehiculo.setEnabled(false);
+            btnEliminarVehiculo.setEnabled(false);
+            btnLimpiarVehiculo.setEnabled(true);
+            btnAgregarVehiculo.setToolTipText("Seleccione primero un residente de la tabla.");
         }
     }
 
