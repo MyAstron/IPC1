@@ -699,6 +699,10 @@ public class Proyecto2 {
         System.out.println("   Residente 2 y vehículos íntegros: " + r2Ok);
         System.out.println("   Vehículos con estado FUERA al restaurar: " + autosOk);
 
+        // Limpieza de archivos temporales de prueba
+        new java.io.File(rutaTestRes).delete();
+        new java.io.File(rutaTestVeh).delete();
+
         if (guardadoOk && r1Ok && r2Ok && autosOk) {
             System.out.println("   [OK] Persistencia y reconstrucción en memoria verificadas con fidelidad total.");
             pruebasPasadasF5++;

@@ -33,6 +33,38 @@ public class GestorArchivos {
     public static final String RUTA_POR_DEFECTO_RESIDENTES = "src/datos/residentes.txt";
     public static final String RUTA_POR_DEFECTO_VEHICULOS = "src/datos/vehiculos.txt";
 
+    /**
+     * Resuelve dinámicamente la ruta del archivo residentes.txt en src/datos/.
+     */
+    public static String getRutaResidentes() {
+        if (new File("src/datos/residentes.txt").exists()) {
+            return "src/datos/residentes.txt";
+        }
+        if (new File("Proyecto2/src/datos/residentes.txt").exists()) {
+            return "Proyecto2/src/datos/residentes.txt";
+        }
+        if (new File("Proyecto2").isDirectory()) {
+            return "Proyecto2/src/datos/residentes.txt";
+        }
+        return RUTA_POR_DEFECTO_RESIDENTES;
+    }
+
+    /**
+     * Resuelve dinámicamente la ruta del archivo vehiculos.txt en src/datos/.
+     */
+    public static String getRutaVehiculos() {
+        if (new File("src/datos/vehiculos.txt").exists()) {
+            return "src/datos/vehiculos.txt";
+        }
+        if (new File("Proyecto2/src/datos/vehiculos.txt").exists()) {
+            return "Proyecto2/src/datos/vehiculos.txt";
+        }
+        if (new File("Proyecto2").isDirectory()) {
+            return "Proyecto2/src/datos/vehiculos.txt";
+        }
+        return RUTA_POR_DEFECTO_VEHICULOS;
+    }
+
     // =========================================================================
     // ESCRITURA / GUARDADO DE DATOS (java.io.BufferedWriter / FileWriter)
     // =========================================================================
@@ -127,13 +159,13 @@ public class GestorArchivos {
     }
 
     /**
-     * Guarda residentes y vehículos en las rutas por defecto del proyecto.
+     * Guarda residentes y vehículos en las rutas por defecto del proyecto (src/datos/).
      *
      * @param listaResidentes Lista doble en memoria
      * @return true si ambas operaciones fueron exitosas
      */
     public static boolean guardarTodo(ListaDobleResidentes listaResidentes) {
-        return guardarTodo(listaResidentes, RUTA_POR_DEFECTO_RESIDENTES, RUTA_POR_DEFECTO_VEHICULOS);
+        return guardarTodo(listaResidentes, getRutaResidentes(), getRutaVehiculos());
     }
 
     /**
@@ -303,12 +335,12 @@ public class GestorArchivos {
     }
 
     /**
-     * Carga y reconstruye todo el estado de residentes y vehículos a partir de las rutas por defecto.
+     * Carga y reconstruye todo el estado de residentes y vehículos a partir de las rutas por defecto (src/datos/).
      *
      * @return ListaDobleResidentes completamente poblada
      */
     public static ListaDobleResidentes cargarTodo() {
-        return cargarTodo(RUTA_POR_DEFECTO_RESIDENTES, RUTA_POR_DEFECTO_VEHICULOS);
+        return cargarTodo(getRutaResidentes(), getRutaVehiculos());
     }
 
     /**

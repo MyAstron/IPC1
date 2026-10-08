@@ -140,9 +140,9 @@ sequenceDiagram
 
 ## 5. Persistencia en Disco y Cifrado XOR
 
-### Formato de Archivo Pipe-Delimited:
-- `residentes.txt`: `ID|Nombre|Casa|EsSocio`
-- `vehiculos.txt`: `Placa|Marca|Modelo|Color|Tipo|IDResidente`
+### Formato de Archivo Pipe-Delimited (`src/datos/`):
+- `src/datos/residentes.txt`: `ID|Nombre|Casa|EsSocio`
+- `src/datos/vehiculos.txt`: `Placa|Marca|Modelo|Color|Tipo|IDResidente`
 
 ### Algoritmo de Cifrado Simétrico:
 $$\text{CaracterCifrado}_i = \text{CaracterOriginal}_i \oplus \text{ClaveSimétrica}_i$$

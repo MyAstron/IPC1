@@ -1,4 +1,0 @@
-P-901A|Toyota|Corolla|Rojo|Automóvil|R-901
-P-901B|Honda|Civic|Gris|Automóvil|R-901
-M-902A|Yamaha|MT03|Azul|Motocicleta|R-902
-P-902B|Ford|F150|Negro|Pickup|R-902

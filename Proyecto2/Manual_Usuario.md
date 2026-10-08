@@ -94,4 +94,4 @@ Muestra el historial cronológico de todas las operaciones realizadas (ingresos,
 ---
 
 ## 3. Cierre del Sistema y Guardado de Datos
-- Al pulsar el botón de cerrar la ventana o el botón **💾 Guardar Disco**, el sistema serializará automáticamente toda la información de residentes y vehículos en archivos de texto delimitados por pipe `|` (`residentes.txt` y `vehiculos.txt`), asegurando persistencia total entre sesiones.
+- Al pulsar el botón de cerrar la ventana o el botón **💾 Guardar Disco**, el sistema serializará automáticamente toda la información de residentes y vehículos en archivos de texto delimitados por pipe `|` ubicados en el directorio de persistencia (`src/datos/residentes.txt` y `src/datos/vehiculos.txt`), asegurando persistencia total entre sesiones.

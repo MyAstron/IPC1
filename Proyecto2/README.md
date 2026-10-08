@@ -30,12 +30,13 @@ Proyecto2/
 ├── Manual_Usuario.md                 <-- Guía de usuario ilustrada y casos de uso
 ├── README.md                         <-- Documento principal del repositorio
 ├── pom.xml                           <-- Configuración Maven de empaquetado
-├── residentes.txt                    <-- Persistencia en disco de residentes
-├── vehiculos.txt                     <-- Persistencia en disco de vehículos
 ├── target/
 │   ├── classes/                      <-- Binarios compilados
 │   └── ResiPark.jar                  <-- JAR Ejecutable autocontenido
 └── src/
+    ├── datos/
+    │   ├── residentes.txt            <-- Persistencia en disco de residentes
+    │   └── vehiculos.txt             <-- Persistencia en disco de vehículos
     └── main/
         └── java/
             └── cris/
