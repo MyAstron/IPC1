@@ -209,6 +209,8 @@ public class PanelResidentes extends JPanel {
         tarjeta.add(TemaUI.crearEtiquetaCampo("Placa (7 chars):"), gbc);
         gbc.gridx = 1;
         txtPlaca = TemaUI.crearCampoTexto(10);
+        txtPlaca.setEditable(true);
+        txtPlaca.setEnabled(true);
         txtPlaca.setToolTipText("Ej: P123ABC (Auto/Pickup) o M123ABC (Moto)");
         tarjeta.add(txtPlaca, gbc);
 
@@ -218,6 +220,8 @@ public class PanelResidentes extends JPanel {
         tarjeta.add(TemaUI.crearEtiquetaCampo("Marca:"), gbc);
         gbc.gridx = 1;
         txtMarca = TemaUI.crearCampoTexto(10);
+        txtMarca.setEditable(true);
+        txtMarca.setEnabled(true);
         tarjeta.add(txtMarca, gbc);
 
         // Modelo
@@ -226,6 +230,8 @@ public class PanelResidentes extends JPanel {
         tarjeta.add(TemaUI.crearEtiquetaCampo("Modelo:"), gbc);
         gbc.gridx = 1;
         txtModelo = TemaUI.crearCampoTexto(10);
+        txtModelo.setEditable(true);
+        txtModelo.setEnabled(true);
         tarjeta.add(txtModelo, gbc);
 
         // Color
@@ -234,6 +240,8 @@ public class PanelResidentes extends JPanel {
         tarjeta.add(TemaUI.crearEtiquetaCampo("Color:"), gbc);
         gbc.gridx = 1;
         txtColor = TemaUI.crearCampoTexto(10);
+        txtColor.setEditable(true);
+        txtColor.setEnabled(true);
         tarjeta.add(txtColor, gbc);
 
         // Tipo
@@ -572,11 +580,21 @@ public class PanelResidentes extends JPanel {
             vehiculoSeleccionado = residenteSeleccionado.getListaVehiculos().buscarPorPlaca(placa);
             if (vehiculoSeleccionado != null) {
                 txtPlaca.setText(vehiculoSeleccionado.getPlaca());
-                txtPlaca.setEditable(false);
                 txtMarca.setText(vehiculoSeleccionado.getMarca());
                 txtModelo.setText(vehiculoSeleccionado.getModelo());
                 txtColor.setText(vehiculoSeleccionado.getColor());
                 cmbTipoVehiculo.setSelectedItem(vehiculoSeleccionado.getTipo());
+
+                // Mantener los campos siempre editables y habilitados para fluidez total
+                txtPlaca.setEditable(true);
+                txtPlaca.setEnabled(true);
+                txtMarca.setEditable(true);
+                txtMarca.setEnabled(true);
+                txtModelo.setEditable(true);
+                txtModelo.setEnabled(true);
+                txtColor.setEditable(true);
+                txtColor.setEnabled(true);
+
                 actualizarEstadosGuiados();
             }
         }
@@ -614,8 +632,14 @@ public class PanelResidentes extends JPanel {
         txtPlaca.setEditable(true);
         txtPlaca.setEnabled(true);
         txtMarca.setText("");
+        txtMarca.setEditable(true);
+        txtMarca.setEnabled(true);
         txtModelo.setText("");
+        txtModelo.setEditable(true);
+        txtModelo.setEnabled(true);
         txtColor.setText("");
+        txtColor.setEditable(true);
+        txtColor.setEnabled(true);
         if (cmbTipoVehiculo != null && cmbTipoVehiculo.getItemCount() > 0) {
             cmbTipoVehiculo.setSelectedIndex(0);
         }
@@ -642,15 +666,13 @@ public class PanelResidentes extends JPanel {
         // Control botones Vehículo
         if (hayResidenteSeleccionado) {
             int cantidadAutos = residenteSeleccionado.getCantidadVehiculos();
-            boolean puedeAgregar = (cantidadAutos < 3) && !hayVehiculoSeleccionado;
+            boolean puedeAgregar = (cantidadAutos < 3);
             btnAgregarVehiculo.setEnabled(puedeAgregar);
             btnEliminarVehiculo.setEnabled(hayVehiculoSeleccionado);
             btnLimpiarVehiculo.setEnabled(true);
 
             if (cantidadAutos >= 3) {
                 btnAgregarVehiculo.setToolTipText("Límite alcanzado: Este residente ya tiene 3 vehículos.");
-            } else if (hayVehiculoSeleccionado) {
-                btnAgregarVehiculo.setToolTipText("Presione 'Limpiar Campos' para agregar otro vehículo.");
             } else {
                 btnAgregarVehiculo.setToolTipText("Agregar un nuevo vehículo a " + residenteSeleccionado.getNombre());
             }
