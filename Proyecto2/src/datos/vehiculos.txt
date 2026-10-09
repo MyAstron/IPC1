@@ -10,3 +10,4 @@ P333FYK|Toyota|2011|Amarillo|Automóvil|R-106
 P999AAA|Toyota|2026|Gris|Pickup|R-106
 M190PQZ|Honda|2023|Negro|Motocicleta|R-106
 P123AAA|132|123|123|Automóvil|R-107
+M132ASD|asd|asd|asd|Motocicleta|R-107
