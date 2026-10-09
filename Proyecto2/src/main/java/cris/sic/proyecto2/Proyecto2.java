@@ -3,6 +3,7 @@ package cris.sic.proyecto2;
 import javax.swing.SwingUtilities;
 import javax.swing.UIManager;
 import cris.sic.proyecto2.vista.VentanaPrincipal;
+import javax.swing.JFrame;
 
 /**
  * Clase principal y punto de entrada oficial para el Sistema ResiPark.
@@ -43,6 +44,7 @@ public class Proyecto2 {
             System.out.println("======================================================================\n");
 
             VentanaPrincipal ventana = new VentanaPrincipal();
+            ventana.setExtendedState(JFrame.MAXIMIZED_BOTH);
             ventana.setVisible(true);
         });
     }

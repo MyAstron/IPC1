@@ -54,31 +54,31 @@ public class ValidadorTexto {
      */
     public static String validarPlaca(String placa, String tipoVehiculo) {
         if (placa == null || placa.trim().isEmpty()) {
-            return "La placa no puede estar vacía.";
+            return "Error de formato: La placa no puede estar vacía.";
         }
         if (contienePipe(placa)) {
-            return "La placa no puede contener el carácter reservado '|'.";
+            return "Error de formato: La placa no puede contener el carácter reservado '|'.";
         }
 
-        String p = placa.trim();
+        String p = placa.trim().toUpperCase();
         if (p.length() != 7) {
-            return "La placa debe tener EXACTAMENTE 7 caracteres (ej: P123ABC o M123ABC). Longitud actual: " + p.length();
+            return "Error de formato: La placa debe tener una inicial P o M, seguida de 3 números y 3 letras (ej. P101ABC).";
         }
 
-        char inicial = Character.toUpperCase(p.charAt(0));
+        char inicial = p.charAt(0);
         if (inicial != 'P' && inicial != 'M') {
-            return "La placa debe iniciar obligatoriamente con la letra 'P' (Autos/Pickups) o 'M' (Motocicletas).";
+            return "Error de formato: La placa debe tener una inicial P o M, seguida de 3 números y 3 letras (ej. P101ABC).";
         }
 
         if (tipoVehiculo != null && !tipoVehiculo.trim().isEmpty()) {
             String tipoNorm = tipoVehiculo.trim().toUpperCase();
             if (tipoNorm.contains("MOTO")) {
                 if (inicial != 'M') {
-                    return "Una motocicleta debe usar la inicial M en la placa (ej: M123ABC).";
+                    return "Error de formato: Una motocicleta debe usar la inicial M en la placa (ej. M101ABC).";
                 }
             } else if (tipoNorm.contains("AUTO") || tipoNorm.contains("PICK")) {
                 if (inicial != 'P') {
-                    return "Un automóvil o pickup debe usar la inicial P en la placa (ej: P123ABC).";
+                    return "Error de formato: Un automóvil o pickup debe usar la inicial P en la placa (ej. P101ABC).";
                 }
             }
         }
@@ -87,16 +87,15 @@ public class ValidadorTexto {
         for (int i = 1; i <= 3; i++) {
             char c = p.charAt(i);
             if (c < '0' || c > '9') {
-                return "Los caracteres en las posiciones 2, 3 y 4 deben ser exclusivamente dígitos numéricos ('0'-'9').";
+                return "Error de formato: La placa debe tener una inicial P o M, seguida de 3 números y 3 letras (ej. P101ABC).";
             }
         }
 
-        // Caracteres 5, 6 y 7: Letras ('A'-'Z' o 'a'-'z', ASCII 65-90 y 97-122)
+        // Caracteres 5, 6 y 7: Letras ('A'-'Z', ASCII 65-90)
         for (int i = 4; i <= 6; i++) {
             char c = p.charAt(i);
-            boolean esLetra = (c >= 'A' && c <= 'Z') || (c >= 'a' && c <= 'z');
-            if (!esLetra) {
-                return "Los últimos 3 caracteres (posiciones 5, 6 y 7) deben ser exclusivamente letras ('A'-'Z').";
+            if (c < 'A' || c > 'Z') {
+                return "Error de formato: La placa debe tener una inicial P o M, seguida de 3 números y 3 letras (ej. P101ABC).";
             }
         }
 

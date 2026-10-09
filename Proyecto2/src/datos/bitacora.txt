@@ -1,0 +1,3 @@
+2026-10-08 18:47:38|ASIGNACION|Garita de Entrada 2|Vehículo P201DEF asignado al espacio A1 (Área de Socios)
+2026-10-08 18:47:39|ASIGNACION|Garita de Entrada 1|Vehículo M123ASD asignado al espacio A2 (Área de Socios)
+2026-10-08 18:47:40|ASIGNACION|Garita de Entrada 2|Vehículo Q1S2D3F asignado al espacio A8 (Área de Socios)

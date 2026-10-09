@@ -417,7 +417,7 @@ public class PanelEntrada extends JPanel implements GaritaListener {
 
         String errorPlaca = ValidadorTexto.obtenerErrorPlaca(placa, tipo);
         if (errorPlaca != null) {
-            JOptionPane.showMessageDialog(this, errorPlaca, "Formato de Placa Inválido", JOptionPane.WARNING_MESSAGE);
+            JOptionPane.showMessageDialog(this, errorPlaca, "Error de Formato", JOptionPane.WARNING_MESSAGE);
             txtPlacaVisitante.requestFocus();
             return;
         }
